@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "verify": "npm run typecheck && npm run build",
-    "snapshot": "node tools/snapshot.mjs"
+    "snapshot": "node tools/snapshot.mjs",
+    "done": "npm run verify && npm run snapshot"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",

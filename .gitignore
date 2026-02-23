@@ -1,8 +1,16 @@
-node_modules
-dist
+node_modules/
+dist/
+
+# Env files (never commit secrets)
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .env.*
+!.env.local.example
+
 *.local
 .DS_Store
 *.tsbuildinfo
-.vscode
+.vscode/

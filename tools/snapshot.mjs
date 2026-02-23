@@ -69,6 +69,12 @@ report.push("`");
 report.push(listTree("tools", 2).join("\n"));
 report.push("`");
 report.push("");
+report.push("## Root files (existence only)");
+const rootFiles = ["vercel.json", ".gitignore", ".env.local.example"];
+for (const file of rootFiles) {
+  report.push(`- ${file}: ${fs.existsSync(file) ? "exists" : "missing"}`);
+}
+report.push("");
 
 report.push("## Env keys present (names only)");
 if (fs.existsSync(".env")) {
