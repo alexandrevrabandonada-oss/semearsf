@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@supabase/supabase-js": "^2.97.0"
+  },
+  "devDependencies": {
+    "eslint-plugin-simple-import-sort": "^12.1.1"
+  }
+}
