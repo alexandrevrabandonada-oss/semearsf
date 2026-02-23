@@ -3,58 +3,90 @@ import path from "node:path";
 import { execSync } from "node:child_process";
 
 function sh(cmd) {
-  try { return execSync(cmd, { stdio: ["ignore", "pipe", "pipe"] }).toString().trim(); }
-  catch (e) { return (e.stdout?.toString() || "") + (e.stderr?.toString() || ""); }
+  try { return execSync(cmd, { stdio: ["ignore","pipe","pipe"] }).toString().trim(); }
+  catch (e) { return ((e.stdout?.toString()||"") + "\n" + (e.stderr?.toString()||"")).trim(); }
 }
 
-function listDir(p) {
-  if (!fs.existsSync(p)) return [];
+function listTree(dir, depth = 3, prefix = "") {
+  if (!fs.existsSync(dir) || depth < 0) return [];
+  const items = fs.readdirSync(dir).filter(x => x !== "node_modules" && x !== ".git" && x !== "dist");
   const out = [];
-  for (const item of fs.readdirSync(p)) {
-    if (item.startsWith(".next") || item === "node_modules") continue;
-    const full = path.join(p, item);
-    const stat = fs.statSync(full);
-    out.push(stat.isDirectory() ? `${item}/` : item);
+  for (const item of items) {
+    const full = path.join(dir, item);
+    const st = fs.statSync(full);
+    out.push(prefix + (st.isDirectory() ? item + "/" : item));
+    if (st.isDirectory()) out.push(...listTree(full, depth - 1, prefix + "  "));
   }
-  return out.sort();
+  return out;
+}
+
+function extractRoutes(appPath) {
+  if (!fs.existsSync(appPath)) return [];
+  const raw = fs.readFileSync(appPath, "utf8");
+  const re = /path\s*=\s*["']([^"']+)["']/g;
+  const found = new Set();
+  let m;
+  while ((m = re.exec(raw)) !== null) found.add(m[1]);
+  return Array.from(found).sort();
 }
 
 const report = [];
-report.push(`# Project State Snapshot`);
-report.push(`**Date:** ${new Date().toISOString()}`);
-report.push(``);
-report.push(`## Git`);
-report.push("```");
+report.push("# Project State Snapshot");
+report.push("");
+report.push("**Date:** " + new Date().toISOString());
+report.push("");
+
+report.push("## Versions");
+report.push("`");
+report.push("node: " + sh("node -v"));
+report.push("npm:  " + sh("npm -v"));
+report.push("`");
+report.push("");
+
+report.push("## Git");
+report.push("`");
 report.push(sh("git status -sb"));
-report.push("```");
-report.push(``);
-report.push(`## Package scripts`);
-report.push("```json");
-report.push(sh("node -e \"const p=require('./package.json'); console.log(JSON.stringify(p.scripts,null,2))\""));
-report.push("```");
-report.push(``);
-report.push(`## App routes (src/app)`);
-report.push("```");
-report.push(listDir("src/app").join("\n"));
-report.push("```");
-report.push(``);
-report.push(`## Tools`);
-report.push("```");
-report.push(listDir("tools").join("\n"));
-report.push("```");
-report.push(``);
-report.push(`## Env keys present (names only)`);
-const envPath = ".env.local";
-if (fs.existsSync(envPath)) {
-  const raw = fs.readFileSync(envPath,"utf8");
-  const keys = raw.split(/\r?\n/).map(l=>l.trim()).filter(l=>l && !l.startsWith("#") && l.includes("=")).map(l=>l.split("=")[0].trim());
-  report.push("```");
-  report.push(keys.join("\n"));
-  report.push("```");
+report.push("`");
+report.push("");
+
+report.push("## package.json scripts");
+report.push("`json");
+report.push(sh('node -e "const p=require(\\\"./package.json\\\"); console.log(JSON.stringify(p.scripts,null,2))"'));
+report.push("`");
+report.push("");
+
+report.push("## Routes (parsed from src/App.tsx)");
+const routes = extractRoutes("src/App.tsx");
+report.push(routes.length ? ("- " + routes.join("\n- ")) : "_No routes found in src/App.tsx_");
+report.push("");
+
+report.push("## Tree (src, tools)");
+report.push("`");
+report.push(listTree("src", 4).join("\n"));
+report.push("`");
+report.push("");
+report.push("`");
+report.push(listTree("tools", 2).join("\n"));
+report.push("`");
+report.push("");
+
+report.push("## Env keys present (names only)");
+if (fs.existsSync(".env")) {
+  const raw = fs.readFileSync(".env","utf8");
+  const keys = raw.split(/\\r?\\n/).map(l=>l.trim()).filter(l=>l && !l.startsWith("#") && l.includes("=")).map(l=>l.split("=")[0].trim());
+  report.push("`");
+  report.push(keys.join("\\n"));
+  report.push("`");
+} else if (fs.existsSync(".env.local")) {
+  const raw = fs.readFileSync(".env.local","utf8");
+  const keys = raw.split(/\\r?\\n/).map(l=>l.trim()).filter(l=>l && !l.startsWith("#") && l.includes("=")).map(l=>l.split("=")[0].trim());
+  report.push("`");
+  report.push(keys.join("\\n"));
+  report.push("`");
 } else {
-  report.push("_No .env.local found_");
+  report.push("_No .env / .env.local found_");
 }
 
 fs.mkdirSync("reports", { recursive: true });
-fs.writeFileSync("reports/state.md", report.join("\n") + "\n", "utf8");
+fs.writeFileSync("reports/state.md", report.join("\\n") + "\\n", "utf8");
 console.log("Wrote reports/state.md");
