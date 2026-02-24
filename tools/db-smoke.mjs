@@ -26,6 +26,28 @@ function parseEnvFile(filePath) {
   return env;
 }
 
+function shortErrorMessage(error) {
+  if (error && typeof error === "object" && "message" in error && typeof error.message === "string") {
+    return error.message;
+  }
+  return "unknown error";
+}
+
+function isExpectedDenied(message) {
+  const text = message.toLowerCase();
+  return text.includes("permission denied") || text.includes("not allowed") || text.includes("401");
+}
+
+async function selectAndCount(supabase, table) {
+  const { error: selectError } = await supabase.from(table).select("*").limit(1);
+  if (selectError) throw selectError;
+
+  const { count, error: countError } = await supabase.from(table).select("*", { count: "exact", head: true });
+  if (countError) throw countError;
+
+  return count ?? 0;
+}
+
 async function run() {
   const env = fs.existsSync(".env.local") ? parseEnvFile(".env.local") : parseEnvFile(".env");
   const url = env.VITE_SUPABASE_URL;
@@ -38,25 +60,33 @@ async function run() {
 
   try {
     const supabase = createClient(url, anonKey);
-    const tables = ["stations", "measurements", "events", "registrations"];
-    const counts = [];
+    const requiredTables = ["stations", "measurements", "events"];
+    const counts = {};
 
-    for (const table of tables) {
-      const { error: selectError } = await supabase.from(table).select("*").limit(1);
-      if (selectError) throw new Error(`${table}: ${selectError.message}`);
-
-      const { count, error: countError } = await supabase.from(table).select("*", { count: "exact", head: true });
-      if (countError) throw new Error(`${table}: ${countError.message}`);
-
-      counts.push(`${table}=${count ?? 0}`);
+    for (const table of requiredTables) {
+      try {
+        counts[table] = await selectAndCount(supabase, table);
+        console.log(`${table}: OK count=${counts[table]}`);
+      } catch (error) {
+        throw new Error(`${table}: ${shortErrorMessage(error)}`);
+      }
     }
 
-    console.log(`DB_SMOKE: OK (${counts.join(", ")})`);
+    try {
+      const registrationsCount = await selectAndCount(supabase, "registrations");
+      console.log(`registrations: OK count=${registrationsCount}`);
+    } catch (error) {
+      const message = shortErrorMessage(error);
+      if (isExpectedDenied(message)) {
+        console.log("registrations: EXPECTED_DENIED");
+      } else {
+        throw new Error(`registrations: ${message}`);
+      }
+    }
+
+    console.log("DB_SMOKE: OK");
   } catch (error) {
-    const message =
-      error && typeof error === "object" && "message" in error && typeof error.message === "string"
-        ? error.message
-        : "unknown error";
+    const message = shortErrorMessage(error);
     console.log(`DB_SMOKE: ERROR (${message})`);
     process.exit(0);
   }

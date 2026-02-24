@@ -1,7 +1,9 @@
-# Project State Snapshot\n\n**Date:** 2026-02-24T17:27:26.864Z\n\n## Versions\n`\nnode: v22.19.0\nnpm:  10.9.3\n`\n\n## Git\n`\n## main...origin/main
- M package.json
+# Project State Snapshot\n\n**Date:** 2026-02-24T18:40:16.841Z\n\n## Versions\n`\nnode: v22.19.0\nnpm:  10.9.3\n`\n\n## Git\n`\n## main...origin/main
+ M reports/state.md
+ M tools/db-smoke.mjs
  M tools/snapshot.mjs
-?? tools/db-smoke.mjs\n`\n\n## package.json scripts\n`json\n{
+?? supabase/
+?? tools/simulate-sensor.mjs\n`\n\n## package.json scripts\n`json\n{
   "dev": "vite",
   "build": "tsc -b && vite build",
   "preview": "vite preview",
@@ -37,4 +39,9 @@ pages/
   SobrePage.tsx
   TransparenciaPage.tsx
 vite-env.d.ts\n`\n\n`\ndb-smoke.mjs
-snapshot.mjs\n`\n\n## Root files (existence only)\n- vercel.json: exists\n- .gitignore: exists\n- .env.local.example: exists\n\n## Env keys present (names only)\n`\n\n`\n\n## DB Smoke\n`\nDB_SMOKE: ERROR (stations: Could not find the table 'public.stations' in the schema cache)\n`\n
+simulate-sensor.mjs
+snapshot.mjs\n`\n\n## Root files (existence only)\n- vercel.json: exists\n- .gitignore: exists\n- .env.local.example: exists\n\n## Env keys present (names only)\n`\n\n`\n\n## DB Smoke\n`\nstations: OK count=1
+measurements: OK count=0
+events: OK count=1
+registrations: EXPECTED_DENIED
+DB_SMOKE: OK\n`\n
