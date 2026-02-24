@@ -9,8 +9,9 @@
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "verify": "npm run typecheck && npm run build",
+    "smoke": "node tools/db-smoke.mjs",
     "snapshot": "node tools/snapshot.mjs",
-    "done": "npm run verify && npm run snapshot"
+    "done": "npm run verify && npm run smoke && npm run snapshot"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",

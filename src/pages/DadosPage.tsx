@@ -4,7 +4,7 @@ import { getLatestMeasurements, listStations, type Measurement, type Station } f
 
 const ENV_HINT = " Verifique .env.local (VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY).";
 const POLLING_INTERVAL_MS = 60_000;
-const ONLINE_THRESHOLD_MS = 10 * 60 * 1000;
+const ONLINE_THRESHOLD_MS = 5 * 60 * 1000;
 
 function formatDate(value: unknown) {
   if (typeof value !== "string") return "-";
@@ -26,14 +26,8 @@ function formatCellValue(value: unknown) {
   return String(value);
 }
 
-function getStationOnlineStatus(station: Station | null, lastTs: unknown) {
-  const onlineFromStation = station?.online;
-  if (typeof onlineFromStation === "boolean") return onlineFromStation;
-
-  const onlineFromStationAlt = station?.is_online;
-  if (typeof onlineFromStationAlt === "boolean") return onlineFromStationAlt;
-
-  const date = parseIsoDate(lastTs);
+function getStationOnlineStatus(station: Station | null) {
+  const date = parseIsoDate(station?.last_seen_at);
   if (!date) return false;
   return Date.now() - date.getTime() <= ONLINE_THRESHOLD_MS;
 }
@@ -45,6 +39,7 @@ export function DadosPage() {
   const [loadingStations, setLoadingStations] = useState(true);
   const [loadingMeasurements, setLoadingMeasurements] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isPageVisible, setIsPageVisible] = useState(
     typeof document === "undefined" ? true : document.visibilityState === "visible"
   );
@@ -72,8 +67,10 @@ export function DadosPage() {
     try {
       if (!silent) setLoadingMeasurements(true);
       setError(null);
+      setSuccessMessage(null);
       const data = await getLatestMeasurements(stationId, 20);
       setMeasurements(data);
+      if (!silent) setSuccessMessage("Dados atualizados com sucesso.");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Falha ao carregar medicoes.";
       setError(`${message}${ENV_HINT}`);
@@ -90,12 +87,16 @@ export function DadosPage() {
 
   useEffect(() => {
     function onVisibilityChange() {
-      setIsPageVisible(document.visibilityState === "visible");
+      const visible = document.visibilityState === "visible";
+      setIsPageVisible(visible);
+      if (visible && selectedStationId) {
+        void loadMeasurements(selectedStationId, true);
+      }
     }
 
     document.addEventListener("visibilitychange", onVisibilityChange);
     return () => document.removeEventListener("visibilitychange", onVisibilityChange);
-  }, []);
+  }, [loadMeasurements, selectedStationId]);
 
   useEffect(() => {
     const stationId = selectedStationId ?? "";
@@ -113,7 +114,7 @@ export function DadosPage() {
     [selectedStationId, stations]
   );
   const lastUpdate = measurements[0]?.ts;
-  const isOnline = getStationOnlineStatus(selectedStation, lastUpdate);
+  const isOnline = getStationOnlineStatus(selectedStation);
 
   return (
     <section className="space-y-6">
@@ -126,9 +127,15 @@ export function DadosPage() {
 
       <section className="rounded-2xl border border-primaria/50 bg-base/70 p-6">
         <h2 className="text-lg font-bold text-ciano">Estacao</h2>
-        {loadingStations ? <p className="mt-3 text-sm text-texto/80">Carregando estacoes...</p> : null}
+        {loadingStations ? (
+          <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
+            Carregando estacoes...
+          </p>
+        ) : null}
         {!loadingStations && !stations.length ? (
-          <p className="mt-3 text-sm text-texto/80">Nenhuma estacao encontrada.</p>
+          <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
+            Nenhuma estacao encontrada.
+          </p>
         ) : null}
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <label className="block">
@@ -161,7 +168,7 @@ export function DadosPage() {
           <div className="rounded-lg border border-ciano/40 bg-fundo/80 p-4">
             <p className="text-xs uppercase tracking-wide text-ciano">Status</p>
             <p className={`mt-1 text-sm font-bold ${isOnline ? "text-primaria" : "text-acento"}`}>
-              {selectedStationId ? (isOnline ? "Online" : "Offline") : "-"}
+            {selectedStationId ? (isOnline ? "Online" : "Offline") : "-"}
             </p>
           </div>
           <div className="rounded-lg border border-ciano/40 bg-fundo/80 p-4">
@@ -174,13 +181,19 @@ export function DadosPage() {
       <section className="rounded-2xl border border-acento/60 bg-fundo/70 p-6">
         <h2 className="text-lg font-bold text-cta">Ultimas medicoes (20)</h2>
         {!selectedStationId ? (
-          <p className="mt-3 text-sm text-texto/80">Selecione uma estacao para ver as medicoes.</p>
+          <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
+            Selecione uma estacao para ver as medicoes.
+          </p>
         ) : null}
         {selectedStationId && loadingMeasurements ? (
-          <p className="mt-3 text-sm text-texto/80">Carregando medicoes...</p>
+          <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
+            Carregando medicoes...
+          </p>
         ) : null}
         {selectedStationId && !loadingMeasurements && !measurements.length ? (
-          <p className="mt-3 text-sm text-texto/80">Nao ha medicoes para esta estacao.</p>
+          <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
+            Nao ha medicoes para esta estacao.
+          </p>
         ) : null}
         {selectedStationId && !loadingMeasurements && measurements.length ? (
           <div className="mt-4 overflow-x-auto">
@@ -219,7 +232,16 @@ export function DadosPage() {
         </div>
       </section>
 
-      {error ? <p className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto">{error}</p> : null}
+      {successMessage ? (
+        <p aria-live="polite" className="rounded-md border border-primaria/70 bg-primaria/15 p-3 text-sm text-texto" role="status">
+          {successMessage}
+        </p>
+      ) : null}
+      {error ? (
+        <p aria-live="assertive" className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto" role="alert">
+          {error}
+        </p>
+      ) : null}
     </section>
   );
 }

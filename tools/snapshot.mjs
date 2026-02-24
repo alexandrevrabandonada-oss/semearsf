@@ -92,6 +92,12 @@ if (fs.existsSync(".env")) {
 } else {
   report.push("_No .env / .env.local found_");
 }
+report.push("");
+
+report.push("## DB Smoke");
+report.push("`");
+report.push(sh("node tools/db-smoke.mjs"));
+report.push("`");
 
 fs.mkdirSync("reports", { recursive: true });
 fs.writeFileSync("reports/state.md", report.join("\\n") + "\\n", "utf8");
