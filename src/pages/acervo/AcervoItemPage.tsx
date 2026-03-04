@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { getAcervoBySlug, type AcervoItem } from "../../lib/api";
+import { getAcervoBySlug, listCollectionsForItem, type AcervoItem, type AcervoCollection } from "../../lib/api";
 
 const KIND_LABELS: Record<string, string> = {
     paper: "Artigo científico",
@@ -34,6 +34,7 @@ function SimpleMarkdown({ text }: { text: string }) {
 export function AcervoItemPage() {
     const { slug } = useParams<{ slug: string }>();
     const [item, setItem] = useState<AcervoItem | null>(null);
+    const [collections, setCollections] = useState<AcervoCollection[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -45,8 +46,14 @@ export function AcervoItemPage() {
             try {
                 setLoading(true);
                 setError(null);
-                const data = await getAcervoBySlug(slug as string);
-                if (!cancelled) setItem(data);
+                const [data, cols] = await Promise.all([
+                    getAcervoBySlug(slug as string),
+                    listCollectionsForItem(slug as string)
+                ]);
+                if (!cancelled) {
+                    setItem(data);
+                    setCollections(cols);
+                }
             } catch (err) {
                 if (!cancelled)
                     setError(err instanceof Error ? err.message : "Falha ao carregar item do acervo.");
@@ -174,6 +181,26 @@ export function AcervoItemPage() {
                                     {tag}
                                 </span>
                             ))}
+                        </div>
+                    )}
+
+                    {/* Associated Collections */}
+                    {collections.length > 0 && (
+                        <div className="mt-8 rounded-xl border border-cta/30 bg-cta/5 p-5">
+                            <span className="block mb-3 text-xs font-bold uppercase tracking-widest text-cta">
+                                📚 Este item está nos dossiês:
+                            </span>
+                            <div className="flex flex-col gap-2">
+                                {collections.map(col => (
+                                    <Link
+                                        key={col.id}
+                                        to={`/dossies/${col.slug}`}
+                                        className="text-sm font-semibold text-cta hover:underline block"
+                                    >
+                                        → {col.title}
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
                     )}
 

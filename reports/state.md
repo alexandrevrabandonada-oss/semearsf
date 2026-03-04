@@ -1,6 +1,6 @@
 # Project State Snapshot
 
-**Date:** 2026-03-04T22:32:31.171Z
+**Date:** 2026-03-04T22:45:50.170Z
 
 ## Versions
 ```
@@ -11,28 +11,16 @@ npm:  10.9.3
 ## Git
 ```
 ## main...origin/main
- M .env.local.example
- M docs/DB_WORKFLOW.md
+ M docs/ACERVO.md
  M package.json
  M reports/state.md
- M src/App.tsx
- M src/components/Navbar.tsx
  M src/lib/api.ts
- M src/pages/BlogListPage.tsx
  M src/pages/HomePage.tsx
  M src/pages/SearchPage.tsx
- M tools/acervo-upload.mjs
- M tools/env-doctor.mjs
- M tools/migration-doctor.mjs
-?? data/collection_items.seed.json
-?? data/collections.seed.json
-?? src/pages/acervo/CollectionDetailPage.tsx
-?? src/pages/acervo/CollectionsListPage.tsx
-?? supabase/migrations/20260304000009_dossies.sql
-?? supabase/migrations/20260304000010_fts.sql
-?? supabase/migrations/20260309000001_covers_optimization.sql
-?? tmp/
-?? tools/collections-import.mjs
+ M src/pages/acervo/AcervoItemPage.tsx
+ M src/pages/acervo/CollectionDetailPage.tsx
+ M src/pages/acervo/CollectionsListPage.tsx
+ M tools/collections-import.mjs
 ```
 
 ## package.json scripts
@@ -53,7 +41,7 @@ npm:  10.9.3
   "fn:deploy": "npx supabase functions deploy --no-verify-jwt",
   "secrets:set": "node tools/secrets-set.mjs",
   "ship:infra": "npm run db:push && npm run fn:deploy && npm run done",
-  "ship:content": "npm run acervo:import && npm run blog:import && npm run transparency:import && npm run done",
+  "ship:content": "npm run acervo:import && npm run collections:import && npm run blog:import && npm run transparency:import && npm run done",
   "ship:all": "npm run ship:infra && npm run ship:content",
   "simulate:sensor": "node tools/simulate-sensor.mjs",
   "smoke": "node tools/db-smoke.mjs",
@@ -61,6 +49,7 @@ npm:  10.9.3
   "acervo:import": "node tools/acervo-import.mjs",
   "acervo:upload": "node tools/acervo-upload.mjs",
   "blog:import": "node tools/blog-import.mjs",
+  "collections:import": "node tools/collections-import.mjs",
   "transparency:import": "node tools/transparency-import.mjs",
   "done": "npm run verify && npm run smoke && npm run db:doctor && npm run env:doctor && npm run snapshot"
 }

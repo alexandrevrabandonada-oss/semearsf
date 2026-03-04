@@ -32,17 +32,19 @@ async function importCollections() {
     const collections = JSON.parse(fs.readFileSync(collectionsFile, "utf8"));
     console.log(`Importando ${collections.length} coleções...`);
 
+    let insertedCount = 0;
     for (const collection of collections) {
         const { error } = await supabase
             .from("acervo_collections")
             .upsert(collection, { onConflict: "slug" });
 
         if (error) {
-            console.error(`ERRO ao importar coleção ${collection.slug}:`, error.message);
+            console.error(`ERRO ao importar coleção ${collection.slug} - Verifique permissões ou schema.`);
         } else {
-            console.log(`[OK] Coleção: ${collection.slug}`);
+            insertedCount++;
         }
     }
+    console.log(`[OK] ${insertedCount} coleções processadas (inserted/updated).`);
 }
 
 async function importCollectionItems() {
@@ -67,12 +69,15 @@ async function importCollectionItems() {
     const collectionMap = Object.fromEntries(collections.map(c => [c.slug, c.id]));
     const itemMap = Object.fromEntries(acervoItems.map(i => [i.slug, i.id]));
 
+    let linkedCount = 0;
+    let skippedCount = 0;
+
     for (const link of items) {
         const cid = collectionMap[link.collection_slug];
         const iid = itemMap[link.item_slug];
 
         if (!cid || !iid) {
-            console.warn(`[SKIP] Vínculo falhou: collection ${link.collection_slug} ou item ${link.item_slug} não encontrados.`);
+            skippedCount++;
             continue;
         }
 
@@ -85,11 +90,13 @@ async function importCollectionItems() {
             });
 
         if (error) {
-            console.error(`ERRO ao vincular ${link.item_slug} -> ${link.collection_slug}:`, error.message);
+            console.error(`ERRO ao vincular ${link.item_slug} -> ${link.collection_slug} - Falha no BD.`);
         } else {
-            console.log(`[OK] Vínculo: ${link.item_slug} -> ${link.collection_slug}`);
+            linkedCount++;
         }
     }
+
+    console.log(`[OK] ${linkedCount} itens vinculados. (${skippedCount} ignorados por ausência do Acervo).`);
 }
 
 async function main() {

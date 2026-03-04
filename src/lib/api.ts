@@ -696,18 +696,58 @@ export interface CollectionWithItems extends AcervoCollection {
   items: AcervoItem[];
 }
 
-export async function listCollections(): Promise<AcervoCollection[]> {
+export async function listCollections({ limit = 50 } = {}): Promise<AcervoCollection[]> {
   try {
     const supabase = assertSupabase();
     const { data, error } = await supabase
       .from("acervo_collections")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(limit);
 
     if (error) throw error;
     return (data || []) as AcervoCollection[];
   } catch (error) {
     throw toAppError("Falha ao listar dossiês", error);
+  }
+}
+
+/**
+ * Retorna as coleções (dossiês) em que um determinado item do acervo está incluído.
+ */
+export async function listCollectionsForItem(itemSlugOrId: string): Promise<AcervoCollection[]> {
+  try {
+    const supabase = assertSupabase();
+
+    // Primeiro precisamos do ID do item se for slug
+    let itemId = itemSlugOrId;
+    if (!itemSlugOrId.includes("-")) { // Checagem simples pra uuid
+      const { data: itemData, error: itemError } = await supabase
+        .from("acervo_items")
+        .select("id")
+        .eq("slug", itemSlugOrId)
+        .single();
+
+      if (itemError) throw itemError;
+      itemId = itemData.id;
+    }
+
+    const { data, error } = await supabase
+      .from("acervo_collection_items")
+      .select(`
+        position,
+        acervo_collections (*)
+      `)
+      .eq("item_id", itemId)
+      .order("position", { ascending: true });
+
+    if (error) throw error;
+
+    // Extract the nested collections and assert type
+    return (data?.map(d => d.acervo_collections) || []).filter(Boolean) as unknown as AcervoCollection[];
+  } catch (error) {
+    console.warn("Falha ao buscar coleções do item:", error);
+    return []; // Return empty gracefully
   }
 }
 

@@ -33,13 +33,13 @@ export function CollectionsListPage() {
             </div>
 
             {loading ? (
-                <p className="text-sm text-texto/70">Carregando coleções...</p>
+                <p className="text-sm text-texto/70" aria-live="polite" aria-busy="true">Carregando coleções...</p>
             ) : error ? (
-                <p className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto">{error}</p>
+                <p className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto" aria-live="assertive">{error}</p>
             ) : collections.length === 0 ? (
-                <p className="text-sm text-texto/50 italic">Nenhum dossiê publicado ainda.</p>
+                <p className="text-sm text-texto/50 italic" aria-live="polite">Nenhum dossiê publicado ainda.</p>
             ) : (
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2" aria-live="polite">
                     {collections.map((col) => (
                         <Link
                             key={col.id}

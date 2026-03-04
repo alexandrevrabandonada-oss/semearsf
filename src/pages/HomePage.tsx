@@ -251,15 +251,15 @@ export function HomePage() {
         <p className="mt-2 text-sm text-texto/70">Explore coleções temáticas curadas pelo nosso time.</p>
 
         {loading ? (
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite" aria-busy="true">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-32 animate-pulse rounded-xl bg-ciano/5" />
             ))}
           </div>
         ) : collections.length === 0 ? (
-          <p className="mt-6 text-sm text-texto/50 italic">Nenhuma coleção em destaque no momento.</p>
+          <p className="mt-6 text-sm text-texto/50 italic" aria-live="polite">Nenhuma coleção em destaque no momento.</p>
         ) : (
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite">
             {collections.map((col) => (
               <Link
                 key={col.id}

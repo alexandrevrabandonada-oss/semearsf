@@ -25,8 +25,8 @@ export function CollectionDetailPage() {
         void load();
     }, [slug]);
 
-    if (loading) return <p className="text-sm text-texto/70">Carregando detalhes do dossiê...</p>;
-    if (error || !collection) return <p className="text-sm text-acento">{error || "Coleção não encontrada."}</p>;
+    if (loading) return <p className="text-sm text-texto/70" aria-live="polite" aria-busy="true">Carregando detalhes do dossiê...</p>;
+    if (error || !collection) return <p className="text-sm text-acento" aria-live="assertive">{error || "Coleção não encontrada."}</p>;
 
     return (
         <section className="space-y-8">

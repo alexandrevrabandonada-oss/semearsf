@@ -40,20 +40,27 @@ export function SearchPage() {
 
                 const promises: Promise<any>[] = [];
 
-                if (tipo === "todos" && query.trim().length >= 2) {
+                if (query.trim().length >= 2) {
                     const [mixedRes, transRes, eventsRes] = await Promise.all([
-                        searchAll(query, 20),
+                        searchAll(query, 30),
                         searchTransparency(query, 5),
                         searchEvents(query, 5)
                     ]);
+
+                    // Client-side filtering of the mixed FTS results based on 'tipo'
+                    const isAll = tipo === "todos";
+                    const isAcervo = tipo === "acervo";
+                    const isBlog = tipo === "blog";
+
                     setResults({
-                        acervo: [],
-                        blog: [],
-                        transparency: transRes,
-                        events: eventsRes,
-                        mixed: mixedRes
+                        acervo: isAcervo ? (mixedRes.filter(r => r.kind === "acervo") as unknown as AcervoItem[]) : [],
+                        blog: isBlog ? (mixedRes.filter(r => r.kind === "blog") as unknown as BlogPost[]) : [],
+                        transparency: (isAll || tipo === "transparencia") ? transRes : [],
+                        events: (isAll || tipo === "agenda") ? eventsRes : [],
+                        mixed: isAll ? mixedRes : []
                     });
                 } else {
+                    // Fallback for short queries (though 1 char usually isn't very useful, we keep the original logic just in case)
                     if (tipo === "todos" || tipo === "acervo") promises.push(searchAcervo(query, 10));
                     else promises.push(Promise.resolve([]));
 
@@ -126,12 +133,17 @@ export function SearchPage() {
                         <button
                             key={t}
                             onClick={() => handleTipoChange(t)}
-                            className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${tipo === t
+                            className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${tipo === t
                                 ? "bg-ciano text-base shadow-lg shadow-ciano/20"
                                 : "bg-base/40 text-texto/60 hover:bg-base/60 hover:text-texto"
                                 }`}
                         >
-                            {t === "transparencia" ? "Transparência" : t}
+                            <span>{t === "transparencia" ? "Transparência" : t}</span>
+                            {query.trim().length >= 2 && !loading && (
+                                <span className={`flex h-4 items-center justify-center rounded-full px-1.5 text-[9px] ${tipo === t ? 'bg-base/20 text-base' : 'bg-texto/10 text-texto/60'}`}>
+                                    {t === "todos" ? totalResults : results[t === "agenda" ? "events" : t === "transparencia" ? "transparency" : t].length}
+                                </span>
+                            )}
                         </button>
                     ))}
                 </div>

@@ -30,5 +30,16 @@ npm run acervo:upload -- --slug galeria-fotos-evento --file "C:\caminho\capa.jpg
 | `--title` | Não         | Título descritivo do arquivo (padrão é o nome do arquivo). |
 | `--cover` | Não         | Se `true`, define este arquivo como `cover_url` do item. |
 
+## Dossiês (Coleções Temáticas)
+
+Dossiês são agrupamentos curados de itens do acervo. O gerenciamento de coleções e seus vínculos com os itens é feito via repository-first:
+1. Cadastre os dossiês e sues metadados básicos no arquivo `data/collections.seed.json`.
+2. Defina os vínculos específicos entre `collection_slug` e `item_slug` com suas ordenações no arquivo `data/collection_items.seed.json`.
+3. Aplique as configurações ao banco de dados rodando:
+
+```bash
+npm run collections:import
+```
+
 ---
-*Nota: Este workflow substitui a necessidade de um painel administrativo para upload, mantendo o controle via repositório/cli.*
+*Nota: Este workflow substitui a necessidade de um painel administrativo para upload e curadoria inicial, mantendo o controle via repositório/cli.*
