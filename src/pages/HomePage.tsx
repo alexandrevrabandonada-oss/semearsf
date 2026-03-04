@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { listAcervoItems, listBlogPosts, listStations, listUpcomingEvents, getTransparencySummary, type AcervoItem, type Event, type Station, type BlogPost, type TransparencySummary } from "../lib/api";
+import { listAcervoItems, listBlogPosts, listStations, listUpcomingEvents, getTransparencySummary, listCollections, type AcervoItem, type Event, type Station, type BlogPost, type TransparencySummary, type AcervoCollection } from "../lib/api";
 
 const ONLINE_THRESHOLD_MS = 5 * 60 * 1000;
 
@@ -17,6 +17,7 @@ export function HomePage() {
   const [acervo, setAcervo] = useState<AcervoItem[]>([]);
   const [latestBlog, setLatestBlog] = useState<BlogPost | null>(null);
   const [transparency, setTransparency] = useState<TransparencySummary | null>(null);
+  const [collections, setCollections] = useState<AcervoCollection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,18 +25,20 @@ export function HomePage() {
     async function load() {
       try {
         setLoading(true);
-        const [stationsData, eventsData, acervoData, blogData, transData] = await Promise.all([
+        const [stationsData, eventsData, acervoData, blogData, transData, collectionsData] = await Promise.all([
           listStations(),
           listUpcomingEvents(),
           listAcervoItems({ featured: true, limit: 6 }),
           listBlogPosts({ limit: 1 }),
-          getTransparencySummary()
+          getTransparencySummary(),
+          listCollections()
         ]);
         setStations(stationsData);
         setEvents(eventsData.slice(0, 3));
         setAcervo(acervoData);
         setLatestBlog(blogData[0] || null);
         setTransparency(transData);
+        setCollections((collectionsData as AcervoCollection[]).slice(0, 3));
       } catch (err) {
         console.error("Erro ao carregar dados da home:", err);
         setError("Não foi possível carregar as informações em tempo real.");
@@ -237,6 +240,64 @@ export function HomePage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Featured Collections (Dossiês) */}
+      <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 md:p-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-black uppercase tracking-wide text-cta md:text-2xl">Dossiês em Destaque</h2>
+          <Link className="text-sm font-bold text-ciano hover:underline" to="/dossies">Ver todos →</Link>
+        </div>
+        <p className="mt-2 text-sm text-texto/70">Explore coleções temáticas curadas pelo nosso time.</p>
+
+        {loading ? (
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-32 animate-pulse rounded-xl bg-ciano/5" />
+            ))}
+          </div>
+        ) : collections.length === 0 ? (
+          <p className="mt-6 text-sm text-texto/50 italic">Nenhuma coleção em destaque no momento.</p>
+        ) : (
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {collections.map((col) => (
+              <Link
+                key={col.id}
+                to={`/dossies/${col.slug}`}
+                className="group flex flex-col overflow-hidden rounded-xl border border-ciano/20 bg-base/20 transition-all hover:border-ciano/50 hover:bg-base/40"
+              >
+                {col.cover_url && (
+                  <div className="aspect-video w-full overflow-hidden bg-ciano/5 relative">
+                    {/* CSS Blur Placeholder Pattern */}
+                    <img
+                      src={col.cover_small_url || col.cover_thumb_url || col.cover_url}
+                      alt={col.title}
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="h-full w-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105"
+                      style={
+                        (!col.cover_small_url && !col.cover_thumb_url) ? {} : {
+                          filter: 'blur(0)', // In a real implementation we would transition this on image load
+                        }
+                      }
+                    />
+                  </div>
+                )}
+                <div className="p-5 flex flex-col flex-1">
+                  <h3 className="text-lg font-bold text-texto group-hover:text-cta">{col.title}</h3>
+                  {col.excerpt && <p className="mt-2 text-xs text-texto/80 line-clamp-2">{col.excerpt}</p>}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {col.tags.slice(0, 2).map((tag) => (
+                      <span key={tag} className="rounded-full bg-ciano/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-ciano">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

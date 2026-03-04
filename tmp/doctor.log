@@ -1,0 +1,20 @@
+=== SUPABASE MIGRATION DOCTOR (Hardened) ===
+[OK] DB Local: Rodando
+[OK] CLI Link: Autenticado
+
+--- LOCAL STATE ---
+[WARN] CLI local list: Falhou (Usando fallback de Filesystem)
+      Motivo: Connecting to local database... failed to connect to postgres: failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:54322: connectex: Nenhuma conex├úo p├┤de ser feita porque a m├íquina de destino as recusou ativamente.)
+[OK] Filesystem Scan: 13 arquivos encontrados
+      ├Ültimas 5 migra├º├Áes locais:
+      - 20260308000005_push_adv.sql
+      - 20260308000004_share_analytics.sql
+      - 20260308000003_push_rules.sql
+      - 20260308000002_push.sql
+      - 20260308000001_storage_acervo.sql
+
+--- REMOTE STATE ---
+[OK] CLI remote list: Sucesso
+      Total: 14 migra├º├Áes no ambiente remoto.
+
+Doctor analysis completed.

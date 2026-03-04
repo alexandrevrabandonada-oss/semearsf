@@ -15,6 +15,8 @@ import { BlogListPage } from "./pages/BlogListPage";
 import { BlogPostPage } from "./pages/BlogPostPage";
 import { StatusPage } from "./pages/StatusPage";
 import { SearchPage } from "./pages/SearchPage";
+import { CollectionsListPage } from "./pages/acervo/CollectionsListPage";
+import { CollectionDetailPage } from "./pages/acervo/CollectionDetailPage";
 
 export default function App() {
   return (
@@ -30,6 +32,8 @@ export default function App() {
         <Route path="/acervo" element={<AcervoPage />} />
         <Route path="/acervo/:area" element={<AcervoListPage />} />
         <Route path="/acervo/item/:slug" element={<AcervoItemPage />} />
+        <Route path="/dossies" element={<CollectionsListPage />} />
+        <Route path="/dossies/:slug" element={<CollectionDetailPage />} />
         <Route path="/blog" element={<BlogListPage />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/status" element={<StatusPage />} />

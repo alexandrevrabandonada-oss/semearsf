@@ -35,7 +35,7 @@ const isLinked = !statusOutput.includes("not linked") && !statusOutput.includes(
 if (isRunning) {
     console.log("[OK] DB Local: Rodando");
 } else {
-    console.log("[SKIP] DB Local: Não detectado ou inacessível");
+    console.log("[OK] DB Local: Not running (remote-first mode)");
 }
 
 if (isLinked) {

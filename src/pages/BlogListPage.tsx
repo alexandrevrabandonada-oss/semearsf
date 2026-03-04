@@ -61,11 +61,20 @@ export function BlogListPage() {
                             to={`/blog/${post.slug}`}
                         >
                             {post.cover_url && (
-                                <img
-                                    alt={post.title}
-                                    className="h-40 w-full object-cover"
-                                    src={post.cover_url}
-                                />
+                                <div className="h-40 w-full overflow-hidden bg-ciano/5 relative">
+                                    <img
+                                        alt={post.title}
+                                        className="h-full w-full object-cover transition-all duration-700 ease-in-out"
+                                        src={post.cover_small_url || post.cover_thumb_url || post.cover_url}
+                                        loading="lazy"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                        style={
+                                            (!post.cover_small_url && !post.cover_thumb_url) ? {} : {
+                                                filter: 'blur(0)'
+                                            }
+                                        }
+                                    />
+                                </div>
                             )}
                             <div className="flex flex-1 flex-col p-5">
                                 <div className="mb-2 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-texto/50">

@@ -50,4 +50,10 @@ if (legacyKeys.length === 0 && viteKeys.length === 0) {
     console.log("[OK] Ambiente limpo de chaves NEXT_PUBLIC_*.");
 }
 
+const hasProjectRef = allKeys["SUPABASE_PROJECT_REF"];
+if (hasProjectRef) {
+    console.log("[OK] SUPABASE_PROJECT_REF detectado. Remote-first habilitado.");
+    console.log("    Use: npm run db:types:remote para atualizar tipos do Supabase.");
+}
+
 process.exit(0);

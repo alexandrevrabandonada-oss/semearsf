@@ -6,6 +6,7 @@ const links = [
   { href: "/acervo", label: "Acervo" },
   { href: "/blog", label: "Blog" },
   { href: "/agenda", label: "Agenda" },
+  { href: "/dossies", label: "Dossiês" },
   { href: "/inscricoes", label: "Inscricoes" },
   { href: "/sobre", label: "Sobre" },
   { href: "/transparencia", label: "Transparencia" }

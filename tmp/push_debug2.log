@@ -1,0 +1,13 @@
+Initialising login role...
+Connecting to remote database...
+Do you want to push these migrations to the remote database?
+ ÔÇó 20260304_000010_fts.sql
+
+ [Y/n] y
+Applying migration 20260304_000010_fts.sql...
+NOTICE (00000): column "search_vec" of relation "blog_posts" does not exist, skipping
+ERROR: duplicate key value violates unique constraint "schema_migrations_pkey" (SQLSTATE 23505)
+Key (version)=(20260304) already exists.                                                       
+At statement: 9                                                                                
+INSERT INTO supabase_migrations.schema_migrations(version, name, statements) VALUES($1, $2, $3)
+Try rerunning the command with --debug to troubleshoot the error.

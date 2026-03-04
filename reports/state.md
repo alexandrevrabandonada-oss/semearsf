@@ -1,6 +1,6 @@
 # Project State Snapshot
 
-**Date:** 2026-03-04T21:47:01.077Z
+**Date:** 2026-03-04T22:32:31.171Z
 
 ## Versions
 ```
@@ -11,23 +11,28 @@ npm:  10.9.3
 ## Git
 ```
 ## main...origin/main
- M .env.local
- M docs/DEPLOY.md
- M package-lock.json
+ M .env.local.example
+ M docs/DB_WORKFLOW.md
  M package.json
  M reports/state.md
- M src/pages/AgendaPage.tsx
- M src/pages/AlertasPage.tsx
- M src/pages/DadosPage.tsx
- M supabase/functions/ingest-measurement/index.ts
- M supabase/functions/register-push/index.ts
+ M src/App.tsx
+ M src/components/Navbar.tsx
+ M src/lib/api.ts
+ M src/pages/BlogListPage.tsx
+ M src/pages/HomePage.tsx
+ M src/pages/SearchPage.tsx
+ M tools/acervo-upload.mjs
  M tools/env-doctor.mjs
- M vercel.json
-?? api/share/agenda.ts
-?? api/share/dados.ts
-?? supabase/migrations/20260308000005_push_adv.sql
-?? tools/env-clean.mjs
-?? vapid.json
+ M tools/migration-doctor.mjs
+?? data/collection_items.seed.json
+?? data/collections.seed.json
+?? src/pages/acervo/CollectionDetailPage.tsx
+?? src/pages/acervo/CollectionsListPage.tsx
+?? supabase/migrations/20260304000009_dossies.sql
+?? supabase/migrations/20260304000010_fts.sql
+?? supabase/migrations/20260309000001_covers_optimization.sql
+?? tmp/
+?? tools/collections-import.mjs
 ```
 
 ## package.json scripts
@@ -40,7 +45,8 @@ npm:  10.9.3
   "verify": "npm run typecheck && npm run build",
   "db:push": "npx supabase db push",
   "db:status": "npx supabase db status",
-  "db:types": "npx supabase gen types typescript --local > src/lib/supabase/database.types.ts",
+  "db:types:local": "npx supabase gen types typescript --local > src/lib/supabase/database.types.ts",
+  "db:types:remote": "source .env.local 2>/dev/null || true; npx supabase gen types typescript --project-id $SUPABASE_PROJECT_REF > src/lib/supabase/database.types.ts",
   "db:doctor": "node tools/migration-doctor.mjs",
   "env:doctor": "node tools/env-doctor.mjs",
   "env:clean": "node tools/env-clean.mjs",
@@ -72,6 +78,8 @@ npm:  10.9.3
 - /blog/:slug
 - /buscar
 - /dados
+- /dossies
+- /dossies/:slug
 - /inscricoes
 - /sobre
 - /status
@@ -97,6 +105,8 @@ pages/
     AcervoItemPage.tsx
     AcervoListPage.tsx
     AcervoPage.tsx
+    CollectionDetailPage.tsx
+    CollectionsListPage.tsx
   AgendaPage.tsx
   AlertasPage.tsx
   BlogListPage.tsx
@@ -117,6 +127,7 @@ vite-env.d.ts
 acervo-import.mjs
 acervo-upload.mjs
 blog-import.mjs
+collections-import.mjs
 db-smoke.mjs
 env-clean.mjs
 env-doctor.mjs
@@ -165,17 +176,17 @@ DB_SMOKE: OK
 --- LOCAL STATE ---
 [WARN] CLI local list: Falhou (Usando fallback de Filesystem)
       Motivo: Connecting to local database... failed to connect to postgres: failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:54322: connectex: Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente.)
-[OK] Filesystem Scan: 11 arquivos encontrados
+[OK] Filesystem Scan: 14 arquivos encontrados
       Últimas 5 migrações locais:
+      - 20260309000001_covers_optimization.sql
       - 20260308000005_push_adv.sql
       - 20260308000004_share_analytics.sql
       - 20260308000003_push_rules.sql
       - 20260308000002_push.sql
-      - 20260308000001_storage_acervo.sql
 
 --- REMOTE STATE ---
 [OK] CLI remote list: Sucesso
-      Total: 11 migrações no ambiente remoto.
+      Total: 14 migrações no ambiente remoto.
 
 Doctor analysis completed.
 ```

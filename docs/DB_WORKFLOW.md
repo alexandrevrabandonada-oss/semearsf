@@ -25,15 +25,19 @@ O Doctor realiza:
 3. **FS Fallback**: Se o CLI falhar, ele analisa a pasta `supabase/migrations` diretamente para garantir que os arquivos estão presentes.
 4. **Naming Lint**: Alerta sobre arquivos que não seguem o padrão de 14 dígitos.
 
-## Aplicando Mudanças
+## Modo Remote-first
 
-1. Crie a migração localmente ou edite o schema.
-2. Teste no banco local.
-3. Para subir para o ambiente remoto:
+Se você optou por não rodar o Supabase localmente, utilize os comandos remotos:
+
+1. Suba migrações diretamente para o projeto vinculado:
    ```bash
    npm run db:push
    ```
-4. Após o push bem-sucedido, rode `npm run done` para verificar a integridade geral.
+2. Atualize os tipos do banco (TypeScript) diretamente do servidor:
+   ```bash
+   npm run db:types:remote
+   ```
+   *Nota: Requer `SUPABASE_PROJECT_REF` no seu `.env.local`.*
 
 ---
 *Nota: A integridade do banco é crítica para o funcionamento do PWA e das Edge Functions.*

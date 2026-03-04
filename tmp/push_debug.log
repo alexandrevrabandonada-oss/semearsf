@@ -1,0 +1,20 @@
+Initialising login role...
+Connecting to remote database...
+Do you want to push these migrations to the remote database?
+ ÔÇó 20260304_000010_fts.sql
+
+ [Y/n] y
+Applying migration 20260304_000010_fts.sql...
+NOTICE (42701): column "search_vec" of relation "acervo_items" already exists, skipping
+ERROR: generation expression is not immutable (SQLSTATE 42P17)                            
+At statement: 2                                                                           
+-- 2. Add generated tsvector column and GIN index to blog_posts                           
+ALTER TABLE public.blog_posts                                                             
+ADD COLUMN IF NOT EXISTS search_vec tsvector                                              
+GENERATED ALWAYS AS (                                                                     
+    setweight(to_tsvector('portuguese', coalesce(title, '')), 'A') ||                     
+    setweight(to_tsvector('portuguese', coalesce(excerpt, '')), 'B') ||                   
+    setweight(to_tsvector('portuguese', coalesce(array_to_string(tags, ' '), '')), 'C') ||
+    setweight(to_tsvector('portuguese', coalesce(content_md, '')), 'D')                   
+) STORED                                                                                  
+Try rerunning the command with --debug to troubleshoot the error.

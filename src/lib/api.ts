@@ -203,6 +203,9 @@ export type AcervoItem = {
   slug: string;
   excerpt: string | null;
   content_md: string | null;
+  cover_url: string | null;
+  cover_thumb_url: string | null;
+  cover_small_url: string | null;
   source_name: string | null;
   source_url: string | null;
   published_at: string | null;
@@ -237,6 +240,9 @@ function rowToAcervoItem(row: Record<string, unknown>): AcervoItem {
     slug: String(row.slug ?? ""),
     excerpt: typeof row.excerpt === "string" ? row.excerpt : null,
     content_md: typeof row.content_md === "string" ? row.content_md : null,
+    cover_url: typeof row.cover_url === "string" ? row.cover_url : null,
+    cover_thumb_url: typeof row.cover_thumb_url === "string" ? row.cover_thumb_url : null,
+    cover_small_url: typeof row.cover_small_url === "string" ? row.cover_small_url : null,
     source_name: typeof row.source_name === "string" ? row.source_name : null,
     source_url: typeof row.source_url === "string" ? row.source_url : null,
     published_at: typeof row.published_at === "string" ? row.published_at : null,
@@ -262,7 +268,7 @@ export async function listAcervoItems(params: ListAcervoParams = {}): Promise<Ac
 
     let query = supabase
       .from("acervo_items")
-      .select("id, kind, title, slug, excerpt, source_name, source_url, published_at, year, city, tags, featured, source_type, created_at")
+      .select("id, kind, title, slug, excerpt, cover_url, cover_thumb_url, cover_small_url, source_name, source_url, published_at, year, city, tags, featured, source_type, created_at")
       .order("published_at", { ascending: false, nullsFirst: false })
       .range(offset, offset + limit - 1);
 
@@ -312,6 +318,8 @@ export type BlogPost = {
   excerpt: string | null;
   content_md: string | null;
   cover_url: string | null;
+  cover_thumb_url: string | null;
+  cover_small_url: string | null;
   tags: string[];
   published_at: string | null;
   status: "draft" | "published";
@@ -333,6 +341,8 @@ function rowToBlogPost(row: Record<string, unknown>): BlogPost {
     excerpt: typeof row.excerpt === "string" ? row.excerpt : null,
     content_md: typeof row.content_md === "string" ? row.content_md : null,
     cover_url: typeof row.cover_url === "string" ? row.cover_url : null,
+    cover_thumb_url: typeof row.cover_thumb_url === "string" ? row.cover_thumb_url : null,
+    cover_small_url: typeof row.cover_small_url === "string" ? row.cover_small_url : null,
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
     published_at: typeof row.published_at === "string" ? row.published_at : null,
     status: (row.status as "draft" | "published") ?? "draft",
@@ -347,7 +357,7 @@ export async function listBlogPosts(params: ListBlogParams = {}): Promise<BlogPo
 
     let query = supabase
       .from("blog_posts")
-      .select("id, slug, title, excerpt, cover_url, tags, published_at, status, created_at")
+      .select("id, slug, title, excerpt, cover_url, cover_thumb_url, cover_small_url, tags, published_at, status, created_at")
       .eq("status", "published")
       .order("published_at", { ascending: false, nullsFirst: false })
       .range(offset, offset + limit - 1);
@@ -636,5 +646,98 @@ export async function searchEvents(q: string, limit = 10): Promise<Event[]> {
     return data as Event[];
   } catch (error) {
     throw toAppError("Falha ao buscar eventos", error);
+  }
+}
+
+// ─────────────────────────────────────────
+// Busca Global (FTS)
+// ─────────────────────────────────────────
+
+export interface SearchResultItem {
+  kind: "acervo" | "blog";
+  title: string;
+  slug: string;
+  excerpt: string;
+  score: number;
+  url: string;
+}
+
+export async function searchAll(q: string, limit = 30): Promise<SearchResultItem[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase.rpc("search_all", {
+      p_q: q,
+      p_limit: limit
+    });
+    if (error) throw error;
+    return (data || []) as SearchResultItem[];
+  } catch (error) {
+    throw toAppError("Falha ao realizar busca global", error);
+  }
+}
+
+// ─────────────────────────────────────────
+// Dossiês (Collections)
+// ─────────────────────────────────────────
+
+export interface AcervoCollection {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  cover_url: string | null;
+  cover_thumb_url: string | null;
+  cover_small_url: string | null;
+  tags: string[];
+  created_at: string;
+}
+
+export interface CollectionWithItems extends AcervoCollection {
+  items: AcervoItem[];
+}
+
+export async function listCollections(): Promise<AcervoCollection[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("acervo_collections")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return (data || []) as AcervoCollection[];
+  } catch (error) {
+    throw toAppError("Falha ao listar dossiês", error);
+  }
+}
+
+export async function getCollectionBySlug(slug: string): Promise<CollectionWithItems> {
+  try {
+    const supabase = assertSupabase();
+    const { data: collection, error: cError } = await supabase
+      .from("acervo_collections")
+      .select("*")
+      .eq("slug", slug)
+      .single();
+
+    if (cError) throw cError;
+
+    const { data: items, error: iError } = await supabase
+      .from("acervo_collection_items")
+      .select(`
+        position,
+        acervo_items (*)
+      `)
+      .eq("collection_id", collection.id)
+      .order("position", { ascending: true });
+
+    if (iError) throw iError;
+
+    return {
+      ...(collection as AcervoCollection),
+      items: (items || []).map((rel: any) => rowToAcervoItem(rel.acervo_items))
+    };
+  } catch (error) {
+    throw toAppError("Falha ao carregar dossiê", error);
   }
 }

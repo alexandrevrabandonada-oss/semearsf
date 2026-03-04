@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { searchAcervo, searchBlog, searchTransparency, searchEvents, type AcervoItem, type BlogPost, type Event } from "../lib/api";
+import { searchAcervo, searchBlog, searchTransparency, searchEvents, searchAll, type AcervoItem, type BlogPost, type Event, type SearchResultItem } from "../lib/api";
 
 type SearchType = "todos" | "acervo" | "blog" | "transparencia" | "agenda";
 
@@ -9,6 +9,7 @@ interface SearchResults {
     blog: BlogPost[];
     transparency: any[];
     events: Event[];
+    mixed: SearchResultItem[];
 }
 
 export function SearchPage() {
@@ -20,14 +21,15 @@ export function SearchPage() {
         acervo: [],
         blog: [],
         transparency: [],
-        events: []
+        events: [],
+        mixed: []
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!query.trim()) {
-            setResults({ acervo: [], blog: [], transparency: [], events: [] });
+            setResults({ acervo: [], blog: [], transparency: [], events: [], mixed: [] });
             return;
         }
 
@@ -38,26 +40,42 @@ export function SearchPage() {
 
                 const promises: Promise<any>[] = [];
 
-                if (tipo === "todos" || tipo === "acervo") promises.push(searchAcervo(query, 10));
-                else promises.push(Promise.resolve([]));
+                if (tipo === "todos" && query.trim().length >= 2) {
+                    const [mixedRes, transRes, eventsRes] = await Promise.all([
+                        searchAll(query, 20),
+                        searchTransparency(query, 5),
+                        searchEvents(query, 5)
+                    ]);
+                    setResults({
+                        acervo: [],
+                        blog: [],
+                        transparency: transRes,
+                        events: eventsRes,
+                        mixed: mixedRes
+                    });
+                } else {
+                    if (tipo === "todos" || tipo === "acervo") promises.push(searchAcervo(query, 10));
+                    else promises.push(Promise.resolve([]));
 
-                if (tipo === "todos" || tipo === "blog") promises.push(searchBlog(query, 10));
-                else promises.push(Promise.resolve([]));
+                    if (tipo === "todos" || tipo === "blog") promises.push(searchBlog(query, 10));
+                    else promises.push(Promise.resolve([]));
 
-                if (tipo === "todos" || tipo === "transparencia") promises.push(searchTransparency(query, 10));
-                else promises.push(Promise.resolve([]));
+                    if (tipo === "todos" || tipo === "transparencia") promises.push(searchTransparency(query, 10));
+                    else promises.push(Promise.resolve([]));
 
-                if (tipo === "todos" || tipo === "agenda") promises.push(searchEvents(query, 10));
-                else promises.push(Promise.resolve([]));
+                    if (tipo === "todos" || tipo === "agenda") promises.push(searchEvents(query, 10));
+                    else promises.push(Promise.resolve([]));
 
-                const [acervoRes, blogRes, transRes, eventsRes] = await Promise.all(promises);
+                    const [acervoRes, blogRes, transRes, eventsRes] = await Promise.all(promises);
 
-                setResults({
-                    acervo: acervoRes,
-                    blog: blogRes,
-                    transparency: transRes,
-                    events: eventsRes
-                });
+                    setResults({
+                        acervo: acervoRes,
+                        blog: blogRes,
+                        transparency: transRes,
+                        events: eventsRes,
+                        mixed: []
+                    });
+                }
             } catch (err) {
                 console.error("Erro na busca:", err);
                 setError("Ocorreu um erro ao realizar a busca.");
@@ -74,7 +92,7 @@ export function SearchPage() {
         setSearchParams({ q: query, tipo: newTipo });
     };
 
-    const totalResults = results.acervo.length + results.blog.length + results.transparency.length + results.events.length;
+    const totalResults = results.acervo.length + results.blog.length + results.transparency.length + results.events.length + results.mixed.length;
 
     const formatCurrency = (cents: number) => {
         return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -109,8 +127,8 @@ export function SearchPage() {
                             key={t}
                             onClick={() => handleTipoChange(t)}
                             className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${tipo === t
-                                    ? "bg-ciano text-base shadow-lg shadow-ciano/20"
-                                    : "bg-base/40 text-texto/60 hover:bg-base/60 hover:text-texto"
+                                ? "bg-ciano text-base shadow-lg shadow-ciano/20"
+                                : "bg-base/40 text-texto/60 hover:bg-base/60 hover:text-texto"
                                 }`}
                         >
                             {t === "transparencia" ? "Transparência" : t}
@@ -142,6 +160,32 @@ export function SearchPage() {
                 </div>
             ) : (
                 <div className="space-y-12 pb-20">
+                    {/* Mixed Results (FTS) */}
+                    {results.mixed.length > 0 && (
+                        <div className="space-y-4">
+                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-cta flex items-center gap-2">
+                                Principais Resultados <span className="rounded-full bg-cta/10 px-2 py-0.5 text-[10px] text-cta">{results.mixed.length}</span>
+                            </h2>
+                            <div className="grid gap-4 md:grid-cols-2">
+                                {results.mixed.map((item) => (
+                                    <Link
+                                        key={item.url}
+                                        to={item.url}
+                                        className="group flex flex-col rounded-xl border border-ciano/20 bg-fundo/60 p-5 transition-all hover:border-ciano hover:bg-fundo/80"
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest ${item.kind === 'blog' ? 'bg-primaria/10 text-primaria' : 'bg-ciano/10 text-ciano'}`}>
+                                                {item.kind === 'blog' ? 'Blog da Emenda' : 'Acervo'}
+                                            </span>
+                                            <span className="text-[10px] text-texto/40">Score: {item.score.toFixed(2)}</span>
+                                        </div>
+                                        <h3 className="mt-2 font-bold text-texto group-hover:text-ciano">{item.title}</h3>
+                                        {item.excerpt && <p className="mt-2 text-xs text-texto/60 line-clamp-2">{item.excerpt}</p>}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                     {/* Acervo Results */}
                     {results.acervo.length > 0 && (
                         <div className="space-y-4">

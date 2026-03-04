@@ -1,0 +1,24 @@
+[
+    {
+        "slug": "ciencia-cidada",
+        "title": "Ciência Cidadã e Monitoramento",
+        "excerpt": "Uma coleção de documentos e mídias sobre como a comunidade participa do monitoramento da qualidade do ar.",
+        "cover_url": "https://semear-pwa.vercel.app/icons/icon-512.png",
+        "tags": [
+            "ciência cidadã",
+            "monitoramento",
+            "comunidade"
+        ]
+    },
+    {
+        "slug": "memoria-viva",
+        "title": "Memória Viva e Histórica",
+        "excerpt": "Registros históricos e memórias do projeto SEMEAR ao longo dos anos.",
+        "cover_url": "https://semear-pwa.vercel.app/icons/icon-512.png",
+        "tags": [
+            "história",
+            "memória",
+            "registros"
+        ]
+    }
+]

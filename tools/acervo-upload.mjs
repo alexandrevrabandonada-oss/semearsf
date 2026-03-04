@@ -87,6 +87,9 @@ async function upload() {
 
         if (cover === "true") {
             updateData.cover_url = publicUrl;
+            // TODO: Integrar transformação real no futuro
+            updateData.cover_thumb_url = publicUrl;
+            updateData.cover_small_url = publicUrl;
         }
 
         const { error: updateError } = await supabase
