@@ -1,82 +1,115 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
+import crypto from "node:crypto";
+
+const SUPABASE_URL = process.env.SUPABASE_URL || "";
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const SHARE_HASH_SALT = process.env.SHARE_HASH_SALT || "semear_fallback_salt";
+const VITE_PROJECT_NAME = process.env.VITE_PROJECT_NAME || "SEMEAR SF";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+function hashIp(ip: string, userAgent: string): string {
+    return crypto
+        .createHash("sha256")
+        .update(`${ip}-${userAgent}-${SHARE_HASH_SALT}`)
+        .digest("hex");
+}
 
 export default async function handler(req: any, res: any) {
     const { station_code } = req.query;
-
     if (!station_code) {
-        return res.redirect('/dados');
+        return res.status(400).send("Bad Request: missing station_code");
     }
 
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    try {
+        // 1. Fetch Station & Latest Measurement via Service Role
+        const { data: station, error: stmtErr } = await supabase
+            .from("stations")
+            .select(`
+                id, code, name,
+                measurements (
+                    pm25, pm10, ts
+                )
+            `)
+            .eq("code", station_code)
+            .order("ts", { referencedTable: "measurements", ascending: false })
+            .limit(1, { referencedTable: "measurements" })
+            .single();
 
-    if (!supabaseUrl || !supabaseServiceKey) {
-        return res.redirect(`/dados?station=${station_code}`);
-    }
+        if (stmtErr) {
+            console.warn(`[share/dados] Could not find station for ${station_code}`, stmtErr.message);
+            return res.redirect(302, `/dados?station=${station_code}`);
+        }
+        if (!station) {
+            return res.redirect(302, `/dados?station=${station_code}`);
+        }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        const meas = station.measurements?.[0];
+        let desc = "Confira os dados em tempo real desta estação de monitoramento no SEMEAR.";
+        if (meas) {
+            const timeStr = new Date(meas.ts).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+            desc = `PM2.5: ${meas.pm25.toFixed(1)} | PM10: ${meas.pm10.toFixed(1)} | Atualizado: ${timeStr}`;
+        }
 
-    // Fetch station and latest measurement
-    const { data: station, error: sError } = await supabase
-        .from('stations')
-        .select('id, name')
-        .eq('code', station_code)
-        .single();
+        // 2. Log Share Event explicitly bypassing RLS via Service Role
+        const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.connection?.remoteAddress || "0.0.0.0";
+        const userAgent = req.headers["user-agent"] || "unknown";
+        const referrer = req.headers["referer"] || null;
+        const hashedIp = hashIp(ip, userAgent);
 
-    if (sError || !station) {
-        return res.redirect('/dados');
-    }
+        const { error: insertErr } = await supabase.from("share_events").insert({
+            kind: "dados",
+            slug: station.code,
+            referrer,
+            user_agent: userAgent,
+            ip_hash: hashedIp
+        });
 
-    const { data: measurement, error: mError } = await supabase
-        .from('measurements')
-        .select('pm25, pm10, ts')
-        .eq('station_id', station.id)
-        .order('ts', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        if (insertErr) {
+            console.warn(`[share/dados] Failed to log telemetry for ${station.code}:`, insertErr.message);
+        }
 
-    const title = `Qualidade do ar agora: ${station.name}`;
-    let description = 'Veja os dados de monitoramento ambiental em tempo real.';
+        // 3. Mount HTML with Open Graph
+        const title = `Qualidade do ar agora — ${station.name} | ${VITE_PROJECT_NAME}`;
+        const finalUrl = `https://${req.headers.host || "localhost"}/dados?station=${station.code}`;
+        const safeTitle = encodeURIComponent(station.name);
+        const safeSubtitle = encodeURIComponent(desc);
+        const fallbackImage = `https://${req.headers.host || "localhost"}/api/og/card?kind=dados&title=${safeTitle}&subtitle=${safeSubtitle}`;
 
-    if (measurement) {
-        const pm25 = measurement.pm25 !== null ? `${measurement.pm25} µg/m³` : 'N/A';
-        description = `Última medição: PM2.5: ${pm25}. Clique para ver o painel completo.`;
-    }
-
-    const image = 'https://semear-pwa.vercel.app/icons/icon-512.png';
-    const url = `https://semear-pwa.vercel.app/dados?station=${station_code}`;
-
-    const html = `
-<!DOCTYPE html>
+        const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>${title}</title>
-  <meta name="description" content="${description}">
-  
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="${url}">
-  <meta property="og:title" content="${title}">
-  <meta property="og:description" content="${description}">
-  <meta property="og:image" content="${image}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
 
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="${url}">
-  <meta property="twitter:title" content="${title}">
-  <meta property="twitter:description" content="${description}">
-  <meta property="twitter:image" content="${image}">
+    <!-- Open Graph / Meta -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="${finalUrl}">
+    <meta property="og:title" content="${title}">
+    <meta property="og:description" content="${desc}">
+    <meta property="og:image" content="${fallbackImage}">
 
-  <!-- Redirect -->
-  <meta http-equiv="refresh" content="0; url=/dados?station=${station_code}">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="${finalUrl}">
+    <meta name="twitter:title" content="${title}">
+    <meta name="twitter:description" content="${desc}">
+    <meta name="twitter:image" content="${fallbackImage}">
+
+    <meta http-equiv="refresh" content="0; url=${finalUrl}">
 </head>
 <body>
-  <p>Redirecionando para o painel de dados...</p>
+    <p>Redirecionando para a estação... <a href="${finalUrl}">Clique aqui</a> se demorar.</p>
 </body>
-</html>
-  `.trim();
+</html>`;
 
-    res.setHeader('Content-Type', 'text/html');
-    return res.status(200).send(html);
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=30");
+        return res.status(200).send(html);
+
+    } catch (err: any) {
+        console.error("[share/dados] Fatal Error:", err);
+        return res.redirect(302, `/dados?station=${station_code}`);
+    }
 }

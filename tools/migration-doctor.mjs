@@ -2,6 +2,8 @@ import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
+import net from "node:net";
+
 const TIMEOUT_MS = 15000;
 
 function run(cmd) {
@@ -24,13 +26,30 @@ function run(cmd) {
     }
 }
 
+function checkPort(port, host = '127.0.0.1') {
+    return new Promise((resolve) => {
+        const socket = new net.Socket();
+        socket.setTimeout(1000);
+        socket.once('connect', () => {
+            socket.destroy();
+            resolve(true);
+        });
+        socket.once('timeout', () => {
+            socket.destroy();
+            resolve(false);
+        });
+        socket.once('error', () => {
+            socket.destroy();
+            resolve(false);
+        });
+        socket.connect(port, host);
+    });
+}
+
 console.log("=== SUPABASE MIGRATION DOCTOR (Hardened) ===");
 
 // 1. Check Status
-const statusRes = run("npx supabase db status");
-const statusOutput = statusRes.output;
-const isRunning = statusOutput.includes("Manage Postgres databases") || statusOutput.includes("Local Version");
-const isLinked = !statusOutput.includes("not linked") && !statusOutput.includes("not logged in") && !statusOutput.includes("failed to initialise logging role");
+const isRunning = await checkPort(54322);
 
 if (isRunning) {
     console.log("[OK] DB Local: Rodando");
@@ -38,18 +57,25 @@ if (isRunning) {
     console.log("[OK] DB Local: Not running (remote-first mode)");
 }
 
+// Para avaliar se tem link remoto válido, uma forma direta é testar 'projects list'
+// que diz se o CLI consegue acessar remotamente:
+const linkRes = run("npx supabase projects list");
+const isLinked = linkRes.success && !linkRes.output.includes("You are not logged in") && linkRes.output.trim().length > 0;
+
 if (isLinked) {
     console.log("[OK] CLI Link: Autenticado");
 } else {
-    console.log("[SKIP] CLI Link: Não autenticado ou expirado");
+    console.log("[SKIP] CLI Link: Não autenticado ou status desconhecido");
 }
 
 // 2. Local Migrations (CLI + Fallback)
 console.log("\n--- LOCAL STATE ---");
-const localListRes = isRunning ? run("npx supabase migration list --local") : { success: false };
+const localListRes = isRunning ? run("npx supabase migration list --local") : { success: false, skipped: true };
 
 if (localListRes.success) {
     console.log("[OK] CLI local list: Sucesso");
+} else if (localListRes.skipped) {
+    console.log("[OK] CLI local list: Ignorado (DB Local offline)");
 } else {
     console.log("[WARN] CLI local list: Falhou (Usando fallback de Filesystem)");
     if (localListRes.error) {

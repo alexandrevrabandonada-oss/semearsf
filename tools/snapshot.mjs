@@ -3,8 +3,16 @@ import path from "node:path";
 import { execSync } from "node:child_process";
 
 function sh(cmd) {
-  try { return execSync(cmd, { stdio: ["ignore", "pipe", "pipe"] }).toString().trim(); }
-  catch (e) { return ((e.stdout?.toString() || "") + "\n" + (e.stderr?.toString() || "")).trim(); }
+  try {
+    return execSync(cmd, { stdio: ["ignore", "pipe", "pipe"] }).toString().trim();
+  }
+  catch (e) {
+    const stdOut = e.stdout?.toString() || "";
+    const stdErr = e.stderr?.toString() || "";
+    // Avoid dumping massive Node stack traces. Just grab the top lines.
+    const combined = (stdOut + "\n" + stdErr).trim().split('\n').filter(Boolean).slice(0, 5).join('\n');
+    return combined || "Error executing command";
+  }
 }
 
 function normalizeDbSmokeOutput(raw) {

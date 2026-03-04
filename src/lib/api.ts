@@ -22,6 +22,32 @@ export type DownsampledMeasurement = {
   quality_flag: string | null;
 };
 
+export type StationOverview = {
+  station_id: string;
+  code: string;
+  name: string;
+  bairro: string;
+  last_seen_at: string;
+  is_online: boolean;
+  last_ts: string | null;
+  pm25: number | null;
+  pm10: number | null;
+  temp: number | null;
+  humidity: number | null;
+};
+
+export async function getStationOverview(): Promise<StationOverview[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase.rpc("get_station_overview");
+    if (error) throw error;
+    return (data ?? []) as StationOverview[];
+  } catch (error) {
+    throw toAppError("Falha ao buscar visão geral das estações", error);
+  }
+}
+
+
 export type Event = {
   id: string;
   title: string;
@@ -748,6 +774,67 @@ export async function listCollectionsForItem(itemSlugOrId: string): Promise<Acer
   } catch (error) {
     console.warn("Falha ao buscar coleções do item:", error);
     return []; // Return empty gracefully
+  }
+}
+
+/**
+ * Retorna até `limit` itens do acervo que compartilham dos mesmos dossiês do item fornecido.
+ */
+export async function getRelatedItemsByCollections(itemSlugOrId: string, limit = 6): Promise<AcervoItem[]> {
+  try {
+    const supabase = assertSupabase();
+
+    let itemId = itemSlugOrId;
+    if (!itemSlugOrId.includes("-")) {
+      const { data: itemData, error: itemError } = await supabase
+        .from("acervo_items")
+        .select("id")
+        .eq("slug", itemSlugOrId)
+        .single();
+      if (itemError) throw itemError;
+      itemId = itemData.id;
+    }
+
+    // Pega as coleções deste item
+    const { data: cols, error: errCols } = await supabase
+      .from("acervo_collection_items")
+      .select("collection_id")
+      .eq("item_id", itemId);
+
+    if (errCols) throw errCols;
+    const colIds = (cols || []).map(c => c.collection_id);
+    if (colIds.length === 0) return [];
+
+    // Pega os itens dessas coleções ordenados por posição
+    const { data: related, error: errRelated } = await supabase
+      .from("acervo_collection_items")
+      .select(`
+        position,
+        acervo_items (*)
+      `)
+      .in("collection_id", colIds)
+      .neq("item_id", itemId)
+      .order("position", { ascending: true })
+      .limit(limit * 3); // Busca extra para permitr deduplicação
+
+    if (errRelated) throw errRelated;
+
+    // Deduplica os itens
+    const uniqueItems = new Map<string, AcervoItem>();
+    for (const row of (related || [])) {
+      if (!row.acervo_items) continue;
+      // Cast through any or unknown because Supabase relationships map identically
+      const itemPayload = Array.isArray(row.acervo_items) ? row.acervo_items[0] : row.acervo_items;
+      const item = rowToAcervoItem(itemPayload as unknown as Record<string, unknown>);
+      if (!uniqueItems.has(item.id)) {
+        uniqueItems.set(item.id, item);
+      }
+    }
+
+    return Array.from(uniqueItems.values()).slice(0, limit);
+  } catch (error) {
+    console.warn("Falha ao buscar itens relacionados:", error);
+    return [];
   }
 }
 

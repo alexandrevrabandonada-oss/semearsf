@@ -141,9 +141,14 @@ export function StatusPage() {
                                     <p className="text-[10px] text-texto/20 italic">Sem dados recentes</p>
                                 ) : (
                                     status.social.top_slugs.map((item, idx) => (
-                                        <div key={idx} className="flex items-center justify-end gap-2 text-[10px]">
-                                            <span className="text-texto/40 font-mono">/{item.slug}</span>
-                                            <span className="font-black text-base italic">{item.count}</span>
+                                        <div key={idx} className="flex flex-col items-end justify-center mb-1">
+                                            <div className="flex items-center gap-2 text-[10px]">
+                                                <span className="text-texto/40 font-mono">/{item.slug}</span>
+                                                <span className="font-black text-base italic">{item.count}</span>
+                                            </div>
+                                            <span className="text-[8px] font-bold uppercase tracking-widest text-ciano/50">
+                                                {item.kind === 'dossies' ? 'Dossiê' : item.kind === 'dados' ? 'Estação' : item.kind}
+                                            </span>
                                         </div>
                                     ))
                                 )}

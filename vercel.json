@@ -9,6 +9,10 @@
       "destination": "/api/share/blog?slug=:slug"
     },
     {
+      "source": "/s/dossies/:slug",
+      "destination": "/api/share/dossies?slug=:slug"
+    },
+    {
       "source": "/s/agenda/:id",
       "destination": "/api/share/agenda?eventId=:id"
     },

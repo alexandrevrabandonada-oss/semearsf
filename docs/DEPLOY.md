@@ -26,6 +26,13 @@ npm run ship:content
 3. Importação da Transparência (`transparency:import`)
 4. Verificação final e snapshot (`done`)
 
+### 🧪 Modo Demo Local (Sensores)
+Para testes de UI ou desenvolvimento sem aguardar requisições reais do sensor físico, você pode injetar ruído artificial cronológico diretamente na estação `piloto` usando:
+```bash
+npm run demo:dados
+```
+*Isto criará 10 métricas simuladas nos últimos 50 minutos retroativos e forçará a estação como `online`.*
+
 ## Como Atualizar Conteúdo
 
 1. Edite os arquivos correspondentes em `/data`:

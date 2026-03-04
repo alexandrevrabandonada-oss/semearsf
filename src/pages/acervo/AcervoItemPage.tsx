@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { getAcervoBySlug, listCollectionsForItem, type AcervoItem, type AcervoCollection } from "../../lib/api";
+import { getAcervoBySlug, listCollectionsForItem, getRelatedItemsByCollections, type AcervoItem, type AcervoCollection } from "../../lib/api";
 
 const KIND_LABELS: Record<string, string> = {
     paper: "Artigo científico",
@@ -35,6 +35,7 @@ export function AcervoItemPage() {
     const { slug } = useParams<{ slug: string }>();
     const [item, setItem] = useState<AcervoItem | null>(null);
     const [collections, setCollections] = useState<AcervoCollection[]>([]);
+    const [related, setRelated] = useState<AcervoItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -50,9 +51,14 @@ export function AcervoItemPage() {
                     getAcervoBySlug(slug as string),
                     listCollectionsForItem(slug as string)
                 ]);
+                let relatedItems: AcervoItem[] = [];
+                if (data && data.id) {
+                    relatedItems = await getRelatedItemsByCollections(data.id, 6);
+                }
                 if (!cancelled) {
                     setItem(data);
                     setCollections(cols);
+                    setRelated(relatedItems);
                 }
             } catch (err) {
                 if (!cancelled)
@@ -184,18 +190,18 @@ export function AcervoItemPage() {
                         </div>
                     )}
 
-                    {/* Associated Collections */}
+                    {/* Associated Collections (Chips) */}
                     {collections.length > 0 && (
                         <div className="mt-8 rounded-xl border border-cta/30 bg-cta/5 p-5">
                             <span className="block mb-3 text-xs font-bold uppercase tracking-widest text-cta">
                                 📚 Este item está nos dossiês:
                             </span>
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 {collections.map(col => (
                                     <Link
                                         key={col.id}
                                         to={`/dossies/${col.slug}`}
-                                        className="text-sm font-semibold text-cta hover:underline block"
+                                        className="rounded-full bg-cta/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-cta hover:bg-cta/25 transition-colors"
                                     >
                                         → {col.title}
                                     </Link>
@@ -225,13 +231,38 @@ export function AcervoItemPage() {
                     {/* External link CTA */}
                     {item.source_url && !item.content_md && (
                         <a
-                            className="mt-8 inline-flex items-center gap-2 rounded-lg bg-cta px-6 py-4 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
+                            className="mt-8 mb-8 inline-flex items-center gap-2 rounded-lg bg-cta px-6 py-4 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
                             href={item.source_url}
                             rel="noopener noreferrer"
                             target="_blank"
                         >
                             Acessar fonte completa →
                         </a>
+                    )}
+
+                    {/* Related Items */}
+                    {related.length > 0 && (
+                        <div className="mt-10 border-t border-ciano/20 pt-8">
+                            <h3 className="mb-6 text-sm font-black uppercase tracking-widest text-ciano">
+                                Relacionados neste dossiê
+                            </h3>
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                {related.map(rel => (
+                                    <Link
+                                        key={rel.id}
+                                        to={`/acervo/item/${rel.slug}`}
+                                        className="group flex flex-col rounded-xl border border-ciano/20 bg-fundo/50 p-4 transition-all hover:bg-base/20 hover:border-ciano"
+                                    >
+                                        <span className="mb-2 inline-block self-start rounded-full bg-ciano/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-ciano group-hover:bg-ciano/20 transition-colors">
+                                            {KIND_LABELS[rel.kind] ?? rel.kind}
+                                        </span>
+                                        <h4 className="text-sm font-bold text-texto group-hover:text-ciano line-clamp-2 leading-snug">
+                                            {rel.title}
+                                        </h4>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
                     )}
                 </article>
             )}

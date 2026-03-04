@@ -1,6 +1,6 @@
 # Project State Snapshot
 
-**Date:** 2026-03-04T22:45:50.170Z
+**Date:** 2026-03-04T23:29:54.663Z
 
 ## Versions
 ```
@@ -11,16 +11,25 @@ npm:  10.9.3
 ## Git
 ```
 ## main...origin/main
- M docs/ACERVO.md
+ M api/share/dados.ts
+ M docs/DEPLOY.md
  M package.json
  M reports/state.md
  M src/lib/api.ts
+ M src/pages/DadosPage.tsx
  M src/pages/HomePage.tsx
- M src/pages/SearchPage.tsx
+ M src/pages/StatusPage.tsx
  M src/pages/acervo/AcervoItemPage.tsx
  M src/pages/acervo/CollectionDetailPage.tsx
  M src/pages/acervo/CollectionsListPage.tsx
- M tools/collections-import.mjs
+ M tools/migration-doctor.mjs
+ M tools/snapshot.mjs
+ M vercel.json
+?? api/og/
+?? api/share/dossies.ts
+?? supabase/migrations/20260309000002_share_dossies.sql
+?? supabase/migrations/20260309000003_station_overview.sql
+?? tools/demo-measurements.mjs
 ```
 
 ## package.json scripts
@@ -51,6 +60,7 @@ npm:  10.9.3
   "blog:import": "node tools/blog-import.mjs",
   "collections:import": "node tools/collections-import.mjs",
   "transparency:import": "node tools/transparency-import.mjs",
+  "demo:dados": "node tools/demo-measurements.mjs",
   "done": "npm run verify && npm run smoke && npm run db:doctor && npm run env:doctor && npm run snapshot"
 }
 ```
@@ -118,6 +128,7 @@ acervo-upload.mjs
 blog-import.mjs
 collections-import.mjs
 db-smoke.mjs
+demo-measurements.mjs
 env-clean.mjs
 env-doctor.mjs
 migration-doctor.mjs
@@ -150,7 +161,7 @@ VITE_PROJECT_NAME
 ## DB Smoke
 ```text
 stations: OK count=1
-measurements: OK count=0
+measurements: OK count=20
 events: OK count=1
 registrations: EXPECTED_DENIED
 DB_SMOKE: OK
@@ -159,23 +170,22 @@ DB_SMOKE: OK
 ## Supabase Migration Doctor
 ```text
 === SUPABASE MIGRATION DOCTOR (Hardened) ===
-[OK] DB Local: Rodando
+[OK] DB Local: Not running (remote-first mode)
 [OK] CLI Link: Autenticado
 
 --- LOCAL STATE ---
-[WARN] CLI local list: Falhou (Usando fallback de Filesystem)
-      Motivo: Connecting to local database... failed to connect to postgres: failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:54322: connectex: Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente.)
-[OK] Filesystem Scan: 14 arquivos encontrados
+[OK] CLI local list: Ignorado (DB Local offline)
+[OK] Filesystem Scan: 16 arquivos encontrados
       Últimas 5 migrações locais:
+      - 20260309000003_station_overview.sql
+      - 20260309000002_share_dossies.sql
       - 20260309000001_covers_optimization.sql
       - 20260308000005_push_adv.sql
       - 20260308000004_share_analytics.sql
-      - 20260308000003_push_rules.sql
-      - 20260308000002_push.sql
 
 --- REMOTE STATE ---
 [OK] CLI remote list: Sucesso
-      Total: 14 migrações no ambiente remoto.
+      Total: 16 migrações no ambiente remoto.
 
 Doctor analysis completed.
 ```

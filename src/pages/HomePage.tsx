@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { listAcervoItems, listBlogPosts, listStations, listUpcomingEvents, getTransparencySummary, listCollections, type AcervoItem, type Event, type Station, type BlogPost, type TransparencySummary, type AcervoCollection } from "../lib/api";
-
-const ONLINE_THRESHOLD_MS = 5 * 60 * 1000;
-
-function getStationOnlineStatus(station: Station) {
-  const lastSeen = typeof station.last_seen_at === "string" ? new Date(station.last_seen_at) : null;
-  if (!lastSeen || Number.isNaN(lastSeen.getTime())) return false;
-  return Date.now() - lastSeen.getTime() <= ONLINE_THRESHOLD_MS;
-}
+import { listAcervoItems, listBlogPosts, getStationOverview, listUpcomingEvents, getTransparencySummary, listCollections, type AcervoItem, type Event, type StationOverview, type BlogPost, type TransparencySummary, type AcervoCollection } from "../lib/api";
 
 export function HomePage() {
-  const [stations, setStations] = useState<Station[]>([]);
+  const [stations, setStations] = useState<StationOverview[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [acervo, setAcervo] = useState<AcervoItem[]>([]);
   const [latestBlog, setLatestBlog] = useState<BlogPost | null>(null);
@@ -26,7 +18,7 @@ export function HomePage() {
       try {
         setLoading(true);
         const [stationsData, eventsData, acervoData, blogData, transData, collectionsData] = await Promise.all([
-          listStations(),
+          getStationOverview(),
           listUpcomingEvents(),
           listAcervoItems({ featured: true, limit: 6 }),
           listBlogPosts({ limit: 1 }),
@@ -49,7 +41,7 @@ export function HomePage() {
     void load();
   }, []);
 
-  const onlineCount = stations.filter(getStationOnlineStatus).length;
+  const onlineCount = stations.filter(s => s.is_online).length;
   const offlineCount = stations.length - onlineCount;
 
   const formatCurrency = (cents: number) => {
@@ -106,17 +98,28 @@ export function HomePage() {
             ) : error ? (
               <p className="text-sm text-acento/80">{error}</p>
             ) : (
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col">
-                  <span className="text-3xl font-black text-primaria">{onlineCount}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-texto/50">Online</span>
+              <div className="flex flex-col mt-4 gap-2">
+                <div className="flex items-center gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-3xl font-black text-primaria">{onlineCount}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-texto/50">Online</span>
+                  </div>
+                  <div className="h-8 w-px bg-ciano/20" />
+                  <div className="flex flex-col">
+                    <span className="text-3xl font-black text-acento">{offlineCount}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-texto/50">Offline</span>
+                  </div>
                 </div>
-                <div className="h-8 w-px bg-ciano/20" />
-                <div className="flex flex-col">
-                  <span className="text-3xl font-black text-acento">{offlineCount}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-texto/50">Offline</span>
-                </div>
-                <div className="ml-auto text-xs text-texto/70 italic">
+                {stations.filter(s => s.pm25 !== null).slice(0, 2).map(s => (
+                  <div key={s.station_id} className="flex justify-between items-center text-xs border-t border-ciano/10 pt-2">
+                    <span className="text-texto/70 truncate mr-2">{s.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-texto">{Math.round(s.pm25!)} µg/m³</span>
+                      <span className="text-[9px] text-texto/40">{new Date(s.last_ts!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                  </div>
+                ))}
+                <div className="mt-2 text-xs text-texto/50 italic">
                   Monitoramento local em tempo real.
                 </div>
               </div>

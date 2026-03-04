@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
-import { getMeasurementsDownsampled, listStations, type DownsampledMeasurement, type Station } from "../lib/api";
+import { getMeasurementsDownsampled, getStationOverview, type DownsampledMeasurement, type StationOverview } from "../lib/api";
 
 const ENV_HINT = " Verifique .env.local (VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY).";
 const POLLING_INTERVAL_MS = 60_000;
-const ONLINE_THRESHOLD_MS = 5 * 60 * 1000;
 
 function formatDate(value: unknown) {
   if (typeof value !== "string") return "-";
@@ -26,14 +26,11 @@ function formatCellValue(value: unknown) {
   return String(value);
 }
 
-function getStationOnlineStatus(station: Station | null) {
-  const date = parseIsoDate(station?.last_seen_at);
-  if (!date) return false;
-  return Date.now() - date.getTime() <= ONLINE_THRESHOLD_MS;
-}
-
 export function DadosPage() {
-  const [stations, setStations] = useState<Station[]>([]);
+  const [searchParams] = useSearchParams();
+  const stationCodeFromQuery = searchParams.get("station");
+
+  const [stations, setStations] = useState<StationOverview[]>([]);
   const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
   const [selectedRange, setSelectedRange] = useState<"24h" | "7d">("24h");
   const [measurements, setMeasurements] = useState<DownsampledMeasurement[]>([]);
@@ -50,9 +47,16 @@ export function DadosPage() {
       try {
         setLoadingStations(true);
         setError(null);
-        const data = await listStations();
+        const data = await getStationOverview();
         setStations(data);
-        setSelectedStationId((prev) => prev ?? data[0]?.id ?? null);
+
+        let defaultStationId = data[0]?.station_id ?? null;
+        if (stationCodeFromQuery) {
+          const matched = data.find(s => s.code === stationCodeFromQuery);
+          if (matched) defaultStationId = matched.station_id;
+        }
+
+        setSelectedStationId((prev) => prev ?? defaultStationId);
       } catch (err) {
         const message = err instanceof Error ? err.message : "Falha ao carregar estacoes.";
         setError(`${message}${ENV_HINT}`);
@@ -62,7 +66,7 @@ export function DadosPage() {
     }
 
     void run();
-  }, []);
+  }, [stationCodeFromQuery]);
 
   const loadMeasurements = useCallback(async (stationId: string, range: "24h" | "7d", silent = false) => {
     try {
@@ -111,11 +115,11 @@ export function DadosPage() {
   }, [isPageVisible, loadMeasurements, selectedRange, selectedStationId]);
 
   const selectedStation = useMemo(
-    () => stations.find((station) => station.id === selectedStationId) ?? null,
+    () => stations.find((station) => station.station_id === selectedStationId) ?? null,
     [selectedStationId, stations]
   );
   const lastUpdate = measurements[0]?.bucket_ts;
-  const isOnline = getStationOnlineStatus(selectedStation);
+  const isOnline = selectedStation?.is_online ?? false;
 
   return (
     <section className="space-y-6">
@@ -149,8 +153,8 @@ export function DadosPage() {
             >
               {!selectedStationId ? <option value="">Selecione...</option> : null}
               {stations.map((station) => (
-                <option key={station.id} value={station.id}>
-                  {String(station.name ?? station.id)}
+                <option key={station.station_id} value={station.station_id}>
+                  {String(station.name ?? station.station_id)}
                 </option>
               ))}
             </select>
