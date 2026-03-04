@@ -1,52 +1,60 @@
 # Product State Report - SEMEAR PWA
 
 **Date:** 2026-03-04
-**Project Identity:** Acervo Vivo Branding
+**Project Identity:** SEMEAR PWA (Acervo Vivo Branding & PWA)
 
 ## 1. Overview
-SEMEAR PWA is a portal designed for environmental monitoring and community engagement. It provides real-time data from air quality stations and manages local events and registrations.
+SEMEAR PWA is a Progressive Web App designed for environmental monitoring, community engagement, and public memory. It provides real-time air quality data, event management, and a curated digital collection (Acervo Vivo).
 
 ## 2. Core Features
 
 ### 📡 Air Quality Monitoring (Dados)
 - **Live Data**: Real-time visualization of sensor data (PM2.5, PM10, Temperature, Humidity).
-- **Downsampling**: SQL-based RPC functionality to aggregate data into buckets (1-minute buckets for 24h view, 15-minute buckets for 7d view).
-- **Polling**: Automatic background updates every 60 seconds when the page is visible.
-- **Status Tracking**: Visual indicators for station online/offline status based on heartbeats.
+- **Downsampling**: SQL-based RPC functionality (`get_measurements_downsampled`) to aggregate data into buckets (1-min for 24h, 15-min for 7d).
+- **Polling**: Automatic background updates every 60 seconds with offline detection.
 
-### 📅 Community Engagement (Agenda & Inscricoes)
-- **Event Management**: Listing of upcoming published events.
-- **Registration System**: User registration with WhatsApp integration and neighborhood (bairro) tracking.
-- **Capacity Control**: Logic to handle event capacity, automatically placing new registrations into a waitlist when full.
-- **LGPD Compliance**: Integrated consent management for data privacy.
+### 📚 Curadoria (Acervo Vivo)
+- **Multi-channel Content**: Dedicated sections for Artigos, Notícias, and Mídias.
+- **Advanced Filtering**: Full-text search (FTS), tag filtering, and year-based navigation.
+- **Dynamic Routing**: Implementation of hub, list, and detailed item views with consistent loading/error states.
+- **Schema Rework**: Migrated to a robust schema with `acervo_items` (GIN indexes, TSVector) and `acervo_editors` guardrails.
+
+### 📅 Community Engagement (Agenda & Incricoes)
+- **Event Lifecycle**: Management of published events and public registrations.
+- **Waitlist Logic**: Automated capacity control and queue management.
+- **WhatsApp Integration**: Streamlined communication for registrations.
+
+### 📱 PWA Features
+- **Installation**: Direct "Instalar" CTA in Navbar with platform-specific instructions.
+- **Offline Support**: Custom `OfflinePage.tsx` fallback and essential asset caching via `vite-plugin-pwa`.
+- **Manifest**: Premium branding ($00e5ff$ ciano / dark theme) and high-quality generated icons (192, 512).
 
 ## 3. Technical Architecture
 
 ### 🛠️ Tech Stack
-- **Frontend**: React 18, Vite, TypeScript.
-- **Styling**: Tailwind CSS for a premium, responsive UI.
-- **Backend/Database**: Supabase (PostgreSQL, Realtime, RPC, Storage).
-- **Routing**: React Router v7.
+- **Frontend**: React 18, Vite, TypeScript, Tailwind CSS.
+- **Backend**: Supabase (PostgreSQL, Realtime, RPC, Storage, RLS).
+- **Verification**: `npm run done` pipeline (TypeScript check, Build, Smoke tests, Snapshot).
 
 ### 🏗️ Design System
-- **Branding**: Acervo Vivo (logo, mark, and stamp integrations).
-- **Aesthetics**: Modern dark/light-balanced theme with ciano and acento highlights, using Google Fonts (Inter/Roboto).
+- **Branding**: Acervo Vivo (logo, stamp, watermark-enabled AutoCover).
+- **UI/UX**: Premium dark-mode aesthetics with glassmorphism and modern typography (Inter/Roboto).
 
 ## 4. Development Status
 
 ### ✅ Database & Infrastructure
-- **Migration Strategy**: Repository-first workflow using Supabase CLI.
-- **Current Version**: Applied through `20260225_000002_downsample_rpc.sql`.
-- **Remote Sync**: Synchronized with the production Supabase instance.
+- **Migrations**: 100% repository-first. Latest: `20260305_000001_acervo.sql`.
+- **Security**: Granular RLS policies protecting sensitive modules and administrator blocks.
 
-### 🔍 Quality & Build
-- **Verification**: `npm run done` is passing (verified Build, Type-check, and Smoke tests).
-- **State Snapshot**: Automated snapshots generated in `reports/state.md`.
+### 🔍 Quality Assurance
+- **Build Status**: ✅ Passing (Exit Code 0).
+- **Linting**: Clean (no high-priority errors).
+- **Snapshots**: Automated snapshots generated periodically in `reports/state.md`.
 
 ## 5. Recent Accomplishments
-- **Downsampling Implementation**: Optimized frontend performance by moving data aggregation to the database layer via RPC.
-- **Branding Integration**: Full implementation of the Brand Pack & AutoCover system.
-- **System Stability**: Resolved database version conflicts and ensured synchronized state across environments.
+1. **PWA Transformation**: Converted the portal into a fully functional PWA with offline fallback.
+2. **Acervo Module**: Implemented the complete curadoria system frontend and backend.
+3. **Design Polish**: Integrated premium branding and stabilized the UI across all modules.
 
 ---
 *Report generated by Antigravity AI.*

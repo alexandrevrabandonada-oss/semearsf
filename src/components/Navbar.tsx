@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 const links = [
   { href: "/", label: "Home" },
   { href: "/dados", label: "Dados" },
+  { href: "/acervo", label: "Acervo" },
   { href: "/agenda", label: "Agenda" },
   { href: "/inscricoes", label: "Inscricoes" },
   { href: "/sobre", label: "Sobre" },
@@ -32,6 +33,17 @@ export function Navbar() {
               </NavLink>
             </li>
           ))}
+          <li>
+            <button
+              className="ml-2 rounded-md border border-cta bg-cta/10 px-3 py-1 text-xs font-black uppercase tracking-wide text-cta transition-colors hover:bg-cta hover:text-base"
+              onClick={() => {
+                alert("Para instalar: no Android, clique nos três pontos e 'Instalar aplicativo'. No iOS, clique em Compartilhar e 'Adicionar à Tela de Início'.");
+              }}
+              type="button"
+            >
+              Instalar
+            </button>
+          </li>
         </ul>
       </nav>
     </header>

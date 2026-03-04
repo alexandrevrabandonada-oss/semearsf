@@ -186,3 +186,96 @@ export async function createRegistration(payload: RegistrationPayload): Promise<
     throw toAppError("Falha ao criar inscricao", error);
   }
 }
+
+// ─────────────────────────────────────────
+// Acervo
+// ─────────────────────────────────────────
+
+export type AcervoKind = "paper" | "news" | "video" | "photo" | "report" | "link";
+
+export type AcervoItem = {
+  id: string;
+  kind: AcervoKind;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content_md: string | null;
+  source_name: string | null;
+  source_url: string | null;
+  published_at: string | null;
+  year: number | null;
+  city: string;
+  tags: string[];
+  meta: Record<string, unknown>;
+  created_at: string;
+};
+
+export type ListAcervoParams = {
+  kind?: AcervoKind;
+  q?: string;
+  tag?: string;
+  year?: number;
+  limit?: number;
+  offset?: number;
+};
+
+function rowToAcervoItem(row: Record<string, unknown>): AcervoItem {
+  return {
+    id: String(row.id ?? ""),
+    kind: (row.kind as AcervoKind) ?? "link",
+    title: String(row.title ?? "Sem título"),
+    slug: String(row.slug ?? ""),
+    excerpt: typeof row.excerpt === "string" ? row.excerpt : null,
+    content_md: typeof row.content_md === "string" ? row.content_md : null,
+    source_name: typeof row.source_name === "string" ? row.source_name : null,
+    source_url: typeof row.source_url === "string" ? row.source_url : null,
+    published_at: typeof row.published_at === "string" ? row.published_at : null,
+    year: typeof row.year === "number" ? row.year : null,
+    city: typeof row.city === "string" ? row.city : "Volta Redonda",
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    meta: row.meta && typeof row.meta === "object" && !Array.isArray(row.meta)
+      ? (row.meta as Record<string, unknown>)
+      : {},
+    created_at: typeof row.created_at === "string" ? row.created_at : ""
+  };
+}
+
+export async function listAcervoItems(params: ListAcervoParams = {}): Promise<AcervoItem[]> {
+  try {
+    const { kind, q, tag, year, limit = 50, offset = 0 } = params;
+    const supabase = assertSupabase();
+
+    let query = supabase
+      .from("acervo_items")
+      .select("id, kind, title, slug, excerpt, source_name, source_url, published_at, year, city, tags, created_at")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .range(offset, offset + limit - 1);
+
+    if (kind) query = query.eq("kind", kind);
+    if (year) query = query.eq("year", year);
+    if (tag) query = query.contains("tags", [tag]);
+    if (q) query = query.textSearch("search_vec", q, { config: "portuguese", type: "websearch" });
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return ((data ?? []) as Record<string, unknown>[]).map(rowToAcervoItem);
+  } catch (error) {
+    throw toAppError("Falha ao listar itens do acervo", error);
+  }
+}
+
+export async function getAcervoBySlug(slug: string): Promise<AcervoItem | null> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("acervo_items")
+      .select("id, kind, title, slug, excerpt, content_md, source_name, source_url, published_at, year, city, tags, meta, created_at")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return rowToAcervoItem(data as Record<string, unknown>);
+  } catch (error) {
+    throw toAppError("Falha ao carregar item do acervo", error);
+  }
+}

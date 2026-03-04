@@ -7,6 +7,9 @@ import { HomePage } from "./pages/HomePage";
 import { InscricoesPage } from "./pages/InscricoesPage";
 import { SobrePage } from "./pages/SobrePage";
 import { TransparenciaPage } from "./pages/TransparenciaPage";
+import { AcervoPage } from "./pages/acervo/AcervoPage";
+import { AcervoListPage } from "./pages/acervo/AcervoListPage";
+import { AcervoItemPage } from "./pages/acervo/AcervoItemPage";
 
 export default function App() {
   return (
@@ -18,6 +21,9 @@ export default function App() {
         <Route path="/inscricoes" element={<InscricoesPage />} />
         <Route path="/sobre" element={<SobrePage />} />
         <Route path="/transparencia" element={<TransparenciaPage />} />
+        <Route path="/acervo" element={<AcervoPage />} />
+        <Route path="/acervo/:area" element={<AcervoListPage />} />
+        <Route path="/acervo/item/:slug" element={<AcervoItemPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </PortalLayout>

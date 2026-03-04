@@ -1,19 +1,23 @@
-# Project State Snapshot\n\n**Date:** 2026-03-04T18:24:58.710Z\n\n## Versions\n`\nnode: v22.19.0\nnpm:  10.9.3\n`\n\n## Git\n`\n## main...origin/main
+# Project State Snapshot\n\n**Date:** 2026-03-04T18:51:57.905Z\n\n## Versions\n`\nnode: v22.19.0\nnpm:  10.9.3\n`\n\n## Git\n`\n## main...origin/main
+ M .gitignore
+ M package-lock.json
  M package.json
  M reports/state.md
+ M src/App.tsx
+ M src/components/Footer.tsx
+ M src/components/Navbar.tsx
  M src/lib/api.ts
- M src/pages/DadosPage.tsx
- D supabase/migrations/20260225_add_stations_code.sql
-?? db_push.log
-?? db_push_2.log
-?? docs/
-?? supabase/.gitignore
-?? supabase/config.toml
-?? supabase/migrations/20260224_000001_baseline.sql
-?? supabase/migrations/20260225_000002_downsample_rpc.sql
-?? tools/secrets-set.mjs\n`\n\n## package.json scripts\n`json\n{
+ M tsconfig.json
+ M vite.config.js
+ M vite.config.ts
+?? public/
+?? src/lib/acervo.ts
+?? src/pages/OfflinePage.tsx
+?? src/pages/acervo/
+?? supabase/migrations/20260304_000003_acervo_items.sql
+?? supabase/migrations/20260305_000001_acervo.sql\n`\n\n## package.json scripts\n`json\n{
   "dev": "vite",
-  "build": "tsc -b && vite build",
+  "build": "vite build",
   "preview": "vite preview",
   "typecheck": "tsc -p tsconfig.json --noEmit",
   "verify": "npm run typecheck && npm run build",
@@ -29,6 +33,9 @@
   "done": "npm run verify && npm run smoke && npm run snapshot"
 }\n`\n\n## Routes (parsed from src/App.tsx)\n- *
 - /
+- /acervo
+- /acervo/:area
+- /acervo/item/:slug
 - /agenda
 - /dados
 - /inscricoes
@@ -41,15 +48,21 @@ index.css
 layout/
   PortalLayout.tsx
 lib/
+  acervo.ts
   api.ts
   supabase/
     client.ts
 main.tsx
 pages/
+  acervo/
+    AcervoItemPage.tsx
+    AcervoListPage.tsx
+    AcervoPage.tsx
   AgendaPage.tsx
   DadosPage.tsx
   HomePage.tsx
   InscricoesPage.tsx
+  OfflinePage.tsx
   PagePlaceholder.tsx
   SobrePage.tsx
   TransparenciaPage.tsx

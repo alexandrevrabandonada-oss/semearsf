@@ -6,6 +6,7 @@ export function Footer() {
           Projeto financiado por Emenda Parlamentar
         </span>
         <span className="rounded-md border border-ciano/50 bg-ciano/10 px-3 py-1">Coordenacao: UFF</span>
+        <span className="ml-4 text-[10px] uppercase tracking-widest text-cta/70">Disponível como PWA</span>
       </div>
     </footer>
   );

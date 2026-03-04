@@ -12,5 +12,10 @@ dist/
 
 *.local
 .DS_Store
-*.tsbuildinfo
 .vscode/
+*.tsbuildinfo
+
+# Reports and Logs
+reports/state.md
+db_push.log
+db_push_*.log
