@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { getLatestMeasurements, listStations, type Measurement, type Station } from "../lib/api";
+import { getMeasurementsDownsampled, listStations, type DownsampledMeasurement, type Station } from "../lib/api";
 
 const ENV_HINT = " Verifique .env.local (VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY).";
 const POLLING_INTERVAL_MS = 60_000;
@@ -35,7 +35,8 @@ function getStationOnlineStatus(station: Station | null) {
 export function DadosPage() {
   const [stations, setStations] = useState<Station[]>([]);
   const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
-  const [measurements, setMeasurements] = useState<Measurement[]>([]);
+  const [selectedRange, setSelectedRange] = useState<"24h" | "7d">("24h");
+  const [measurements, setMeasurements] = useState<DownsampledMeasurement[]>([]);
   const [loadingStations, setLoadingStations] = useState(true);
   const [loadingMeasurements, setLoadingMeasurements] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,12 +64,12 @@ export function DadosPage() {
     void run();
   }, []);
 
-  const loadMeasurements = useCallback(async (stationId: string, silent = false) => {
+  const loadMeasurements = useCallback(async (stationId: string, range: "24h" | "7d", silent = false) => {
     try {
       if (!silent) setLoadingMeasurements(true);
       setError(null);
       setSuccessMessage(null);
-      const data = await getLatestMeasurements(stationId, 20);
+      const data = await getMeasurementsDownsampled(stationId, range);
       setMeasurements(data);
       if (!silent) setSuccessMessage("Dados atualizados com sucesso.");
     } catch (err) {
@@ -82,38 +83,38 @@ export function DadosPage() {
   useEffect(() => {
     const stationId = selectedStationId ?? "";
     if (!stationId) return;
-    void loadMeasurements(stationId);
-  }, [loadMeasurements, selectedStationId]);
+    void loadMeasurements(stationId, selectedRange);
+  }, [loadMeasurements, selectedRange, selectedStationId]);
 
   useEffect(() => {
     function onVisibilityChange() {
       const visible = document.visibilityState === "visible";
       setIsPageVisible(visible);
       if (visible && selectedStationId) {
-        void loadMeasurements(selectedStationId, true);
+        void loadMeasurements(selectedStationId, selectedRange, true);
       }
     }
 
     document.addEventListener("visibilitychange", onVisibilityChange);
     return () => document.removeEventListener("visibilitychange", onVisibilityChange);
-  }, [loadMeasurements, selectedStationId]);
+  }, [loadMeasurements, selectedRange, selectedStationId]);
 
   useEffect(() => {
     const stationId = selectedStationId ?? "";
     if (!stationId || !isPageVisible) return;
 
     const intervalId = window.setInterval(() => {
-      void loadMeasurements(stationId, true);
+      void loadMeasurements(stationId, selectedRange, true);
     }, POLLING_INTERVAL_MS);
 
     return () => window.clearInterval(intervalId);
-  }, [isPageVisible, loadMeasurements, selectedStationId]);
+  }, [isPageVisible, loadMeasurements, selectedRange, selectedStationId]);
 
   const selectedStation = useMemo(
     () => stations.find((station) => station.id === selectedStationId) ?? null,
     [selectedStationId, stations]
   );
-  const lastUpdate = measurements[0]?.ts;
+  const lastUpdate = measurements[0]?.bucket_ts;
   const isOnline = getStationOnlineStatus(selectedStation);
 
   return (
@@ -157,10 +158,31 @@ export function DadosPage() {
           <button
             className="rounded-md bg-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={!selectedStationId || loadingMeasurements}
-            onClick={() => selectedStationId && void loadMeasurements(selectedStationId)}
+            onClick={() => selectedStationId && void loadMeasurements(selectedStationId, selectedRange)}
             type="button"
           >
             Atualizar agora
+          </button>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${
+              selectedRange === "24h" ? "bg-ciano text-base" : "border border-ciano/40 bg-fundo text-texto hover:bg-fundo/80"
+            }`}
+            onClick={() => setSelectedRange("24h")}
+            type="button"
+          >
+            24h
+          </button>
+          <button
+            className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${
+              selectedRange === "7d" ? "bg-ciano text-base" : "border border-ciano/40 bg-fundo text-texto hover:bg-fundo/80"
+            }`}
+            onClick={() => setSelectedRange("7d")}
+            type="button"
+          >
+            7d
           </button>
         </div>
 
@@ -179,7 +201,7 @@ export function DadosPage() {
       </section>
 
       <section className="rounded-2xl border border-acento/60 bg-fundo/70 p-6">
-        <h2 className="text-lg font-bold text-cta">Ultimas medicoes (20)</h2>
+        <h2 className="text-lg font-bold text-cta">Medicoes consolidadas por bucket ({selectedRange})</h2>
         {!selectedStationId ? (
           <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
             Selecione uma estacao para ver as medicoes.
@@ -210,8 +232,8 @@ export function DadosPage() {
               </thead>
               <tbody>
                 {measurements.map((row) => (
-                  <tr className="border-b border-base/80" key={String(row.id)}>
-                    <td className="px-3 py-2 text-texto/90">{formatDate(row.ts)}</td>
+                  <tr className="border-b border-base/80" key={String(row.bucket_ts)}>
+                    <td className="px-3 py-2 text-texto/90">{formatDate(row.bucket_ts)}</td>
                     <td className="px-3 py-2 text-texto/90">{formatCellValue(row.pm25)}</td>
                     <td className="px-3 py-2 text-texto/90">{formatCellValue(row.pm10)}</td>
                     <td className="px-3 py-2 text-texto/90">{formatCellValue(row.temp)}</td>

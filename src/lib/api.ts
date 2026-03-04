@@ -13,6 +13,15 @@ export type Measurement = {
   [key: string]: unknown;
 };
 
+export type DownsampledMeasurement = {
+  bucket_ts: string;
+  pm25: number | null;
+  pm10: number | null;
+  temp: number | null;
+  humidity: number | null;
+  quality_flag: string | null;
+};
+
 export type Event = {
   id: string;
   title: string;
@@ -80,6 +89,23 @@ export async function getLatestMeasurements(stationId: string, limit = 20): Prom
     return (data ?? []) as Measurement[];
   } catch (error) {
     throw toAppError("Falha ao listar medicoes", error);
+  }
+}
+
+export async function getMeasurementsDownsampled(
+  stationId: string,
+  range: "24h" | "7d"
+): Promise<DownsampledMeasurement[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase.rpc("get_measurements_downsampled", {
+      p_station_id: stationId,
+      p_range: range
+    });
+    if (error) throw error;
+    return (data ?? []) as DownsampledMeasurement[];
+  } catch (error) {
+    throw toAppError("Falha ao listar medicoes consolidadas", error);
   }
 }
 
