@@ -8,6 +8,7 @@ import { InscricoesPage } from "./pages/InscricoesPage";
 import { SobrePage } from "./pages/SobrePage";
 import { TransparenciaPage } from "./pages/TransparenciaPage";
 import { AcervoPage } from "./pages/acervo/AcervoPage";
+import { AcervoTimelinePage } from "./pages/acervo/AcervoTimelinePage";
 import { AcervoListPage } from "./pages/acervo/AcervoListPage";
 import { AcervoItemPage } from "./pages/acervo/AcervoItemPage";
 import { AlertasPage } from "./pages/AlertasPage";
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/sobre" element={<SobrePage />} />
         <Route path="/transparencia" element={<TransparenciaPage />} />
         <Route path="/acervo" element={<AcervoPage />} />
+        <Route path="/acervo/linha" element={<AcervoTimelinePage />} />
         <Route path="/acervo/:area" element={<AcervoListPage />} />
         <Route path="/acervo/item/:slug" element={<AcervoItemPage />} />
         <Route path="/dossies" element={<CollectionsListPage />} />

@@ -39,6 +39,32 @@ export function AcervoItemPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    // Modal State
+    const [activeMedia, setActiveMedia] = useState<{ url: string; type: string; title?: string } | null>(null);
+    const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+    useEffect(() => {
+        const handleOnline = () => setIsOffline(false);
+        const handleOffline = () => setIsOffline(true);
+        window.addEventListener("online", handleOnline);
+        window.addEventListener("offline", handleOffline);
+        return () => {
+            window.removeEventListener("online", handleOnline);
+            window.removeEventListener("offline", handleOffline);
+        };
+    }, []);
+
+    // Close Modal on ESC
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && activeMedia) {
+                setActiveMedia(null);
+            }
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [activeMedia]);
+
     useEffect(() => {
         if (!slug) return;
         let cancelled = false;
@@ -228,8 +254,29 @@ export function AcervoItemPage() {
                     {/* Body */}
                     {item.content_md ? <SimpleMarkdown text={item.content_md} /> : null}
 
+                    {/* Media Gallery / PDF Viewer Buttons */}
+                    {item.media && item.media.length > 0 && (
+                        <div className="mt-8 mb-8 flex flex-wrap gap-4">
+                            {item.media.map((m, idx) => {
+                                const isPdf = m.type.toLowerCase().includes("pdf") || m.url.toLowerCase().endsWith(".pdf");
+                                return (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setActiveMedia(m)}
+                                        className="inline-flex items-center gap-2 rounded-lg bg-cta px-5 py-3 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
+                                        type="button"
+                                        aria-label={isPdf ? "Abrir PDF" : "Ver imagem"}
+                                    >
+                                        <span className="text-xl">{isPdf ? "📄" : "🖼️"}</span>
+                                        {m.title || (isPdf ? "Abrir PDF" : "Ver Imagem")}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+
                     {/* External link CTA */}
-                    {item.source_url && !item.content_md && (
+                    {item.source_url && !item.content_md && (!item.media || item.media.length === 0) && (
                         <a
                             className="mt-8 mb-8 inline-flex items-center gap-2 rounded-lg bg-cta px-6 py-4 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
                             href={item.source_url}
@@ -265,6 +312,66 @@ export function AcervoItemPage() {
                         </div>
                     )}
                 </article>
+            )}
+
+            {/* Media Viewer Modal */}
+            {activeMedia && (
+                <div
+                    className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-fundo/95 p-4 backdrop-blur-sm"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="media-modal-title"
+                >
+                    <div className="absolute top-4 right-4 flex items-center gap-4">
+                        <a
+                            href={activeMedia.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-bold uppercase tracking-widest text-ciano hover:text-ciano/80"
+                        >
+                            Abrir em nova aba ↗
+                        </a>
+                        <button
+                            className="rounded-full bg-acento/20 p-2 text-acento hover:bg-acento/30 transition-colors"
+                            onClick={() => setActiveMedia(null)}
+                            aria-label="Fechar visualizador"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div className="flex h-full w-full max-w-5xl flex-col items-center justify-center pt-12 pb-4">
+                        <p id="media-modal-title" className="sr-only">Visualizador de Mídia do Acervo</p>
+
+                        {isOffline && (
+                            <div className="mb-4 w-full rounded-lg border border-acento/40 bg-acento/10 p-3 text-center">
+                                <p className="text-sm font-bold text-acento">Você está offline</p>
+                                <p className="text-xs text-texto/80 mt-1">Se você já carregou este arquivo antes, ele pode reabrir usando o cache do dispositivo.</p>
+                            </div>
+                        )}
+
+                        {activeMedia.type.toLowerCase().includes("pdf") || activeMedia.url.toLowerCase().endsWith(".pdf") ? (
+                            <iframe
+                                src={activeMedia.url}
+                                className="h-full w-full rounded-xl border border-ciano/30 bg-base"
+                                title={activeMedia.title || "Documento PDF"}
+                            />
+                        ) : (
+                            <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl border border-ciano/10 bg-base/50">
+                                <img
+                                    src={activeMedia.url}
+                                    alt={activeMedia.title || "Mídia do acervo"}
+                                    className="max-h-full max-w-full object-contain cursor-zoom-in hover:scale-105 transition-transform duration-300"
+                                />
+                            </div>
+                        )}
+                        {activeMedia.title && (
+                            <p className="mt-4 text-center text-sm font-semibold italic text-texto/70">{activeMedia.title}</p>
+                        )}
+                    </div>
+                </div>
             )}
         </section>
     );

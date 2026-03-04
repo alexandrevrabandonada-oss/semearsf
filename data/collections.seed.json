@@ -8,7 +8,9 @@
             "ciência cidadã",
             "monitoramento",
             "comunidade"
-        ]
+        ],
+        "featured": true,
+        "position": 1
     },
     {
         "slug": "memoria-viva",
@@ -19,6 +21,8 @@
             "história",
             "memória",
             "registros"
-        ]
+        ],
+        "featured": true,
+        "position": 2
     }
 ]

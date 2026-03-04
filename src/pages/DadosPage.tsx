@@ -188,6 +188,44 @@ export function DadosPage() {
             >
               Atualizar agora
             </button>
+            <button
+              className="flex-1 md:flex-none rounded-md border border-ciano px-4 py-2 text-sm font-black uppercase tracking-wide text-ciano transition-colors hover:bg-ciano hover:text-base disabled:opacity-60"
+              disabled={!selectedStation || measurements.length === 0}
+              onClick={() => {
+                if (!selectedStation || measurements.length === 0) return;
+
+                const headers = ["bucket_ts", "pm25", "pm10", "temp", "humidity", "quality_flag"];
+                const csvRows = [headers.join(",")];
+
+                for (const row of measurements) {
+                  const values = [
+                    row.bucket_ts ? new Date(row.bucket_ts).toISOString() : "",
+                    row.pm25 ?? "",
+                    row.pm10 ?? "",
+                    row.temp ?? "",
+                    row.humidity ?? "",
+                    row.quality_flag ?? ""
+                  ];
+                  // Escape values if they contain commas (though none of these should)
+                  csvRows.push(values.map(v => typeof v === 'string' && v.includes(',') ? `"${v}"` : String(v)).join(","));
+                }
+
+                const csvString = csvRows.join("\n");
+                const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                const today = new Date().toISOString().split("T")[0];
+                a.href = url;
+                a.download = `semear_${selectedStation.code}_${selectedRange}_${today}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              }}
+              type="button"
+            >
+              Baixar CSV
+            </button>
           </div>
         </div>
 

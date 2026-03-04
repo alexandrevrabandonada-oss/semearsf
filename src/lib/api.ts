@@ -244,6 +244,7 @@ export type AcervoItem = {
   doi: string | null;
   featured: boolean;
   source_type: string | null;
+  media: Array<{ url: string; type: string; title?: string }> | null;
   created_at: string;
 };
 
@@ -283,6 +284,9 @@ function rowToAcervoItem(row: Record<string, unknown>): AcervoItem {
     doi: typeof row.doi === "string" ? row.doi : null,
     featured: Boolean(row.featured),
     source_type: typeof row.source_type === "string" ? row.source_type : null,
+    media: (row.meta && typeof row.meta === "object" && Array.isArray((row.meta as Record<string, unknown>).media))
+      ? ((row.meta as Record<string, unknown>).media as Array<{ url: string; type: string; title?: string }>)
+      : null,
     created_at: typeof row.created_at === "string" ? row.created_at : ""
   };
 }
@@ -330,6 +334,33 @@ export async function getAcervoBySlug(slug: string): Promise<AcervoItem | null> 
     return rowToAcervoItem(data as Record<string, unknown>);
   } catch (error) {
     throw toAppError("Falha ao carregar item do acervo", error);
+  }
+}
+
+export type AcervoYearIndex = {
+  year: number;
+  total: number;
+};
+
+export async function getAcervoYearIndex(): Promise<AcervoYearIndex[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase.rpc("get_acervo_year_index");
+    if (error) throw error;
+    return (data || []) as AcervoYearIndex[];
+  } catch (error) {
+    throw toAppError("Falha ao carregar indice da linha do tempo", error);
+  }
+}
+
+export async function getAcervoByYear(year: number, limit = 200): Promise<AcervoItem[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase.rpc("get_acervo_by_year", { p_year: year, p_limit: limit });
+    if (error) throw error;
+    return ((data || []) as Record<string, unknown>[]).map(rowToAcervoItem);
+  } catch (error) {
+    throw toAppError("Falha ao carregar itens da linha do tempo", error);
   }
 }
 
@@ -715,6 +746,8 @@ export interface AcervoCollection {
   cover_thumb_url: string | null;
   cover_small_url: string | null;
   tags: string[];
+  featured?: boolean;
+  position?: number;
   created_at: string;
 }
 
@@ -735,6 +768,24 @@ export async function listCollections({ limit = 50 } = {}): Promise<AcervoCollec
     return (data || []) as AcervoCollection[];
   } catch (error) {
     throw toAppError("Falha ao listar dossiês", error);
+  }
+}
+
+export async function listFeaturedCollections(limit = 6): Promise<AcervoCollection[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("acervo_collections")
+      .select("*")
+      .eq("featured", true)
+      .order("position", { ascending: true })
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return (data || []) as AcervoCollection[];
+  } catch (error) {
+    throw toAppError("Falha ao listar dossiês em destaque", error);
   }
 }
 

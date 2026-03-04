@@ -74,7 +74,12 @@ export default async function handler(req: any, res: any) {
         const finalUrl = `https://${req.headers.host || "localhost"}/dados?station=${station.code}`;
         const safeTitle = encodeURIComponent(station.name);
         const safeSubtitle = encodeURIComponent(desc);
-        const fallbackImage = `https://${req.headers.host || "localhost"}/api/og/card?kind=dados&title=${safeTitle}&subtitle=${safeSubtitle}`;
+
+        let fallbackImage = `https://${req.headers.host || "localhost"}/api/og/card?kind=dados&title=${safeTitle}&subtitle=${safeSubtitle}`;
+        if (meas) {
+            const timeStr = new Date(meas.ts).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+            fallbackImage += `&pm25=${meas.pm25.toFixed(1)}&pm10=${meas.pm10.toFixed(1)}&time=${encodeURIComponent(timeStr)}`;
+        }
 
         const html = `<!DOCTYPE html>
 <html lang="pt-BR">

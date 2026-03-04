@@ -4,6 +4,7 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/dados", label: "Dados" },
   { href: "/acervo", label: "Acervo" },
+  { href: "/acervo/linha", label: "Linha do tempo" },
   { href: "/blog", label: "Blog" },
   { href: "/agenda", label: "Agenda" },
   { href: "/dossies", label: "Dossiês" },
