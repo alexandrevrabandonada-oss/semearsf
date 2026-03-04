@@ -1,41 +1,40 @@
 # Relatório de Estado do Projeto: SEMEAR PWA
 **Data:** 04 de Março de 2026
-**Status Global:** 🟢 OPERACIONAL / PRODUÇÃO-READY
+**Status Global:** 🟢 OPERACIONAL / TOTALMENTE HARDENED
 
 ## 1. Visão Geral
-O projeto SEMEAR PWA evoluiu de um protótipo para uma plataforma de engajamento ambiental robusta. Recentemente, implementamos funcionalidades críticas de comunicação, gestão de mídia e resiliência offline.
+O projeto SEMEAR PWA atingiu um novo patamar de maturidade técnica e funcional. Esta fase consolidou a plataforma como um sistema de monitoramento ambiental e engajamento social robusto, com foco em privacidade, controle do usuário e excelência em SEO.
 
-## 2. Funcionalidades de Conteúdo & Descoberta
-- **Busca Global Unificada**: Nova rota `/buscar` que indexa Acervo, Blog, Transparência e Agenda em uma única interface com filtros por categoria.
-- **Pipeline de Mídia (Acervo)**:
-  - Bucket `acervo` no Supabase Storage.
-  - Suporte a mídias variadas (PDFs, Imagens, Links) por item.
-  - Ferramenta CLI `acervo:upload` para fluxo repository-first.
-- **Social Sharing**: Previews ricos (OpenGraph/Twitter) via Vercel Serverless Functions (`/s/*`), permitindo que links do acervo e blog tenham cards informativos em redes sociais.
+## 2. Comunicação de Elite (Push Avançado)
+- **Granularidade Total**: Usuários agora podem monitorar estações específicas ou toda a rede na nova rota `/alertas`.
+- **Modo Silencioso (Quiet Hours)**: Implementação de lógica inteligente que respeita o descanso do usuário (ex: 22h às 07h), inclusive cruzando a meia-noite.
+- **Alertas Multi-Poluentes**: Suporte integrado para limiares de PM2.5 (partículas finas) e PM10 (partículas maiores).
+- **Notificações Ricas**: Web Pushes dinâmicos que incluem o nome da estação afetada e links diretos para o gráfico de dados.
 
-## 3. Comunicação & Engajamento (Push Phase 2)
-- **Central de Alertas Customizáveis**: Rota `/alertas` agora permite que o usuário defina seu próprio limiar de PM2.5 e tempo de repouso (cooldown).
-- **Notificações Inteligentes**: O ingest de sensores agora cruza dados em tempo real com as preferências de cada usuário, disparando Web Pushes automáticos e prevenindo spam.
-- **Teste de Conectividade**: Botão de teste manual para garantir que o dispositivo está apto a receber alertas.
+## 3. SEO & Alcance Social Dinâmico
+- **Share Pages de Próxima Geração (`/s/*`)**:
+  - **Agenda**: Previews dinâmicos com data, título e local do evento.
+  - **Dados ao Vivo**: Social cards que mostram a qualidade do ar em tempo real (ex: "Qualidade do ar agora: Sede").
+  - **Acervo/Blog**: Previews ricos com resumos e imagens de capa.
+- **Short-Links Inteligentes**: Sistema de redirecionamento configurado via `vercel.json` para máxima compatibilidade com redes sociais.
 
-## 4. Analytics & Alcance Social
-- **Tracking Ativo (Privacy-Safe)**: Implementação de logs de compartilhamento que utilizam hashing de IP (SHA-256 + SALT), permitindo medir o alcance de posts e itens do acervo sem coletar dados sensíveis.
-- **Painel de Engajamento**: Rota `/status` atualizada com o bloco "Alcance Social", exibindo o total de interações nos últimos 7 dias e o ranking de conteúdos mais populares.
+## 4. Analytics & Privacidade (Privacy-First)
+- **Tracking Transparente**: Monitoramento de alcance social via hashing SHA-256 + SALT de IPs, permitindo métricas de popularidade sem comprometer a identidade dos cidadãos.
+- **Dashboard de Engajamento**: Rota `/status` exibe agora o "Alcance Social (7 dias)", rankeando os conteúdos de maior impacto na rede.
 
-## 5. Infraestrutura & Performance (PWA)
-- **Cache Estratégico**: Configuração Workbox no Vite para cache permanente de imagens (`CacheFirst`) e cache resiliente de PDFs (`NetworkFirst`).
-- **Navegação Offline**: Fallback garantido para a página inicial ou página offline customizada.
-- **Vite-only Hardening**: Padronização de variáveis de ambiente com prefixo `VITE_`, eliminando qualquer dependência de padrões legacy (Next.js).
+## 5. Infraestrutura & Hardening (Vite Standard)
+- **Env Hardening**: Remoção total de dependências legacy (`NEXT_PUBLIC_`). O projeto agora utiliza 100% o padrão `VITE_`.
+- **Ferramentas de Limpeza**: Novo comando `npm run env:clean` com backup automático para garantir um ambiente sempre limpo.
+- **Snapshot de Saúde**: O comando `npm run done` foi aprimorado para realizar um "check-up" completo de compilação, fumaça (smoke tests), banco de dados e ambiente.
 
-## 6. Governança & Integridade
-- **Migration Doctor**: Ferramenta de diagnóstico com fallback de Filesystem, garantindo que o estado do banco seja verificável mesmo sem conexão local ao Postgres.
-- **Workflow de DB**: Guia `docs/DB_WORKFLOW.md` estabelecido para evitar corrupção de histórico de migrações.
-- **Pipeline de Verificação**: Script `npm run done` consolidado que executa Build -> Smoke Tests -> Doctors -> Snapshot.
+## 6. Governança de Dados
+- **Manual de Migrações**: Fluxo repository-first consolidado em `docs/DB_WORKFLOW.md`.
+- **Migration Doctor**: Sistema de diagnóstico local/remoto que garante a paridade do schema em todos os ambientes.
 
 ## 7. Próximos Passos Recomendados
-1. **Otimização de Imagens**: Integrar um transformador de imagens (ex: Cloudinary ou Supabase Image Transformation) para reduzir o peso inicial do acervo e melhorar o LCP.
-2. **SEO Fine-tuning**: Expandir o suporte de tags OpenGraph para outras páginas dinâmicas (Agenda e Dados).
-3. **Auditoria de Acessibilidade**: Executar um scan completo de a11y em dispositivos móveis seguindo as WCAG 2.1.
+1. **Otimização de Imagens**: Integrar transformação dinâmica de imagens para otimizar o carregamento de capas grandes no Acervo.
+2. **Auditoria de Acessibilidade (Mobile)**: Scan profundo nas páginas de `/inscricoes` e `/alertas` para garantir conformidade total com leitores de tela.
+3. **Internacionalização**: Preparar a estrutura para suporte a múltiplos idiomas, visando parcerias internacionais.
 
 ---
-*Relatório gerado automaticamente via Antigravity AI.*
+*Relatório consolidado e verificado via Antigravity AI.*

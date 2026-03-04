@@ -9,6 +9,14 @@
       "destination": "/api/share/blog?slug=:slug"
     },
     {
+      "source": "/s/agenda/:id",
+      "destination": "/api/share/agenda?eventId=:id"
+    },
+    {
+      "source": "/s/dados/:code",
+      "destination": "/api/share/dados?station_code=:code"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },

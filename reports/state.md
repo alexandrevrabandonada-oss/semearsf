@@ -1,6 +1,6 @@
 # Project State Snapshot
 
-**Date:** 2026-03-04T21:28:04.165Z
+**Date:** 2026-03-04T21:47:01.077Z
 
 ## Versions
 ```
@@ -11,20 +11,23 @@ npm:  10.9.3
 ## Git
 ```
 ## main...origin/main
- M .env.local.example
- M api/share/acervo.ts
- M api/share/blog.ts
+ M .env.local
  M docs/DEPLOY.md
+ M package-lock.json
+ M package.json
  M reports/state.md
- M src/lib/api.ts
+ M src/pages/AgendaPage.tsx
  M src/pages/AlertasPage.tsx
- M src/pages/StatusPage.tsx
+ M src/pages/DadosPage.tsx
  M supabase/functions/ingest-measurement/index.ts
  M supabase/functions/register-push/index.ts
  M tools/env-doctor.mjs
-?? reports/state_report_20260304.md
-?? supabase/migrations/20260308000003_push_rules.sql
-?? supabase/migrations/20260308000004_share_analytics.sql
+ M vercel.json
+?? api/share/agenda.ts
+?? api/share/dados.ts
+?? supabase/migrations/20260308000005_push_adv.sql
+?? tools/env-clean.mjs
+?? vapid.json
 ```
 
 ## package.json scripts
@@ -40,6 +43,7 @@ npm:  10.9.3
   "db:types": "npx supabase gen types typescript --local > src/lib/supabase/database.types.ts",
   "db:doctor": "node tools/migration-doctor.mjs",
   "env:doctor": "node tools/env-doctor.mjs",
+  "env:clean": "node tools/env-clean.mjs",
   "fn:deploy": "npx supabase functions deploy --no-verify-jwt",
   "secrets:set": "node tools/secrets-set.mjs",
   "ship:infra": "npm run db:push && npm run fn:deploy && npm run done",
@@ -114,6 +118,7 @@ acervo-import.mjs
 acervo-upload.mjs
 blog-import.mjs
 db-smoke.mjs
+env-clean.mjs
 env-doctor.mjs
 migration-doctor.mjs
 secrets-set.mjs
@@ -130,13 +135,16 @@ vapid-gen.mjs
 
 ## Env keys present (names only)
 ```
-NEXT_PUBLIC_SUPABASE_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY
-SUPABASE_SERVICE_ROLE_KEY
 VITE_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
 INGEST_API_KEY
-NEXT_PUBLIC_PROJECT_NAME
+SHARE_HASH_SALT
+VITE_VAPID_PUBLIC_KEY
+VAPID_PUBLIC_KEY
+VAPID_PRIVATE_KEY
+VITE_PROJECT_NAME
 ```
 
 ## DB Smoke
@@ -157,17 +165,17 @@ DB_SMOKE: OK
 --- LOCAL STATE ---
 [WARN] CLI local list: Falhou (Usando fallback de Filesystem)
       Motivo: Connecting to local database... failed to connect to postgres: failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:54322: connectex: Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente.)
-[OK] Filesystem Scan: 10 arquivos encontrados
+[OK] Filesystem Scan: 11 arquivos encontrados
       Últimas 5 migrações locais:
+      - 20260308000005_push_adv.sql
       - 20260308000004_share_analytics.sql
       - 20260308000003_push_rules.sql
       - 20260308000002_push.sql
       - 20260308000001_storage_acervo.sql
-      - 20260307164000_transparencia.sql
 
 --- REMOTE STATE ---
 [OK] CLI remote list: Sucesso
-      Total: 10 migrações no ambiente remoto.
+      Total: 11 migrações no ambiente remoto.
 
 Doctor analysis completed.
 ```
@@ -178,4 +186,7 @@ Doctor analysis completed.
 [OK] Chaves Vite detectadas:
     - VITE_SUPABASE_URL
     - VITE_SUPABASE_ANON_KEY
+    - VITE_VAPID_PUBLIC_KEY
+    - VITE_PROJECT_NAME
+[OK] Ambiente limpo de chaves NEXT_PUBLIC_*.
 ```

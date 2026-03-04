@@ -1,12 +1,21 @@
 import { useState, useEffect } from "react";
+import { listStations, type Station } from "../lib/api";
 
 export function AlertasPage() {
     const [status, setStatus] = useState<"default" | "granted" | "denied">("default");
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [stations, setStations] = useState<Station[]>([]);
+
+    // Form states
     const [pm25Threshold, setPm25Threshold] = useState(35);
+    const [pm10Threshold, setPm10Threshold] = useState<number | "">("");
     const [cooldownMinutes, setCooldownMinutes] = useState(120);
+    const [stationCodeFilter, setStationCodeFilter] = useState<string>(""); // empty = "Todas"
+    const [quietStart, setQuietStart] = useState("22:00");
+    const [quietEnd, setQuietEnd] = useState("07:00");
+
     const [testLoading, setTestLoading] = useState(false);
     const [testMessage, setTestMessage] = useState<string | null>(null);
 
@@ -16,7 +25,17 @@ export function AlertasPage() {
         }
 
         checkSubscription();
+        loadStations();
     }, []);
+
+    async function loadStations() {
+        try {
+            const data = await listStations();
+            setStations(data);
+        } catch (err) {
+            console.error("Falha ao carregar estacoes:", err);
+        }
+    }
 
     async function checkSubscription() {
         if (!("serviceWorker" in navigator)) return;
@@ -64,12 +83,17 @@ export function AlertasPage() {
                     subscription,
                     user_agent: navigator.userAgent,
                     pm25_threshold: pm25Threshold,
-                    cooldown_minutes: cooldownMinutes
+                    pm10_threshold: pm10Threshold === "" ? null : pm10Threshold,
+                    cooldown_minutes: cooldownMinutes,
+                    station_code_filter: stationCodeFilter || null,
+                    quiet_start: quietStart,
+                    quiet_end: quietEnd
                 })
             });
 
             if (!response.ok) {
-                throw new Error("Falha ao registrar inscrição no servidor.");
+                const data = await response.json();
+                throw new Error(data.error || "Falha ao registrar inscrição no servidor.");
             }
 
             setIsSubscribed(true);
@@ -107,11 +131,11 @@ export function AlertasPage() {
     }
 
     return (
-        <section className="mx-auto max-w-2xl space-y-8 py-10 px-4">
+        <section className="mx-auto max-w-2xl space-y-8 py-10 px-4 pb-20">
             <header className="text-center space-y-2">
-                <h1 className="text-3xl font-black text-cta md:text-4xl italic tracking-tight">Alertas & Notificações</h1>
+                <h1 className="text-3xl font-black text-cta md:text-4xl italic tracking-tight">Configurações de Alerta</h1>
                 <p className="text-texto/70 text-sm md:text-base leading-relaxed">
-                    Personalize seus alertas de qualidade do ar e receba avisos em tempo real.
+                    Ajuste seus critérios para receber notificações inteligentes e personalizadas.
                 </p>
             </header>
 
@@ -126,7 +150,7 @@ export function AlertasPage() {
                     <div>
                         <h2 className="text-lg font-bold text-texto tracking-tight">Estado das Notificações</h2>
                         <p className={`text-xs uppercase tracking-[0.2em] font-black ${status === 'granted' ? 'text-base' : 'text-texto/40'}`}>
-                            {status === "granted" ? "Ativadas" : status === "denied" ? "Bloqueadas" : "Aguardando Permissão"}
+                            {status === "granted" ? "Monitoramento Ativo" : status === "denied" ? "Bloqueadas" : "Configuração Pendente"}
                         </p>
                     </div>
                 </div>
@@ -145,45 +169,120 @@ export function AlertasPage() {
                     </div>
                 )}
 
-                <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-texto/10">
+                <div className="space-y-8">
+                    {/* Filtro por Estação */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-black uppercase text-cta tracking-[0.2em]">Foco de Alerta</h3>
                         <div className="space-y-2">
-                            <label htmlFor="pm25" className="block text-xs font-black uppercase text-texto/60 tracking-wider">
-                                Limiar PM2.5 (µg/m³)
+                            <label htmlFor="station" className="block text-xs font-bold text-texto/60">
+                                Monitorar qual estação?
                             </label>
-                            <input
-                                id="pm25"
-                                type="number"
-                                value={pm25Threshold}
-                                onChange={(e) => setPm25Threshold(Number(e.target.value))}
-                                className="w-full rounded-xl bg-texto/5 border border-texto/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cta/50"
-                                min="1"
+                            <select
+                                id="station"
+                                value={stationCodeFilter}
+                                onChange={(e) => setStationCodeFilter(e.target.value)}
+                                className="w-full rounded-xl bg-texto/5 border border-texto/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cta/50 appearance-none"
                                 disabled={isSubscribed}
-                            />
-                            <p className="text-[10px] text-texto/40">Você será avisado quando o nível ultrapassar este valor.</p>
-                        </div>
-                        <div className="space-y-2">
-                            <label htmlFor="cooldown" className="block text-xs font-black uppercase text-texto/60 tracking-wider">
-                                Cooldown (minutos)
-                            </label>
-                            <input
-                                id="cooldown"
-                                type="number"
-                                value={cooldownMinutes}
-                                onChange={(e) => setCooldownMinutes(Number(e.target.value))}
-                                className="w-full rounded-xl bg-texto/5 border border-texto/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cta/50"
-                                min="1"
-                                disabled={isSubscribed}
-                            />
-                            <p className="text-[10px] text-texto/40">Tempo mínimo de espera entre dois alertas seguidos.</p>
+                            >
+                                <option value="">Todas as estações</option>
+                                {stations.map(s => (
+                                    <option key={s.id} value={s.code as string}>{s.name}</option>
+                                ))}
+                            </select>
+                            <p className="text-[10px] text-texto/40">Selecione uma estação específica ou receba alertas de toda a rede.</p>
                         </div>
                     </div>
 
+                    {/* Limiares */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-black uppercase text-cta tracking-[0.2em]">Criterios de Poluicão</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label htmlFor="pm25" className="block text-xs font-bold text-texto/60">
+                                    Limiar PM2.5 (µg/m³)
+                                </label>
+                                <input
+                                    id="pm25"
+                                    type="number"
+                                    value={pm25Threshold}
+                                    onChange={(e) => setPm25Threshold(Number(e.target.value))}
+                                    className="w-full rounded-xl bg-texto/5 border border-texto/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cta/50"
+                                    min="1"
+                                    disabled={isSubscribed}
+                                />
+                                <p className="text-[10px] text-texto/40 italic">Recomendado: 35</p>
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="pm10" className="block text-xs font-bold text-texto/60">
+                                    Limiar PM10 (opcional)
+                                </label>
+                                <input
+                                    id="pm10"
+                                    type="number"
+                                    value={pm10Threshold}
+                                    onChange={(e) => setPm10Threshold(e.target.value === "" ? "" : Number(e.target.value))}
+                                    placeholder="Desativado"
+                                    className="w-full rounded-xl bg-texto/5 border border-texto/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cta/50"
+                                    min="1"
+                                    disabled={isSubscribed}
+                                />
+                                <p className="text-[10px] text-texto/40 text-right">Aviso para particulas maiores.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Horário de Silêncio */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-black uppercase text-cta tracking-[0.2em]">Modo Silencioso</h3>
+                        <div className="grid grid-cols-2 gap-4 rounded-xl bg-texto/5 p-4 border border-texto/5">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-texto/40 uppercase">Início</label>
+                                <input
+                                    type="time"
+                                    value={quietStart}
+                                    onChange={(e) => setQuietStart(e.target.value)}
+                                    className="w-full bg-transparent text-sm font-bold focus:outline-none"
+                                    disabled={isSubscribed}
+                                />
+                            </div>
+                            <div className="space-y-1 border-l border-texto/10 pl-4">
+                                <label className="text-[10px] font-bold text-texto/40 uppercase">Fim</label>
+                                <input
+                                    type="time"
+                                    value={quietEnd}
+                                    onChange={(e) => setQuietEnd(e.target.value)}
+                                    className="w-full bg-transparent text-sm font-bold focus:outline-none"
+                                    disabled={isSubscribed}
+                                />
+                            </div>
+                        </div>
+                        <p className="text-[10px] text-texto/40">Nenhum alerta será enviado nestas horas (ex: durante o sono).</p>
+                    </div>
+
+                    {/* Cooldown */}
+                    <div className="space-y-2 pt-4 border-t border-texto/5">
+                        <label htmlFor="cooldown" className="block text-xs font-bold text-texto/60">
+                            Frequência Máxima (Minutos entre alertas)
+                        </label>
+                        <input
+                            id="cooldown"
+                            type="number"
+                            value={cooldownMinutes}
+                            onChange={(e) => setCooldownMinutes(Number(e.target.value))}
+                            className="w-full rounded-xl bg-texto/5 border border-texto/10 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cta/50"
+                            min="10"
+                            disabled={isSubscribed}
+                        />
+                    </div>
+
                     {isSubscribed ? (
-                        <div className="space-y-4">
+                        <div className="space-y-4 pt-6">
                             <div className="rounded-xl border border-base/20 bg-base/5 p-6 text-center">
                                 <p className="text-sm font-bold text-base flex items-center justify-center gap-2">
-                                    <span>🚀</span> Inscrição Ativa e Configurada!
+                                    <span>🚀</span> Assinatura Configurada e Ativa!
+                                </p>
+                                <p className="mt-2 text-[10px] text-texto/40 uppercase tracking-widest font-black italic">
+                                    {stationCodeFilter ? `Filtro: ${stationCodeFilter}` : "Monitorando: Todas as Estações"}
                                 </p>
                             </div>
 
@@ -194,14 +293,18 @@ export function AlertasPage() {
                             >
                                 {testLoading ? "Enviando..." : "Enviar Notificação de Teste"}
                             </button>
+
+                            <p className="text-[10px] text-center text-texto/30 italic">
+                                Para alterar as preferências, remova a permissão nas configurações do navegador e reinscreva-se.
+                            </p>
                         </div>
                     ) : (
                         <button
-                            className="w-full rounded-xl bg-cta py-4 text-sm font-black uppercase tracking-[0.2em] text-base shadow-lg transition-all hover:scale-[1.02] hover:shadow-cta/20 active:scale-[0.98] disabled:opacity-50"
+                            className="w-full rounded-xl bg-cta py-4 text-sm font-black uppercase tracking-[0.2em] text-base shadow-lg transition-all hover:scale-[1.02] hover:shadow-cta/20 active:scale-[0.98] disabled:opacity-50 mt-6"
                             disabled={loading || status === "denied"}
                             onClick={subscribe}
                         >
-                            {loading ? "Processando..." : "Ativar Notificações"}
+                            {loading ? "Salvando Configurações..." : "Confirmar e Ativar Alertas"}
                         </button>
                     )}
 
@@ -216,7 +319,7 @@ export function AlertasPage() {
             </div>
 
             <footer className="rounded-2xl bg-texto/5 p-6 text-[11px] leading-relaxed text-texto/50 text-center border border-texto/5">
-                <p>O serviço utiliza <strong>Duração de Sessão</strong> para armazenamento temporário das preferências de alerta até o próximo registro.</p>
+                <p>Configurações avançadas persistidas no navegador via <strong>Push Manager</strong> e sincronizadas anonimamente com o portal.</p>
             </footer>
         </section>
     );

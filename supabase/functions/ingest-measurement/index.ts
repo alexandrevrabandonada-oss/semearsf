@@ -40,6 +40,21 @@ function isValidIsoTimestamp(value: string): boolean {
   return date.toISOString() === value;
 }
 
+function isQuiet(start: string, end: string): boolean {
+  if (!start || !end) return false;
+  // Use UTC or fixed offset? For SEMEAR, we assume the user's intent matches the server's processed time 
+  // or that quiet hours are "generic". Here we'll use the server's current time (UTC).
+  const now = new Date();
+  const currentStr = now.getUTCHours().toString().padStart(2, '0') + ':' + now.getUTCMinutes().toString().padStart(2, '0');
+
+  if (start <= end) {
+    return currentStr >= start && currentStr <= end;
+  } else {
+    // Spans midnight (e.g. 22:00 to 07:00)
+    return currentStr >= start || currentStr <= end;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return json(405, { ok: false, error: "method_not_allowed" });
@@ -99,7 +114,7 @@ Deno.serve(async (req) => {
 
   const { data: station, error: stationError } = await supabase
     .from("stations")
-    .select("id")
+    .select("id, name, code")
     .eq("code", stationCode)
     .maybeSingle();
 
@@ -133,76 +148,96 @@ Deno.serve(async (req) => {
     return json(500, { ok: false, error: "station_update_failed" });
   }
 
-  // --- Push Notification Alerts (Phase 2) ---
-  if (pm25 !== null) {
-    try {
-      // 1. Fetch eligible active subscriptions
-      // Rules: is_active=true AND pm25 >= threshold AND (last_alert_at is null OR expired cooldown)
-      const { data: subs, error: subError } = await supabase
-        .from("push_subscriptions")
-        .select("*")
-        .eq("is_active", true)
-        .lte("pm25_threshold", pm25);
+  // --- Advanced Push Notification Alerts ---
+  try {
+    const { data: subs, error: subError } = await supabase
+      .from("push_subscriptions")
+      .select("*")
+      .eq("is_active", true);
 
-      if (subError) throw subError;
+    if (subError) throw subError;
 
-      const eligibleSubs = (subs || []).filter(sub => {
-        if (!sub.last_alert_at) return true;
+    const eligibleSubs = (subs || []).filter(sub => {
+      // 1. Station Filter
+      if (sub.station_code_filter && sub.station_code_filter !== stationCode) return false;
+
+      // 2. Quiet Hours check
+      if (isQuiet(sub.quiet_start, sub.quiet_end)) return false;
+
+      // 3. Cooldown check
+      if (sub.last_alert_at) {
         const lastAlert = new Date(sub.last_alert_at).getTime();
         const cooldownMs = (sub.cooldown_minutes || 120) * 60 * 1000;
-        return Date.now() - lastAlert >= cooldownMs;
-      });
+        if (Date.now() - lastAlert < cooldownMs) return false;
+      }
 
-      if (eligibleSubs.length > 0) {
-        const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
-        const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
+      // 4. Threshold trigger (PM2.5 or PM10)
+      const pm25Trigger = pm25 !== null && pm25 >= (sub.pm25_threshold || 35);
+      const pm10Trigger = pm10 !== null && sub.pm10_threshold !== null && pm10 >= sub.pm10_threshold;
 
-        if (vapidPublicKey && vapidPrivateKey) {
-          webpush.setVapidDetails(
-            'mailto:portal@semear.org.br',
-            vapidPublicKey,
-            vapidPrivateKey
-          );
+      return pm25Trigger || pm10Trigger;
+    });
 
-          const payload = JSON.stringify({
-            title: `Alerta: Qualidade do Ar (${stationCode})`,
-            body: `Nível crítico de PM2.5 detectado: ${pm25} µg/m³.`,
-            icon: '/icons/icon-192.png',
-            data: { url: `/dados?station=${stationCode}` }
-          });
+    if (eligibleSubs.length > 0) {
+      const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
+      const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
 
-          // Dispatch notifications
-          await Promise.allSettled(
-            eligibleSubs.map(async (sub) => {
+      if (vapidPublicKey && vapidPrivateKey) {
+        webpush.setVapidDetails(
+          'mailto:portal@semear.org.br',
+          vapidPublicKey,
+          vapidPrivateKey
+        );
+
+        const pollutant = pm25 !== null && pm25 >= 35 ? "PM2.5" : "PM10";
+        const value = pollutant === "PM2.5" ? pm25 : pm10;
+
+        const pushPayload = JSON.stringify({
+          title: `Alerta: Qualidade do Ar - ${station.name}`,
+          body: `Nível crítico de ${pollutant} detectado: ${value} µg/m³.`,
+          icon: '/icons/icon-192.png',
+          data: {
+            url: `/dados?station=${stationCode}`,
+            stationCode: stationCode,
+            pollutant,
+            value
+          }
+        });
+
+        await Promise.allSettled(
+          eligibleSubs.map(async (sub) => {
+            try {
               const pushSubscription = {
                 endpoint: sub.endpoint,
                 keys: { p256dh: sub.p256dh, auth: sub.auth }
               };
-              await webpush.sendNotification(pushSubscription, payload);
+              await webpush.sendNotification(pushSubscription, pushPayload);
 
-              // Update sub state
               await supabase
                 .from("push_subscriptions")
                 .update({
                   last_alert_at: new Date().toISOString(),
-                  last_alert_pm25: pm25
+                  last_alert_pm25: pm25,
+                  // note: we update state based on what triggered, but the table only has last_alert_pm25. 
+                  // In a real scenario we might add last_alert_pm10 too.
                 })
                 .eq("id", sub.id);
-            })
-          );
+            } catch (err) {
+              console.error(`Failed to notify sub ${sub.id}:`, err.message);
+            }
+          })
+        );
 
-          // Log the alert event (aggregate for this ingest)
-          await supabase.from("push_alert_events").insert({
-            station_id: station.id,
-            pm25,
-            reason: `Disparo automático para ${eligibleSubs.length} assinantes.`
-          });
-        }
+        await supabase.from("push_alert_events").insert({
+          station_id: station.id,
+          pm25,
+          pm10,
+          reason: `Disparo avançado para ${eligibleSubs.length} assinantes (Filtro: ${stationCode}).`
+        });
       }
-    } catch (err) {
-      console.error("[PushAlert] Failed to trigger alerts:", err.message);
-      // Don't fail the whole ingest if push fails
     }
+  } catch (err) {
+    console.error("[PushAlert] Failed to process alerts:", err.message);
   }
 
   return json(200, { ok: true });

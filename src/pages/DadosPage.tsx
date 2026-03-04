@@ -155,30 +155,50 @@ export function DadosPage() {
               ))}
             </select>
           </label>
-          <button
-            className="rounded-md bg-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90 disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={!selectedStationId || loadingMeasurements}
-            onClick={() => selectedStationId && void loadMeasurements(selectedStationId, selectedRange)}
-            type="button"
-          >
-            Atualizar agora
-          </button>
+          <div className="flex gap-2 w-full md:w-auto">
+            <button
+              className="flex-1 md:flex-none rounded-md border border-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-cta transition-colors hover:bg-cta hover:text-base disabled:opacity-60"
+              disabled={!selectedStation}
+              onClick={() => {
+                if (!selectedStation) return;
+                const shareUrl = `${window.location.origin}/s/dados/${selectedStation.code}`;
+                if (navigator.share) {
+                  navigator.share({
+                    title: `Qualidade do Ar: ${selectedStation.name}`,
+                    url: shareUrl
+                  }).catch(console.error);
+                } else {
+                  void navigator.clipboard.writeText(shareUrl);
+                  alert("Link copiado!");
+                }
+              }}
+              type="button"
+            >
+              Compartilhar
+            </button>
+            <button
+              className="flex-1 md:flex-none rounded-md bg-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={!selectedStationId || loadingMeasurements}
+              onClick={() => selectedStationId && void loadMeasurements(selectedStationId, selectedRange)}
+              type="button"
+            >
+              Atualizar agora
+            </button>
+          </div>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
           <button
-            className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${
-              selectedRange === "24h" ? "bg-ciano text-base" : "border border-ciano/40 bg-fundo text-texto hover:bg-fundo/80"
-            }`}
+            className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${selectedRange === "24h" ? "bg-ciano text-base" : "border border-ciano/40 bg-fundo text-texto hover:bg-fundo/80"
+              }`}
             onClick={() => setSelectedRange("24h")}
             type="button"
           >
             24h
           </button>
           <button
-            className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${
-              selectedRange === "7d" ? "bg-ciano text-base" : "border border-ciano/40 bg-fundo text-texto hover:bg-fundo/80"
-            }`}
+            className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${selectedRange === "7d" ? "bg-ciano text-base" : "border border-ciano/40 bg-fundo text-texto hover:bg-fundo/80"
+              }`}
             onClick={() => setSelectedRange("7d")}
             type="button"
           >
@@ -190,7 +210,7 @@ export function DadosPage() {
           <div className="rounded-lg border border-ciano/40 bg-fundo/80 p-4">
             <p className="text-xs uppercase tracking-wide text-ciano">Status</p>
             <p className={`mt-1 text-sm font-bold ${isOnline ? "text-primaria" : "text-acento"}`}>
-            {selectedStationId ? (isOnline ? "Online" : "Offline") : "-"}
+              {selectedStationId ? (isOnline ? "Online" : "Offline") : "-"}
             </p>
           </div>
           <div className="rounded-lg border border-ciano/40 bg-fundo/80 p-4">

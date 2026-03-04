@@ -17,7 +17,16 @@ serve(async (req) => {
             Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
         )
 
-        const { subscription, user_agent, pm25_threshold, cooldown_minutes } = await req.json()
+        const {
+            subscription,
+            user_agent,
+            pm25_threshold,
+            pm10_threshold,
+            cooldown_minutes,
+            station_code_filter,
+            quiet_start,
+            quiet_end
+        } = await req.json()
 
         if (!subscription || !subscription.endpoint) {
             return new Response(JSON.stringify({ error: 'Missing subscription' }), {
@@ -34,7 +43,11 @@ serve(async (req) => {
                 auth: subscription.keys.auth,
                 user_agent: user_agent,
                 pm25_threshold: pm25_threshold ?? 35,
+                pm10_threshold: pm10_threshold ?? null,
                 cooldown_minutes: cooldown_minutes ?? 120,
+                station_code_filter: station_code_filter ?? null,
+                quiet_start: quiet_start ?? '22:00',
+                quiet_end: quiet_end ?? '07:00',
                 is_active: true
             }, {
                 onConflict: 'endpoint'

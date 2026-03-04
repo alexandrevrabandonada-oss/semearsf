@@ -14,6 +14,7 @@
     "db:types": "npx supabase gen types typescript --local > src/lib/supabase/database.types.ts",
     "db:doctor": "node tools/migration-doctor.mjs",
     "env:doctor": "node tools/env-doctor.mjs",
+    "env:clean": "node tools/env-clean.mjs",
     "fn:deploy": "npx supabase functions deploy --no-verify-jwt",
     "secrets:set": "node tools/secrets-set.mjs",
     "ship:infra": "npm run db:push && npm run fn:deploy && npm run done",

@@ -56,3 +56,10 @@ Além das `VITE_*`, configure:
 - `SHARE_HASH_SALT`: Salt para anonimização de IPs no social analytics.
 - `INGEST_API_KEY`: Chave de autorização para o ingest de sensores.
 - `VAPID_PRIVATE_KEY`: Chave privada para notificações push.
+
+#### Vite Env (Cleanup)
+Se você importou um arquivo `.env.local` legado que contém chaves `NEXT_PUBLIC_*`, rode o comando de limpeza para garantir que apenas o padrão Vite seja utilizado e evitar avisos no pipeline:
+```bash
+npm run env:clean
+```
+Este comando criará um backup automático e removerá as chaves legadas.

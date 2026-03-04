@@ -30,11 +30,13 @@ const viteKeys = Object.keys(allKeys).filter(key => key.startsWith("VITE_"));
 
 if (legacyKeys.length > 0 && viteKeys.length > 0) {
     console.warn("[!] CONFLITO: Chaves herdadas e novas detectadas simultaneamente.");
-    console.warn("    Este projeto usa Vite. Remova as chaves NEXT_PUBLIC_* imediatamente:");
+    console.warn("    Este projeto usa Vite. Remova as chaves NEXT_PUBLIC_* imediatamente.");
+    console.warn("    Rode: npm run env:clean");
     legacyKeys.forEach(key => console.warn(`    - ${key} (CONFLICT)`));
 } else if (legacyKeys.length > 0) {
     console.warn(`[WARN] Uso de chaves herdadas detectado: ${legacyKeys.join(", ")}`);
     console.warn("    Vite usa prefixo VITE_*. Essas chaves podem não estar sendo carregadas corretamente.");
+    console.warn("    Rode: npm run env:clean");
 }
 
 if (viteKeys.length > 0) {

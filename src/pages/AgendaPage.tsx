@@ -64,12 +64,31 @@ export function AgendaPage() {
                     Local: {typeof event.location === "string" && event.location.trim() ? event.location : "Local nao informado."}
                   </p>
                 </div>
-                <Link
-                  className="inline-flex w-fit rounded-md bg-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
-                  to={`/inscricoes?eventId=${encodeURIComponent(event.id)}`}
-                >
-                  Inscrever-se
-                </Link>
+                <div className="flex gap-2">
+                  <button
+                    className="inline-flex w-fit rounded-md border border-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-cta transition-colors hover:bg-cta hover:text-base"
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}/s/agenda/${event.id}`;
+                      if (navigator.share) {
+                        navigator.share({
+                          title: String(event.title),
+                          url: shareUrl
+                        }).catch(console.error);
+                      } else {
+                        void navigator.clipboard.writeText(shareUrl);
+                        alert("Link copiado!");
+                      }
+                    }}
+                  >
+                    Compartilhar
+                  </button>
+                  <Link
+                    className="inline-flex w-fit rounded-md bg-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
+                    to={`/inscricoes?eventId=${encodeURIComponent(event.id)}`}
+                  >
+                    Inscrever-se
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>
