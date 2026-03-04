@@ -10,6 +10,8 @@ import { TransparenciaPage } from "./pages/TransparenciaPage";
 import { AcervoPage } from "./pages/acervo/AcervoPage";
 import { AcervoListPage } from "./pages/acervo/AcervoListPage";
 import { AcervoItemPage } from "./pages/acervo/AcervoItemPage";
+import { BlogListPage } from "./pages/BlogListPage";
+import { BlogPostPage } from "./pages/BlogPostPage";
 
 export default function App() {
   return (
@@ -24,6 +26,8 @@ export default function App() {
         <Route path="/acervo" element={<AcervoPage />} />
         <Route path="/acervo/:area" element={<AcervoListPage />} />
         <Route path="/acervo/item/:slug" element={<AcervoItemPage />} />
+        <Route path="/blog" element={<BlogListPage />} />
+        <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </PortalLayout>

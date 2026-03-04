@@ -19,6 +19,8 @@
     "smoke": "node tools/db-smoke.mjs",
     "snapshot": "node tools/snapshot.mjs",
     "acervo:import": "node tools/acervo-import.mjs",
+    "blog:import": "node tools/blog-import.mjs",
+    "transparency:import": "node tools/transparency-import.mjs",
     "done": "npm run verify && npm run smoke && npm run snapshot"
   },
   "dependencies": {

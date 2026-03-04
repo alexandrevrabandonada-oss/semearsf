@@ -1,0 +1,15 @@
+[
+    {
+        "slug": "primeiro-post-blog",
+        "title": "Bem-vindo ao Blog da Emenda",
+        "excerpt": "Estamos iniciando nosso canal oficial de comunicação para trazer transparência e informação técnica sobre o monitoramento do ar.",
+        "content_md": "**Olá!**\n\nEste é o nosso primeiro post oficial. Aqui você encontrará atualizações sobre a rede de sensores, relatórios de impacto e notícias sobre a qualidade do ar em Volta Redonda.\n\nFique atento para as próximas atualizações!",
+        "tags": [
+            "institucional",
+            "boas-vindas"
+        ],
+        "published_at": "2026-03-04T16:00:00Z",
+        "status": "published",
+        "cover_url": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=1200"
+    }
+]

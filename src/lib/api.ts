@@ -297,3 +297,170 @@ export async function getAcervoBySlug(slug: string): Promise<AcervoItem | null> 
     throw toAppError("Falha ao carregar item do acervo", error);
   }
 }
+
+// ─────────────────────────────────────────
+// Blog
+// ─────────────────────────────────────────
+
+export type BlogPost = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  content_md: string | null;
+  cover_url: string | null;
+  tags: string[];
+  published_at: string | null;
+  status: "draft" | "published";
+  created_at: string;
+};
+
+export type ListBlogParams = {
+  q?: string;
+  tag?: string;
+  limit?: number;
+  offset?: number;
+};
+
+function rowToBlogPost(row: Record<string, unknown>): BlogPost {
+  return {
+    id: String(row.id ?? ""),
+    slug: String(row.slug ?? ""),
+    title: String(row.title ?? "Sem título"),
+    excerpt: typeof row.excerpt === "string" ? row.excerpt : null,
+    content_md: typeof row.content_md === "string" ? row.content_md : null,
+    cover_url: typeof row.cover_url === "string" ? row.cover_url : null,
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    published_at: typeof row.published_at === "string" ? row.published_at : null,
+    status: (row.status as "draft" | "published") ?? "draft",
+    created_at: typeof row.created_at === "string" ? row.created_at : ""
+  };
+}
+
+export async function listBlogPosts(params: ListBlogParams = {}): Promise<BlogPost[]> {
+  try {
+    const { q, tag, limit = 50, offset = 0 } = params;
+    const supabase = assertSupabase();
+
+    let query = supabase
+      .from("blog_posts")
+      .select("id, slug, title, excerpt, cover_url, tags, published_at, status, created_at")
+      .eq("status", "published")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .range(offset, offset + limit - 1);
+
+    if (tag) query = query.contains("tags", [tag]);
+    if (q) {
+      query = query.ilike("title", `%${q}%`);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return ((data ?? []) as Record<string, unknown>[]).map(rowToBlogPost);
+  } catch (error) {
+    throw toAppError("Falha ao listar posts do blog", error);
+  }
+}
+
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select("*")
+      .eq("slug", slug)
+      .eq("status", "published")
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return rowToBlogPost(data as Record<string, unknown>);
+  } catch (error) {
+    throw toAppError("Falha ao carregar post do blog", error);
+  }
+}
+
+// ─────────────────────────────────────────
+// Transparência
+// ─────────────────────────────────────────
+
+export type TransparencyLink = {
+  id: string;
+  title: string;
+  url: string;
+  kind: "portal" | "processo" | "nota" | "arquivo";
+  created_at: string;
+};
+
+export type Expense = {
+  id: string;
+  occurred_on: string;
+  vendor: string;
+  description: string;
+  category: string;
+  amount_cents: number;
+  document_url: string | null;
+  meta: Record<string, unknown>;
+  created_at: string;
+};
+
+export async function listTransparencyLinks(): Promise<TransparencyLink[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("transparency_links")
+      .select("*")
+      .order("created_at", { ascending: true });
+    if (error) throw error;
+    return (data ?? []) as TransparencyLink[];
+  } catch (error) {
+    throw toAppError("Falha ao listar links de transparência", error);
+  }
+}
+
+export async function listExpenses(limit = 100): Promise<Expense[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("expenses")
+      .select("*")
+      .order("occurred_on", { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return (data ?? []) as Expense[];
+  } catch (error) {
+    throw toAppError("Falha ao listar despesas", error);
+  }
+}
+
+export type TransparencySummary = {
+  total_cents: number;
+  by_category: Record<string, number>;
+  count: number;
+};
+
+export async function getTransparencySummary(): Promise<TransparencySummary> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("expenses")
+      .select("category, amount_cents");
+    if (error) throw error;
+
+    const summary: TransparencySummary = {
+      total_cents: 0,
+      by_category: {},
+      count: (data ?? []).length
+    };
+
+    (data ?? []).forEach((row) => {
+      const amount = Number(row.amount_cents);
+      const cat = String(row.category);
+      summary.total_cents += amount;
+      summary.by_category[cat] = (summary.by_category[cat] ?? 0) + amount;
+    });
+
+    return summary;
+  } catch (error) {
+    throw toAppError("Falha ao calcular sumário de transparência", error);
+  }
+}

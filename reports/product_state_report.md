@@ -5,50 +5,53 @@
 **Current Health:** ✅ Healthy (Build & Smoke Tests Passing)
 
 ## 1. Overview
-SEMEAR PWA is a Progressive Web App designed for environmental monitoring, community engagement, and public memory. It provides real-time air quality data, event management, and a highly curated digital collection (Acervo Vivo), now featuring a dynamic "Living Home" dashboard.
+SEMEAR PWA is a multi-modular Progressive Web App designed for environmental monitoring, institutional transparency, and public memory. It provides a robust, real-time ecosystem for air quality data and community engagement.
 
-## 2. Core Features
+## 2. Core Modules
 
 ### 📡 Real-time Monitoring ("Dado agora")
-- **Live Status**: Home Page displays real-time counts of online/offline stations based on a 5-minute activity threshold.
-- **Detailed Dashboard**: `/dados` provides full access to sensor data (PM2.5, PM10, Temp, Humidity) with 1-min and 15-min downsampling.
-- **Polling**: Automated 60s background updates for live connectivity.
+- **Live Status**: Home Page displays real-time counts of online/offline stations.
+- **Detailed Dashboard**: `/dados` provides full access to sensor data with 1-min and 15-min downsampling.
+- **Connectivity**: Automated background updates every 60s.
 
-### 📚 Curadoria Profissional (Acervo Vivo)
-- **Advanced Metadata**: Support for Authors, DOI, and internal Curator Notes for scientific and historical context.
-- **Featured System**: "Destaques" system that promotes relevant content to the Hub and Home Page.
-- **Multi-channel Content**: CategorizedArtigos, Notícias, and Mídias with source type identification (Científico, Imprensa, Institucional, Pessoal).
-- **Navigation**: Full-text search, tag integration, and deep-link historical filters.
+### 📚 Acervo Vivo (Digital Collection)
+- **Professional Curatorship**: Support for Authors, DOI, and Curator Notes.
+- **Featured Content**: System to highlight relevant items on the portal hub.
+- **Multi-channel**: Dedicated areas for Artigos, Notícias, and Mídias.
 
-### 📅 Community Agenda (Agenda & Inscrições)
-- **Dynamic Feed**: Home Page automatically lists the 3 most imminent published events.
-- **Event Lifecycle**: Full management from publication to registration with capacity control and waitlist logic.
-- **Participation**: Integrated registration forms with WhatsApp contact support.
+### ✍️ Blog da Emenda (Communication)
+- **Publishing Hub**: New `/blog` listing and `/blog/:slug` detail views.
+- **Markdown Support**: Rich content rendering for institutional updates.
+- **CLI Importer**: Dedicated `blog:import` tool for repository-first content management.
 
-### 📱 PWA & Offline
-- **Installability**: Direct installation CTAs and platform-specific instructions in the Navigation bar.
-- **Resilience**: Custom fallbacks for slow connections and an dedicated `OfflinePage.tsx` for zero-connectivity scenarios.
-- **Performance**: Static asset caching and PWA manifest optimized for high-density displays (192px/512px icons).
+### ⚖️ Transparência da Emenda (Audit)
+- **Financial Dashboard**: Real-time spending visualization and category breakdown.
+- **Official Records**: Integrated links to external portals and official documents.
+- **Traceability**: CLI-based expense importer with idempotent hashing.
+
+### 📅 Agenda & Inscrições
+- **Event Lifecycle**: Management of imminent events and public registrations.
+- **Automation**: Automatic waitlist and capacity management.
 
 ## 3. Infrastructure & Architecture
 
 ### 🛠️ Tech Stack
 - **Frontend**: React 18, Vite, TypeScript, Tailwind CSS.
-- **Backend**: Supabase (PostgreSQL, Realtime, RLS).
-- **CLI Portability**: Standardized on `npx supabase` for database operations, removing environmental dependencies.
+- **Backend**: Supabase (PostgreSQL, RLS, Realtime).
+- **Branding**: Integrated "Acervo Vivo" tokens (logo, stamp, watermark).
 
-### 🏗️ Build & Verification
-- **`npm run done`**: Unified verification pipeline checking types, production build, database smoke tests, and state snapshots.
-- **Last Migration**: `20260305_000002_acervo_curadoria.sql` (implements expanded curatory fields and FTS).
+### 🏗️ Verification & Sync
+- **Migration Standard**: Unified `YYYYMMDDHHMMSS` naming for 100% reliable Supabase CLI sync.
+- **Unified Pipeline**: `npm run done` enforces type safety, build integrity, and database smoke tests.
 
-### 🛡️ Security
-- **RLS (Row Level Security)**: Strict policies protecting registration data and curator-only fields.
-- **Sanitization**: Standardized `SimpleMarkdown` and HTML sanitization in dynamic views.
+### 📱 PWA Status
+- **Installation**: Direct CTAs for iOS/Android in Navbar.
+- **Offline Mode**: Essential asset caching and dedicated offline fallback pages.
 
-## 4. Quality Assurance Status
-- **Build Status**: ✅ Passing.
-- **Environment**: ✅ Consistent via `.env.local` and `npx` wrappers.
-- **Documentation**: Walkthroughs and Implementation Plans versioned alongside code.
+## 4. Current Quality Status
+- **Build**: ✅ Passing.
+- **Security**: ✅ RLS policies active across all modules.
+- **Snapshots**: ✅ Automated snapshots versioned in `reports/state.md`.
 
 ---
 *Report generated by Antigravity AI.*

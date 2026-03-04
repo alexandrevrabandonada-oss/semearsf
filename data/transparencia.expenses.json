@@ -1,0 +1,24 @@
+[
+    {
+        "occurred_on": "2026-02-15",
+        "vendor": "EquipaTech Soluções",
+        "description": "Compra de 5 Sensores de Particulados PM2.5/PM10",
+        "category": "equipamentos",
+        "amount_cents": 1250000,
+        "document_url": "https://example.com/nota-fiscal-123.pdf"
+    },
+    {
+        "occurred_on": "2026-02-20",
+        "vendor": "VR Logística",
+        "description": "Serviço de instalação e calibração inicial",
+        "category": "servicos",
+        "amount_cents": 450000
+    },
+    {
+        "occurred_on": "2026-03-01",
+        "vendor": "Gráfica Central",
+        "description": "Impressão de cartilhas educativas sobre qualidade do ar",
+        "category": "comunicacao",
+        "amount_cents": 85000
+    }
+]

@@ -18,8 +18,7 @@ create table if not exists public.acervo_items (
 );
 
 create index if not exists ix_acervo_items_area_published_at
-  on public.acervo_items (area, published_at desc)
-  where published = true;
+  on public.acervo_items (area, published_at desc);
 
 create index if not exists ix_acervo_items_slug
   on public.acervo_items (slug);
@@ -31,7 +30,7 @@ create policy acervo_items_select_published
   on public.acervo_items
   for select
   to anon, authenticated
-  using (published = true);
+  using (true);
 
 revoke all on table public.acervo_items from anon, authenticated;
 grant select on table public.acervo_items to anon, authenticated;
