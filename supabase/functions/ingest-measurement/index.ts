@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import webpush from "https://esm.sh/web-push@3.6.6";
 
 const MAX_FUTURE_MS = 10 * 60 * 1000;
 const MAX_PAST_MS = 7 * 24 * 60 * 60 * 1000;
@@ -130,6 +131,78 @@ Deno.serve(async (req) => {
 
   if (updateError) {
     return json(500, { ok: false, error: "station_update_failed" });
+  }
+
+  // --- Push Notification Alerts (Phase 2) ---
+  if (pm25 !== null) {
+    try {
+      // 1. Fetch eligible active subscriptions
+      // Rules: is_active=true AND pm25 >= threshold AND (last_alert_at is null OR expired cooldown)
+      const { data: subs, error: subError } = await supabase
+        .from("push_subscriptions")
+        .select("*")
+        .eq("is_active", true)
+        .lte("pm25_threshold", pm25);
+
+      if (subError) throw subError;
+
+      const eligibleSubs = (subs || []).filter(sub => {
+        if (!sub.last_alert_at) return true;
+        const lastAlert = new Date(sub.last_alert_at).getTime();
+        const cooldownMs = (sub.cooldown_minutes || 120) * 60 * 1000;
+        return Date.now() - lastAlert >= cooldownMs;
+      });
+
+      if (eligibleSubs.length > 0) {
+        const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
+        const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
+
+        if (vapidPublicKey && vapidPrivateKey) {
+          webpush.setVapidDetails(
+            'mailto:portal@semear.org.br',
+            vapidPublicKey,
+            vapidPrivateKey
+          );
+
+          const payload = JSON.stringify({
+            title: `Alerta: Qualidade do Ar (${stationCode})`,
+            body: `Nível crítico de PM2.5 detectado: ${pm25} µg/m³.`,
+            icon: '/icons/icon-192.png',
+            data: { url: `/dados?station=${stationCode}` }
+          });
+
+          // Dispatch notifications
+          await Promise.allSettled(
+            eligibleSubs.map(async (sub) => {
+              const pushSubscription = {
+                endpoint: sub.endpoint,
+                keys: { p256dh: sub.p256dh, auth: sub.auth }
+              };
+              await webpush.sendNotification(pushSubscription, payload);
+
+              // Update sub state
+              await supabase
+                .from("push_subscriptions")
+                .update({
+                  last_alert_at: new Date().toISOString(),
+                  last_alert_pm25: pm25
+                })
+                .eq("id", sub.id);
+            })
+          );
+
+          // Log the alert event (aggregate for this ingest)
+          await supabase.from("push_alert_events").insert({
+            station_id: station.id,
+            pm25,
+            reason: `Disparo automático para ${eligibleSubs.length} assinantes.`
+          });
+        }
+      }
+    } catch (err) {
+      console.error("[PushAlert] Failed to trigger alerts:", err.message);
+      // Don't fail the whole ingest if push fails
+    }
   }
 
   return json(200, { ok: true });

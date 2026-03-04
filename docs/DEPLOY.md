@@ -44,7 +44,15 @@ npm run ship:content
 ## Variáveis de Ambiente
 Este projeto utiliza **Vite**. Todas as variáveis expostas ao frontend **devem** começar com `VITE_`. O uso de `NEXT_PUBLIC_` é depreciado e causará avisos no pipeline de verificação.
 
-### Deploy na Vercel (Social Share)
-As rotas de compartilhamento (`/s/*`) utilizam Vercel Serverless Functions. Para que funcionem, você deve configurar as seguintes variáveis no painel da Vercel:
-- `SUPABASE_URL`: URL do seu projeto Supabase.
-- `SUPABASE_SERVICE_ROLE_KEY`: Chave de serviço (service_role) para acesso administrativo ao banco.
+### Env (Vite)
+Este projeto utiliza **Vite**. Siga estas regras estritamente:
+- **Frontend**: Variáveis que aparecem na UI (como URLs do Supabase no browser) **obrigatoriamente** devem começar com `VITE_`.
+- **Legacy**: Nunca use `NEXT_PUBLIC_*`. O Vite não as carrega automaticamente e o pipeline de verificação emitirá avisos.
+- **Server/Tools**: Variáveis sensíveis (como `SERVICE_ROLE_KEY`) não devem ter prefixo `VITE_` para evitar exposição acidental.
+
+#### Variáveis de Produção (Vercel)
+Além das `VITE_*`, configure:
+- `SUPABASE_SERVICE_ROLE_KEY`: Acesso administrativo ao DB.
+- `SHARE_HASH_SALT`: Salt para anonimização de IPs no social analytics.
+- `INGEST_API_KEY`: Chave de autorização para o ingest de sensores.
+- `VAPID_PRIVATE_KEY`: Chave privada para notificações push.

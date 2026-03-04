@@ -128,11 +128,14 @@ export async function listUpcomingEvents(): Promise<Event[]> {
 export async function getEventSummary(eventId: string): Promise<EventSummary | null> {
   try {
     const supabase = assertSupabase();
-    const { data, error } = await supabase
-      .from("events")
-      .select("id, title, start_at, location, capacity")
-      .eq("id", eventId)
-      .maybeSingle();
+    const results = await Promise.all([
+      supabase
+        .from("events")
+        .select("id, title, start_at, location, capacity")
+        .eq("id", eventId)
+        .maybeSingle(),
+    ]);
+    const { data, error } = results[0];
     if (error) throw error;
     return (data as EventSummary | null) ?? null;
   } catch (error) {
@@ -483,6 +486,10 @@ export type SystemStatus = {
     latest_blog: BlogPost[];
   };
   transparency: TransparencySummary;
+  social: {
+    total_7d: number;
+    top_slugs: { kind: string; slug: string; count: number }[];
+  };
 };
 
 export async function getSystemStatus(): Promise<SystemStatus> {
@@ -505,16 +512,27 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       .limit(1)
       .maybeSingle();
 
-    // 2. Content
-    const [events, acervo, blog, transparency] = await Promise.all([
+    // 2. Content & Social
+    const results = await Promise.all([
       supabase.from("events").select("id, title, start_at, location, capacity")
         .order("start_at", { ascending: true })
         .gt("start_at", new Date().toISOString())
         .limit(3),
       supabase.from("acervo_items").select("*").order("created_at", { ascending: false }).limit(3),
       listBlogPosts({ limit: 2 }),
-      getTransparencySummary()
+      getTransparencySummary(),
+      supabase.from("share_events")
+        .select("*", { count: "exact", head: true })
+        .gt("occurred_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+      supabase.rpc("get_top_shared_items", { p_days: 7 })
     ]);
+
+    const events = results[0];
+    const acervo = results[1];
+    const blog = results[2] as BlogPost[];
+    const transparency = results[3] as TransparencySummary;
+    const social7d = results[4] as { count: number };
+    const topShares = results[5] as { data: any[] };
 
     return {
       monitoring: {
@@ -530,7 +548,11 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         latest_acervo: (acervo.data ?? []) as any[],
         latest_blog: blog
       },
-      transparency
+      transparency,
+      social: {
+        total_7d: social7d.count || 0,
+        top_slugs: (topShares.data || []) as { kind: string; slug: string; count: number }[]
+      }
     };
   } catch (error) {
     throw toAppError("Falha ao obter status do sistema", error);

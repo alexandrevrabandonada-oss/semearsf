@@ -26,16 +26,26 @@ let allKeys = {};
 });
 
 const legacyKeys = Object.keys(allKeys).filter(key => key.startsWith("NEXT_PUBLIC_"));
+const viteKeys = Object.keys(allKeys).filter(key => key.startsWith("VITE_"));
 
-if (legacyKeys.length > 0) {
-    console.warn(`[!] CONFLITO: ${legacyKeys.length} chaves herdadas detectadas.`);
-    console.warn("    Este projeto usa Vite. Remova ou renomeie as seguintes chaves do seu .env.local:");
-    legacyKeys.forEach(key => {
-        const suggested = key.replace("NEXT_PUBLIC_", "VITE_");
-        console.warn(`    - ${key} -> (sugerido: ${suggested})`);
-    });
-} else {
-    console.log("[OK] Nenhuma variável NEXT_PUBLIC_* encontrada. Ambiente limpo para Vite.");
+if (legacyKeys.length > 0 && viteKeys.length > 0) {
+    console.warn("[!] CONFLITO: Chaves herdadas e novas detectadas simultaneamente.");
+    console.warn("    Este projeto usa Vite. Remova as chaves NEXT_PUBLIC_* imediatamente:");
+    legacyKeys.forEach(key => console.warn(`    - ${key} (CONFLICT)`));
+} else if (legacyKeys.length > 0) {
+    console.warn(`[WARN] Uso de chaves herdadas detectado: ${legacyKeys.join(", ")}`);
+    console.warn("    Vite usa prefixo VITE_*. Essas chaves podem não estar sendo carregadas corretamente.");
+}
+
+if (viteKeys.length > 0) {
+    console.log("[OK] Chaves Vite detectadas:");
+    viteKeys.forEach(key => console.log(`    - ${key}`));
+}
+
+if (legacyKeys.length === 0 && viteKeys.length === 0) {
+    console.log("[?] Nenhuma variável de ambiente pública (VITE_/NEXT_) encontrada.");
+} else if (legacyKeys.length === 0) {
+    console.log("[OK] Ambiente limpo de chaves NEXT_PUBLIC_*.");
 }
 
 process.exit(0);

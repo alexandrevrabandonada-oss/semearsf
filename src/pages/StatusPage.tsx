@@ -53,7 +53,7 @@ export function StatusPage() {
     }
 
     return (
-        <section className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <section className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
             <header className="flex flex-col gap-2">
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-ciano">Diagnóstico em Tempo Real</p>
                 <h1 className="text-4xl font-black text-texto">Status do Sistema</h1>
@@ -121,7 +121,35 @@ export function StatusPage() {
                             <span className="text-xs font-black text-texto">{status.content.upcoming_events.length} Eventos</span>
                         </div>
                     </div>
-                    <p className="mt-auto text-[10px] text-texto/40 uppercase tracking-tighter">Última atualização: {new Date().toLocaleTimeString("pt-BR")}</p>
+                    <p className="mt-auto text-[10px] text-texto/40 uppercase tracking-tighter">Sincronizado</p>
+                </div>
+
+                {/* Social Reach Card */}
+                <div className="rounded-2xl border border-base/40 bg-fundo/60 p-6 flex flex-col md:col-span-3">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <h2 className="text-xs font-black uppercase tracking-widest text-cta">Alcance Social (7 dias)</h2>
+                            <div className="mt-4 flex items-end gap-3">
+                                <span className="text-5xl font-black text-base">{status.social.total_7d}</span>
+                                <span className="mb-2 text-[10px] font-bold uppercase tracking-tighter text-texto/40 italic">Cliques de compartilhamento</span>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-[10px] font-bold uppercase text-texto/30 tracking-widest">Top Engajamento</p>
+                            <div className="mt-2 space-y-1">
+                                {status.social.top_slugs.length === 0 ? (
+                                    <p className="text-[10px] text-texto/20 italic">Sem dados recentes</p>
+                                ) : (
+                                    status.social.top_slugs.map((item, idx) => (
+                                        <div key={idx} className="flex items-center justify-end gap-2 text-[10px]">
+                                            <span className="text-texto/40 font-mono">/{item.slug}</span>
+                                            <span className="font-black text-base italic">{item.count}</span>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

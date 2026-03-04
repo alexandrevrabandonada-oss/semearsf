@@ -1,37 +1,56 @@
 import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req: any, res: any) {
-    const { slug } = req.query;
+  const { slug } = req.query;
 
-    if (!slug) {
-        return res.redirect('/');
-    }
+  if (!slug) {
+    return res.redirect('/');
+  }
 
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!supabaseUrl || !supabaseServiceKey) {
-        return res.redirect(`/blog/${slug}`);
-    }
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return res.redirect(`/blog/${slug}`);
+  }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { data: post, error } = await supabase
-        .from('blog_posts')
-        .select('title, excerpt, cover_url')
-        .eq('slug', slug)
-        .single();
+  // --- Share Analytics (Privacy-Safe) ---
+  try {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '0.0.0.0';
+    const salt = process.env.SHARE_HASH_SALT || 'default-salt-change-me';
 
-    if (error || !post) {
-        return res.redirect(`/blog/${slug}`);
-    }
+    const crypto = await import('node:crypto');
+    const ipHash = crypto.createHash('sha256').update(`${ip}${salt}`).digest('hex');
 
-    const title = `${post.title} | Blog SEMEAR`;
-    const description = post.excerpt || 'Leia este artigo no Blog SEMEAR.';
-    const image = post.cover_url || 'https://semear-pwa.vercel.app/icons/icon-512.png';
-    const url = `https://semear-pwa.vercel.app/blog/${slug}`;
+    await supabase.from('share_events').insert({
+      kind: 'blog',
+      slug,
+      referrer: req.headers['referer'] || null,
+      user_agent: req.headers['user-agent'] || null,
+      ip_hash: ipHash
+    });
+  } catch (err) {
+    console.error('[ShareAnalytics] Failed to log event:', err);
+  }
 
-    const html = `
+  const { data: post, error } = await supabase
+    .from('blog_posts')
+    .select('title, excerpt, cover_url')
+    .eq('slug', slug)
+    .single();
+
+  if (error || !post) {
+    return res.redirect(`/blog/${slug}`);
+  }
+
+  const title = `${post.title} | Blog SEMEAR`;
+  const description = post.excerpt || 'Leia este artigo no Blog SEMEAR.';
+  const image = post.cover_url || 'https://semear-pwa.vercel.app/icons/icon-512.png';
+  const url = `https://semear-pwa.vercel.app/blog/${slug}`;
+
+  const html = `
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -62,6 +81,6 @@ export default async function handler(req: any, res: any) {
 </html>
   `.trim();
 
-    res.setHeader('Content-Type', 'text/html');
-    return res.status(200).send(html);
+  res.setHeader('Content-Type', 'text/html');
+  return res.status(200).send(html);
 }

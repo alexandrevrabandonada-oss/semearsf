@@ -1,6 +1,6 @@
 # Project State Snapshot
 
-**Date:** 2026-03-04T21:07:19.678Z
+**Date:** 2026-03-04T21:28:04.165Z
 
 ## Versions
 ```
@@ -12,41 +12,19 @@ npm:  10.9.3
 ```
 ## main...origin/main
  M .env.local.example
- M .gitignore
- M docs/ACERVO.md
- M docs/DB_WORKFLOW.md
+ M api/share/acervo.ts
+ M api/share/blog.ts
  M docs/DEPLOY.md
- M package.json
  M reports/state.md
- M src/App.tsx
- M src/components/Navbar.tsx
  M src/lib/api.ts
- M src/pages/BlogPostPage.tsx
- M src/pages/HomePage.tsx
- M src/pages/acervo/AcervoItemPage.tsx
- D supabase/migrations/OLD_20260304000003_acervo_items.sql
- M tools/acervo-import.mjs
- M tools/blog-import.mjs
- M tools/snapshot.mjs
- M tools/transparency-import.mjs
- M vercel.json
- M vite.config.ts
-?? api/
-?? docs/PUSH.md
-?? docs/PWA.md
-?? reports/product_state_v3.md
-?? src/pages/AlertasPage.tsx
-?? src/pages/SearchPage.tsx
-?? src/pages/StatusPage.tsx
-?? supabase/_archive/
-?? supabase/functions/register-push/
-?? supabase/functions/test-push/
-?? supabase/migrations/20260308000001_storage_acervo.sql
-?? supabase/migrations/20260308000002_push.sql
-?? tools/acervo-upload.mjs
-?? tools/env-doctor.mjs
-?? tools/migration-doctor.mjs
-?? tools/vapid-gen.mjs
+ M src/pages/AlertasPage.tsx
+ M src/pages/StatusPage.tsx
+ M supabase/functions/ingest-measurement/index.ts
+ M supabase/functions/register-push/index.ts
+ M tools/env-doctor.mjs
+?? reports/state_report_20260304.md
+?? supabase/migrations/20260308000003_push_rules.sql
+?? supabase/migrations/20260308000004_share_analytics.sql
 ```
 
 ## package.json scripts
@@ -179,17 +157,17 @@ DB_SMOKE: OK
 --- LOCAL STATE ---
 [WARN] CLI local list: Falhou (Usando fallback de Filesystem)
       Motivo: Connecting to local database... failed to connect to postgres: failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:54322: connectex: Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente.)
-[OK] Filesystem Scan: 8 arquivos encontrados
+[OK] Filesystem Scan: 10 arquivos encontrados
       Últimas 5 migrações locais:
+      - 20260308000004_share_analytics.sql
+      - 20260308000003_push_rules.sql
       - 20260308000002_push.sql
       - 20260308000001_storage_acervo.sql
       - 20260307164000_transparencia.sql
-      - 20260306164000_blog.sql
-      - 20260305000002_acervo_curadoria.sql
 
 --- REMOTE STATE ---
 [OK] CLI remote list: Sucesso
-      Total: 8 migrações no ambiente remoto.
+      Total: 10 migrações no ambiente remoto.
 
 Doctor analysis completed.
 ```
@@ -197,4 +175,7 @@ Doctor analysis completed.
 ## Env Doctor
 ```text
 === ENV DOCTOR (Vite-only Hardening) ===
+[OK] Chaves Vite detectadas:
+    - VITE_SUPABASE_URL
+    - VITE_SUPABASE_ANON_KEY
 ```
