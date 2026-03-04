@@ -16,7 +16,7 @@ export function Navbar() {
     <header className="fixed inset-x-0 top-0 z-50 border-b border-ciano/50 bg-fundo/95 backdrop-blur">
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 md:px-6">
         <strong className="text-sm font-black uppercase tracking-[0.2em] text-cta md:text-base">
-          SEMEAR Portal
+          {import.meta.env.VITE_PROJECT_NAME || "SEMEAR Portal"}
         </strong>
         <ul className="flex flex-wrap items-center justify-end gap-2 text-xs font-semibold md:gap-3 md:text-sm">
           {links.map((link) => (

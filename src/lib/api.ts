@@ -464,3 +464,155 @@ export async function getTransparencySummary(): Promise<TransparencySummary> {
     throw toAppError("Falha ao calcular sumário de transparência", error);
   }
 }
+// ─────────────────────────────────────────
+// Status do Sistema
+// ─────────────────────────────────────────
+
+export type SystemStatus = {
+  monitoring: {
+    stations_count: number;
+    measurements_24h: number;
+    latest_measurement: {
+      ts: string;
+      station_name: string;
+    } | null;
+  };
+  content: {
+    upcoming_events: EventSummary[];
+    latest_acervo: any[]; // Use AcervoItem type if available, but for status list generic is fine
+    latest_blog: BlogPost[];
+  };
+  transparency: TransparencySummary;
+};
+
+export async function getSystemStatus(): Promise<SystemStatus> {
+  try {
+    const supabase = assertSupabase();
+
+    // 1. Monitoring stats
+    const [{ count: stationsCount }, { count: measurements24h }] = await Promise.all([
+      supabase.from("stations").select("*", { count: "exact", head: true }),
+      supabase.from("measurements")
+        .select("*", { count: "exact", head: true })
+        .gt("ts", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+    ]);
+
+    // Latest measurement with station name
+    const { data: latestM } = await supabase
+      .from("measurements")
+      .select("ts, station:stations(name)")
+      .order("ts", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    // 2. Content
+    const [events, acervo, blog, transparency] = await Promise.all([
+      supabase.from("events").select("id, title, start_at, location, capacity")
+        .order("start_at", { ascending: true })
+        .gt("start_at", new Date().toISOString())
+        .limit(3),
+      supabase.from("acervo_items").select("*").order("created_at", { ascending: false }).limit(3),
+      listBlogPosts({ limit: 2 }),
+      getTransparencySummary()
+    ]);
+
+    return {
+      monitoring: {
+        stations_count: stationsCount || 0,
+        measurements_24h: measurements24h || 0,
+        latest_measurement: latestM ? {
+          ts: String(latestM.ts),
+          station_name: String((latestM.station as any)?.name || "N/A")
+        } : null
+      },
+      content: {
+        upcoming_events: (events.data ?? []) as EventSummary[],
+        latest_acervo: (acervo.data ?? []) as any[],
+        latest_blog: blog
+      },
+      transparency
+    };
+  } catch (error) {
+    throw toAppError("Falha ao obter status do sistema", error);
+  }
+}
+
+/**
+ * Busca itens no acervo pelo título ou excerto.
+ */
+export async function searchAcervo(q: string, limit = 10): Promise<AcervoItem[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("acervo_items")
+      .select("*")
+      .or(`title.ilike.%${q}%,excerpt.ilike.%${q}%`)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data as AcervoItem[];
+  } catch (error) {
+    throw toAppError("Falha ao buscar no acervo", error);
+  }
+}
+
+/**
+ * Busca posts no blog pelo título ou conteúdo.
+ */
+export async function searchBlog(q: string, limit = 10): Promise<BlogPost[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select("*")
+      .or(`title.ilike.%${q}%,content_md.ilike.%${q}%`)
+      .order("published_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data as BlogPost[];
+  } catch (error) {
+    throw toAppError("Falha ao buscar no blog", error);
+  }
+}
+
+/**
+ * Busca gastos na transparência por fornecedor, descrição ou categoria.
+ */
+export async function searchTransparency(q: string, limit = 10): Promise<any[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("expenses")
+      .select("*")
+      .or(`vendor.ilike.%${q}%,description.ilike.%${q}%,category.ilike.%${q}%`)
+      .order("occurred_on", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data as any[];
+  } catch (error) {
+    throw toAppError("Falha ao buscar na transparência", error);
+  }
+}
+
+/**
+ * Busca eventos na agenda por título ou descrição.
+ */
+export async function searchEvents(q: string, limit = 10): Promise<Event[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("events")
+      .select("*")
+      .or(`title.ilike.%${q}%,description.ilike.%${q}%`)
+      .order("start_at", { ascending: true })
+      .limit(limit);
+
+    if (error) throw error;
+    return data as Event[];
+  } catch (error) {
+    throw toAppError("Falha ao buscar eventos", error);
+  }
+}

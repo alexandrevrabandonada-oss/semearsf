@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { listAcervoItems, listStations, listUpcomingEvents, type AcervoItem, type Event, type Station } from "../lib/api";
+import { listAcervoItems, listBlogPosts, listStations, listUpcomingEvents, getTransparencySummary, type AcervoItem, type Event, type Station, type BlogPost, type TransparencySummary } from "../lib/api";
 
 const ONLINE_THRESHOLD_MS = 5 * 60 * 1000;
 
@@ -15,6 +15,8 @@ export function HomePage() {
   const [stations, setStations] = useState<Station[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [acervo, setAcervo] = useState<AcervoItem[]>([]);
+  const [latestBlog, setLatestBlog] = useState<BlogPost | null>(null);
+  const [transparency, setTransparency] = useState<TransparencySummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,14 +24,18 @@ export function HomePage() {
     async function load() {
       try {
         setLoading(true);
-        const [stationsData, eventsData, acervoData] = await Promise.all([
+        const [stationsData, eventsData, acervoData, blogData, transData] = await Promise.all([
           listStations(),
           listUpcomingEvents(),
-          listAcervoItems({ featured: true, limit: 6 })
+          listAcervoItems({ featured: true, limit: 6 }),
+          listBlogPosts({ limit: 1 }),
+          getTransparencySummary()
         ]);
         setStations(stationsData);
         setEvents(eventsData.slice(0, 3));
         setAcervo(acervoData);
+        setLatestBlog(blogData[0] || null);
+        setTransparency(transData);
       } catch (err) {
         console.error("Erro ao carregar dados da home:", err);
         setError("Não foi possível carregar as informações em tempo real.");
@@ -43,6 +49,10 @@ export function HomePage() {
   const onlineCount = stations.filter(getStationOnlineStatus).length;
   const offlineCount = stations.length - onlineCount;
 
+  const formatCurrency = (cents: number) => {
+    return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  };
+
   return (
     <section className="space-y-8">
       {/* Hero Section */}
@@ -54,6 +64,25 @@ export function HomePage() {
         <p className="mt-4 max-w-3xl text-sm text-texto/90 md:text-base">
           Acompanhe os dados de qualidade do ar em tempo real, participe das nossas atividades e explore o acervo curado pela equipe SEMEAR.
         </p>
+        <div className="mt-8 relative max-w-xl group">
+          <input
+            type="text"
+            placeholder="Buscar no acervo e no projeto..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const q = (e.target as HTMLInputElement).value;
+                if (q.trim()) window.location.href = `/buscar?q=${encodeURIComponent(q)}`;
+              }
+            }}
+            className="w-full rounded-xl border border-ciano/30 bg-base/20 p-4 pr-12 text-sm font-bold text-texto placeholder:text-texto/40 focus:border-ciano focus:outline-none transition-all group-hover:border-ciano/50"
+          />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-ciano/40 pointer-events-none">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
         <div className="mt-6 flex flex-wrap gap-3">
           <Link className="rounded-lg bg-cta px-5 py-3 text-sm font-black uppercase tracking-wide text-base transition-transform hover:-translate-y-0.5 hover:bg-cta/90" to="/dados">
             Ver dados agora
@@ -95,6 +124,52 @@ export function HomePage() {
           </Link>
         </div>
 
+        {/* O Que Há de Novo (Blog + Transparência) */}
+        <div className="flex flex-col rounded-2xl border border-primaria/40 bg-fundo/60 p-6 transition-all hover:border-primaria/60">
+          <h2 className="text-lg font-black uppercase tracking-wide text-cta">O que há de novo</h2>
+          <div className="mt-4 flex flex-1 flex-col gap-4">
+            {loading ? (
+              <div className="space-y-3">
+                <div className="h-20 w-full animate-pulse rounded-lg bg-primaria/10" />
+                <div className="h-12 w-full animate-pulse rounded-lg bg-primaria/10" />
+              </div>
+            ) : (
+              <>
+                {/* Blog Signal */}
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primaria">Última do Blog</p>
+                  {latestBlog ? (
+                    <Link to={`/blog/${latestBlog.slug}`} className="group block">
+                      <h3 className="text-sm font-bold leading-snug text-texto group-hover:text-ciano">{latestBlog.title}</h3>
+                      <p className="text-[10px] text-texto/50 uppercase mt-1">{new Date(latestBlog.published_at!).toLocaleDateString()}</p>
+                    </Link>
+                  ) : (
+                    <p className="text-xs text-texto/40 italic">Nenhum post recente.</p>
+                  )}
+                </div>
+
+                {/* Transparency Signal */}
+                <div className="mt-auto pt-4 border-t border-primaria/10 space-y-1">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primaria">Transparência</p>
+                  {transparency ? (
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-black text-texto">{formatCurrency(transparency.total_cents)}</span>
+                      <Link to="/transparencia" className="text-[10px] font-bold text-ciano hover:underline uppercase">Auditável →</Link>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-texto/40 italic">Sem dados financeiros.</p>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+          <Link className="mt-6 text-sm font-bold text-primaria hover:underline" to="/status">
+            Ver status do sistema →
+          </Link>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
         {/* Próximas Atividades */}
         <div className="flex flex-col rounded-2xl border border-acento/40 bg-fundo/60 p-6 transition-all hover:border-acento/60">
           <h2 className="text-lg font-black uppercase tracking-wide text-cta">Próximas atividades</h2>
@@ -127,42 +202,41 @@ export function HomePage() {
             Ver agenda completa →
           </Link>
         </div>
-      </div>
 
-      {/* Destaques do Acervo */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-black uppercase tracking-wider text-cta">Destaques do Acervo</h2>
-          <Link className="text-sm font-bold text-ciano hover:underline" to="/acervo">Ver tudo →</Link>
+        {/* Destaques do Acervo */}
+        <div className="space-y-4 flex flex-col">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-black uppercase tracking-wide text-cta">Destaques do Acervo</h2>
+            <Link className="text-sm font-bold text-ciano hover:underline" to="/acervo">Ver tudo →</Link>
+          </div>
+
+          {loading ? (
+            <div className="grid gap-3 md:grid-cols-2 flex-1">
+              {[1, 2].map((i) => (
+                <div className="h-24 animate-pulse rounded-xl bg-ciano/5" key={i} />
+              ))}
+            </div>
+          ) : acervo.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-ciano/30 py-4 text-center flex-1 flex items-center justify-center">
+              <p className="text-xs text-texto/50 italic">Nenhum destaque.</p>
+            </div>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2 flex-1">
+              {acervo.slice(0, 4).map((item) => (
+                <Link
+                  className="flex flex-col gap-1 rounded-xl border border-ciano/20 bg-fundo/70 p-4 transition-all hover:border-ciano hover:bg-fundo/90"
+                  key={item.id}
+                  to={`/acervo/item/${item.slug}`}
+                >
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-ciano">
+                    {item.kind}
+                  </span>
+                  <h3 className="line-clamp-1 text-sm font-bold text-texto">{item.title}</h3>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
-
-        {loading ? (
-          <div className="grid gap-4 md:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div className="h-40 animate-pulse rounded-xl bg-ciano/5" key={i} />
-            ))}
-          </div>
-        ) : acervo.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-ciano/30 py-8 text-center">
-            <p className="text-sm text-texto/50">Nenhum destaque no acervo no momento.</p>
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-3">
-            {acervo.map((item) => (
-              <Link
-                className="flex flex-col gap-2 rounded-xl border border-ciano/20 bg-fundo/70 p-5 transition-all hover:border-ciano hover:bg-fundo/90"
-                key={item.id}
-                to={`/acervo/item/${item.slug}`}
-              >
-                <span className="rounded-full bg-ciano/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-ciano w-fit">
-                  {item.kind}
-                </span>
-                <h3 className="line-clamp-2 font-bold text-texto">{item.title}</h3>
-                {item.excerpt && <p className="line-clamp-2 text-xs text-texto/70">{item.excerpt}</p>}
-              </Link>
-            ))}
-          </div>
-        )}
       </div>
     </section>
   );

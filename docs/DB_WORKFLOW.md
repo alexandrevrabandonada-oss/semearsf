@@ -1,28 +1,39 @@
-# DB Workflow (Repo-First)
+# Fluxo de Banco de Dados (DB Workflow) - SEMEAR PWA
 
-## Regra principal
-- Nunca usar SQL Editor para alterar schema.
-- Toda mudanca de banco deve entrar em `supabase/migrations/*.sql`.
+Este projeto utiliza o Supabase CLI para gerenciar migrações de banco de dados. Para garantir a integridade entre ambientes local e remoto, siga estas diretrizes.
 
-## Fluxo padrao
-1. Criar/editar migration idempotente em `supabase/migrations/`.
-2. Validar localmente (quando aplicavel) com Supabase CLI.
-3. Aplicar no projeto com `db push`.
-4. Versionar a migration no Git junto do codigo que depende dela.
+## Nomenclatura de Migrações
 
-## Comandos
-- `npm run db:status`
-- `npm run db:push`
-- `npm run db:types`
-- `npm run done`
+Todas as novas migrações **devem** seguir o padrão de 14 dígitos (timestamp) da CLI:
+`YYYYMMDDHHMMSS_descricao_da_mudanca.sql`
 
-## Setup minimo de CLI
-1. `npx supabase init` (se ainda nao existir `supabase/config.toml`)
-2. `npx supabase login --token <SUPABASE_ACCESS_TOKEN>`
-3. `npx supabase link --project-ref <PROJECT_REF> -p <DB_PASSWORD>`
+Exemplo: `20260308000001_relatorio_gastos.sql`
 
-## Boas praticas
-- Sempre usar SQL idempotente (`if not exists`, `drop policy if exists`, etc.).
-- Ao mudar nomes de colunas, alinhar migration + API + paginas no mesmo commit.
-- Nao expor `SUPABASE_SERVICE_ROLE_KEY` no frontend.
-- Secrets de Edge Function devem ser configurados via CLI/Dashboard, nunca hardcoded.
+> [!IMPORTANT]
+> **Não renomeie migrações antigas**: Se uma migração já foi aplicada em produção (remoto), renomeá-la localmente causará conflitos de histórico. O `Migration Doctor` avisará sobre nomes fora do padrão, mas isso deve ser tratado apenas para **novas** migrações.
+
+## Ferramenta de Diagnóstico (Doctor)
+
+Se você encontrar erros de "diverging history" ou "out of sync", use:
+```bash
+npm run db:doctor
+```
+
+O Doctor realiza:
+1. **Status Check**: Verifica se o DB local está rodando e se a CLI está vinculada.
+2. **CLI Scan**: Tenta listar migrações via Supabase CLI.
+3. **FS Fallback**: Se o CLI falhar, ele analisa a pasta `supabase/migrations` diretamente para garantir que os arquivos estão presentes.
+4. **Naming Lint**: Alerta sobre arquivos que não seguem o padrão de 14 dígitos.
+
+## Aplicando Mudanças
+
+1. Crie a migração localmente ou edite o schema.
+2. Teste no banco local.
+3. Para subir para o ambiente remoto:
+   ```bash
+   npm run db:push
+   ```
+4. Após o push bem-sucedido, rode `npm run done` para verificar a integridade geral.
+
+---
+*Nota: A integridade do banco é crítica para o funcionamento do PWA e das Edge Functions.*

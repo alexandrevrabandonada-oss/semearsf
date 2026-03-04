@@ -12,23 +12,29 @@
     "db:push": "npx supabase db push",
     "db:status": "npx supabase db status",
     "db:types": "npx supabase gen types typescript --local > src/lib/supabase/database.types.ts",
-    "fn:deploy": "supabase functions deploy ingest-measurement --no-verify-jwt",
+    "db:doctor": "node tools/migration-doctor.mjs",
+    "env:doctor": "node tools/env-doctor.mjs",
+    "fn:deploy": "npx supabase functions deploy --no-verify-jwt",
     "secrets:set": "node tools/secrets-set.mjs",
     "ship:infra": "npm run db:push && npm run fn:deploy && npm run done",
+    "ship:content": "npm run acervo:import && npm run blog:import && npm run transparency:import && npm run done",
+    "ship:all": "npm run ship:infra && npm run ship:content",
     "simulate:sensor": "node tools/simulate-sensor.mjs",
     "smoke": "node tools/db-smoke.mjs",
     "snapshot": "node tools/snapshot.mjs",
     "acervo:import": "node tools/acervo-import.mjs",
+    "acervo:upload": "node tools/acervo-upload.mjs",
     "blog:import": "node tools/blog-import.mjs",
     "transparency:import": "node tools/transparency-import.mjs",
-    "done": "npm run verify && npm run smoke && npm run snapshot"
+    "done": "npm run verify && npm run smoke && npm run db:doctor && npm run env:doctor && npm run snapshot"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.8.2",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "web-push": "^3.6.6"
   },
   "devDependencies": {
     "@types/node": "^25.3.0",

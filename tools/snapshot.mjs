@@ -3,8 +3,8 @@ import path from "node:path";
 import { execSync } from "node:child_process";
 
 function sh(cmd) {
-  try { return execSync(cmd, { stdio: ["ignore","pipe","pipe"] }).toString().trim(); }
-  catch (e) { return ((e.stdout?.toString()||"") + "\n" + (e.stderr?.toString()||"")).trim(); }
+  try { return execSync(cmd, { stdio: ["ignore", "pipe", "pipe"] }).toString().trim(); }
+  catch (e) { return ((e.stdout?.toString() || "") + "\n" + (e.stderr?.toString() || "")).trim(); }
 }
 
 function normalizeDbSmokeOutput(raw) {
@@ -63,22 +63,22 @@ report.push("**Date:** " + new Date().toISOString());
 report.push("");
 
 report.push("## Versions");
-report.push("`");
+report.push("```");
 report.push("node: " + sh("node -v"));
 report.push("npm:  " + sh("npm -v"));
-report.push("`");
+report.push("```");
 report.push("");
 
 report.push("## Git");
-report.push("`");
+report.push("```");
 report.push(sh("git status -sb"));
-report.push("`");
+report.push("```");
 report.push("");
 
 report.push("## package.json scripts");
-report.push("`json");
-report.push(sh('node -e "const p=require(\\\"./package.json\\\"); console.log(JSON.stringify(p.scripts,null,2))"'));
-report.push("`");
+report.push("```json");
+report.push(sh('node -e "const p=require(\'./package.json\'); console.log(JSON.stringify(p.scripts,null,2))"'));
+report.push("```");
 report.push("");
 
 report.push("## Routes (parsed from src/App.tsx)");
@@ -87,14 +87,15 @@ report.push(routes.length ? ("- " + routes.join("\n- ")) : "_No routes found in 
 report.push("");
 
 report.push("## Tree (src, tools)");
-report.push("`");
+report.push("```");
 report.push(listTree("src", 4).join("\n"));
-report.push("`");
+report.push("```");
 report.push("");
-report.push("`");
+report.push("```");
 report.push(listTree("tools", 2).join("\n"));
-report.push("`");
+report.push("```");
 report.push("");
+
 report.push("## Root files (existence only)");
 const rootFiles = ["vercel.json", ".gitignore", ".env.local.example"];
 for (const file of rootFiles) {
@@ -104,27 +105,39 @@ report.push("");
 
 report.push("## Env keys present (names only)");
 if (fs.existsSync(".env")) {
-  const raw = fs.readFileSync(".env","utf8");
-  const keys = raw.split(/\\r?\\n/).map(l=>l.trim()).filter(l=>l && !l.startsWith("#") && l.includes("=")).map(l=>l.split("=")[0].trim());
-  report.push("`");
-  report.push(keys.join("\\n"));
-  report.push("`");
+  const raw = fs.readFileSync(".env", "utf8");
+  const keys = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith("#") && l.includes("=")).map(l => l.split("=")[0].trim());
+  report.push("```");
+  report.push(keys.join("\n"));
+  report.push("```");
 } else if (fs.existsSync(".env.local")) {
-  const raw = fs.readFileSync(".env.local","utf8");
-  const keys = raw.split(/\\r?\\n/).map(l=>l.trim()).filter(l=>l && !l.startsWith("#") && l.includes("=")).map(l=>l.split("=")[0].trim());
-  report.push("`");
-  report.push(keys.join("\\n"));
-  report.push("`");
+  const raw = fs.readFileSync(".env.local", "utf8");
+  const keys = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith("#") && l.includes("=")).map(l => l.split("=")[0].trim());
+  report.push("```");
+  report.push(keys.join("\n"));
+  report.push("```");
 } else {
   report.push("_No .env / .env.local found_");
 }
 report.push("");
 
 report.push("## DB Smoke");
-report.push("`");
+report.push("```text");
 report.push(normalizeDbSmokeOutput(sh("node tools/db-smoke.mjs")));
-report.push("`");
+report.push("```");
+report.push("");
+
+report.push("## Supabase Migration Doctor");
+report.push("```text");
+report.push(sh("node tools/migration-doctor.mjs"));
+report.push("```");
+report.push("");
+
+report.push("## Env Doctor");
+report.push("```text");
+report.push(sh("node tools/env-doctor.mjs"));
+report.push("```");
 
 fs.mkdirSync("reports", { recursive: true });
-fs.writeFileSync("reports/state.md", report.join("\\n") + "\\n", "utf8");
+fs.writeFileSync("reports/state.md", report.join("\n") + "\n", "utf8");
 console.log("Wrote reports/state.md");

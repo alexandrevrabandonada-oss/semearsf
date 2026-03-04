@@ -1,50 +1,34 @@
-# Acervo SEMEAR - Guia de Importação
+# Gestão do Acervo Digital (Media Pipeline)
 
-Este documento explica como gerenciar e importar itens para o Acervo Vivo sem usar painéis administrativos.
+O acervo do portal SEMEAR PWA suporta diversos tipos de mídia (PDFs, Imagens, Links) associados a cada item curriculado.
 
-## 1. O Arquivo de Dados
+## Workflow Repository-First
 
-Os dados estão no arquivo `data/acervo.seed.json`.
+O conteúdo textual é gerido em `data/acervo.json` (ou importado via S3/API), mas arquivos de mídia pesada devem ser enviados para o **Supabase Storage**.
 
-### Formato esperado:
-```json
-{
-  "kind": "paper | news | video | photo | report | link",
-  "title": "Título do Item",
-  "slug": "url-amigavel-unica",
-  "excerpt": "Resumo curto (opcional)",
-  "source_name": "Nome da Fonte (opcional)",
-  "source_url": "URL da Fonte (opcional)",
-  "published_at": "YYYY-MM-DD (opcional)",
-  "tags": ["tag1", "tag2"],
-  "content_md": "Conteúdo em Markdown (opcional)",
-  "meta": { "chave": "valor" }
-}
-```
+### Upload de Arquivos via CLI
 
-### Regras importantes:
-- **Não armazene PDFs no repositório**: Use o campo `source_url` para apontar para o arquivo hospedado (ex: Google Drive, site da UFF, etc).
-- **Slug único**: O slug é usado para identificar o item. Se você mudar os dados de um slug existente, o script fará um **UPSERT** (atualização).
+Use o script `acervo:upload` para enviar arquivos e atualizar o banco de dados automaticamente.
 
-## 2. Como Importar
-
-### Pré-requisitos
-No arquivo `.env.local`, você deve ter as seguintes chaves configuradas:
-- `VITE_SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY` (Chave de serviço para permissão de escrita)
-
-### Comando
-Para sincronizar o arquivo JSON com o banco de dados:
-
+#### Exemplo 1: Adicionar um PDF
 ```bash
-npm run acervo:import
+npm run acervo:upload -- --slug meu-item-estudo --file "C:\caminho\documento.pdf" --kind pdf --title "Relatório Técnico 2026"
 ```
 
-O script informará quantos itens foram inseridos/atualizados e se houve algum erro.
+#### Exemplo 2: Definir Capa (Imagem)
+```bash
+npm run acervo:upload -- --slug galeria-fotos-evento --file "C:\caminho\capa.jpg" --kind image --cover true
+```
 
-## 3. Verificação
-Após a importação, os itens estarão visíveis no portal em:
-- `/acervo` (Hub principal)
-- `/acervo/artigos`
-- `/acervo/noticias`
-- `/acervo/midias`
+### Parâmetros Suportados
+
+| Parâmetro | Obrigatório | Descrição |
+|-----------|-------------|-----------|
+| `--slug`  | Sim         | O slug identificador do item no acervo (ex: `meu-item`). |
+| `--file`  | Sim         | Caminho absoluto para o arquivo no seu computador. |
+| `--kind`  | Sim         | Tipo de mídia: `pdf` ou `image`. |
+| `--title` | Não         | Título descritivo do arquivo (padrão é o nome do arquivo). |
+| `--cover` | Não         | Se `true`, define este arquivo como `cover_url` do item. |
+
+---
+*Nota: Este workflow substitui a necessidade de um painel administrativo para upload, mantendo o controle via repositório/cli.*

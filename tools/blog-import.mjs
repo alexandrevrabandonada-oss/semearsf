@@ -46,30 +46,45 @@ async function run() {
 
     console.log(`Iniciando importação de ${items.length} posts do blog...`);
 
-    let countSuccess = 0;
-    let countError = 0;
+    // Fetch existing slugs to determine inserted vs updated
+    const { data: existing, error: selectError } = await supabase.from("blog_posts").select("slug");
+    if (selectError) {
+        console.error(`[ERRO CRÍTICO] Falha ao buscar posts do blog: ${selectError.message}`);
+        process.exit(1);
+    }
+    const existingSlugs = new Set((existing ?? []).map(row => row.slug));
+
+    let inserted = 0;
+    let updated = 0;
+    let errors = 0;
 
     for (const item of items) {
+        const isUpdate = existingSlugs.has(item.slug);
+
         const { error } = await supabase
             .from("blog_posts")
             .upsert(item, { onConflict: "slug" });
 
         if (error) {
-            console.error(`[ERRO] Slug: ${item.slug} - ${error.message}`);
-            countError++;
+            console.error(`[ERRO] ${item.slug}: ${error.message}`);
+            errors++;
         } else {
-            console.log(`[OK] Slug: ${item.slug}`);
-            countSuccess++;
+            if (isUpdate) updated++;
+            else inserted++;
         }
     }
 
-    console.log("-----------------------------------------");
-    console.log(`Importação concluída.`);
-    console.log(`Sucesso: ${countSuccess}`);
-    console.log(`Erros:   ${countError}`);
-    console.log("-----------------------------------------");
+    console.log("\n--- Resumo Final (Blog) ---");
+    console.log(`Inseridos: ${inserted}`);
+    console.log(`Atualizados: ${updated}`);
+    console.log(`Erros: ${errors}`);
+    console.log("---------------------------\n");
 
-    if (countError > 0) process.exit(1);
+    if (errors > 0) {
+        console.log("Saindo com ERRO.");
+        process.exit(1);
+    }
+    console.log("Saindo com SUCESSO.");
     process.exit(0);
 }
 

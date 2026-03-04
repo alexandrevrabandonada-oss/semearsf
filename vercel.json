@@ -1,3 +1,20 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/s/acervo/:slug",
+      "destination": "/api/share/acervo?slug=:slug"
+    },
+    {
+      "source": "/s/blog/:slug",
+      "destination": "/api/share/blog?slug=:slug"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }

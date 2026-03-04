@@ -99,6 +99,25 @@ export function BlogPostPage() {
                                 </div>
                             </>
                         )}
+                        <button
+                            className="ml-auto inline-flex items-center gap-1 rounded-full bg-ciano/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-ciano hover:bg-ciano/20"
+                            onClick={() => {
+                                const url = `${window.location.origin}/s/blog/${post.slug}`;
+                                if (navigator.share) {
+                                    void navigator.share({
+                                        title: post.title,
+                                        text: post.excerpt || undefined,
+                                        url
+                                    });
+                                } else {
+                                    void navigator.clipboard.writeText(url);
+                                    alert("Link de compartilhamento copiado!");
+                                }
+                            }}
+                            type="button"
+                        >
+                            🔗 Compartilhar
+                        </button>
                     </div>
 
                     <h1 className="mb-6 text-3xl font-black leading-tight text-cta md:text-5xl">

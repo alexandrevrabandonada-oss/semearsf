@@ -44,33 +44,47 @@ async function run() {
     const items = JSON.parse(fs.readFileSync(seedPath, "utf8"));
     const supabase = createClient(url, serviceRoleKey);
 
-    console.log(`Iniciando importação de ${items.length} itens...`);
+    console.log(`Iniciando importação de ${items.length} itens no acervo...`);
 
-    let countSuccess = 0;
-    let countError = 0;
+    // Fetch existing slugs to determine inserted vs updated
+    const { data: existing, error: selectError } = await supabase.from("acervo_items").select("slug");
+    if (selectError) {
+        console.error(`[ERRO CRÍTICO] Falha ao buscar itens existentes: ${selectError.message}`);
+        process.exit(1);
+    }
+    const existingSlugs = new Set((existing ?? []).map(row => row.slug));
+
+    let inserted = 0;
+    let updated = 0;
+    let errors = 0;
 
     for (const item of items) {
-        // published_at is optional in seed, default to null if missing
-        // table uses generated year, city has default, search_vec is generated
+        const isUpdate = existingSlugs.has(item.slug);
+
         const { error } = await supabase
             .from("acervo_items")
             .upsert(item, { onConflict: "slug" });
 
         if (error) {
-            console.error(`[ERRO] Slug: ${item.slug} - ${error.message}`);
-            countError++;
+            console.error(`[ERRO] ${item.slug}: ${error.message}`);
+            errors++;
         } else {
-            countSuccess++;
+            if (isUpdate) updated++;
+            else inserted++;
         }
     }
 
-    console.log("-----------------------------------------");
-    console.log(`Importação concluída.`);
-    console.log(`Sucesso: ${countSuccess}`);
-    console.log(`Erros:   ${countError}`);
-    console.log("-----------------------------------------");
+    console.log("\n--- Resumo Final (Acervo) ---");
+    console.log(`Inseridos: ${inserted}`);
+    console.log(`Atualizados: ${updated}`);
+    console.log(`Erros: ${errors}`);
+    console.log("-----------------------------\n");
 
-    if (countError > 0) process.exit(1);
+    if (errors > 0) {
+        console.log("Saindo com ERRO.");
+        process.exit(1);
+    }
+    console.log("Saindo com SUCESSO.");
     process.exit(0);
 }
 

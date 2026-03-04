@@ -98,6 +98,25 @@ export function AcervoItemPage() {
                                 ⭐ Destaque
                             </span>
                         )}
+                        <button
+                            className="inline-flex items-center gap-1 rounded-full bg-ciano/10 px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-ciano hover:bg-ciano/20"
+                            onClick={() => {
+                                const url = `${window.location.origin}/s/acervo/${item.slug}`;
+                                if (navigator.share) {
+                                    void navigator.share({
+                                        title: item.title,
+                                        text: item.excerpt || undefined,
+                                        url
+                                    });
+                                } else {
+                                    void navigator.clipboard.writeText(url);
+                                    alert("Link de compartilhamento copiado!");
+                                }
+                            }}
+                            type="button"
+                        >
+                            🔗 Compartilhar
+                        </button>
                     </div>
 
                     <h1 className="mt-4 text-2xl font-black leading-tight text-cta md:text-3xl">

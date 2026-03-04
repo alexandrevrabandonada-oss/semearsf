@@ -10,14 +10,18 @@ import { TransparenciaPage } from "./pages/TransparenciaPage";
 import { AcervoPage } from "./pages/acervo/AcervoPage";
 import { AcervoListPage } from "./pages/acervo/AcervoListPage";
 import { AcervoItemPage } from "./pages/acervo/AcervoItemPage";
+import { AlertasPage } from "./pages/AlertasPage";
 import { BlogListPage } from "./pages/BlogListPage";
 import { BlogPostPage } from "./pages/BlogPostPage";
+import { StatusPage } from "./pages/StatusPage";
+import { SearchPage } from "./pages/SearchPage";
 
 export default function App() {
   return (
     <PortalLayout>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/alertas" element={<AlertasPage />} />
         <Route path="/dados" element={<DadosPage />} />
         <Route path="/agenda" element={<AgendaPage />} />
         <Route path="/inscricoes" element={<InscricoesPage />} />
@@ -28,6 +32,8 @@ export default function App() {
         <Route path="/acervo/item/:slug" element={<AcervoItemPage />} />
         <Route path="/blog" element={<BlogListPage />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route path="/status" element={<StatusPage />} />
+        <Route path="/buscar" element={<SearchPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </PortalLayout>
