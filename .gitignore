@@ -20,3 +20,5 @@ reports/state.md
 db_push.log
 db_push_*.log
 trans_debug.txt
+.env.local
+vapid.json
