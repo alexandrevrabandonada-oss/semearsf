@@ -12,6 +12,13 @@ const KIND_LABELS: Record<string, string> = {
     photo: "Fotografia"
 };
 
+const SOURCE_TYPE_LABELS: Record<string, string> = {
+    cientifico: "Científico",
+    imprensa: "Imprensa",
+    institucional: "Institucional",
+    pessoal: "Pessoal"
+};
+
 function SimpleMarkdown({ text }: { text: string }) {
     const html = text
         .replace(/&/g, "&amp;")
@@ -76,17 +83,33 @@ export function AcervoItemPage() {
                 </div>
             ) : (
                 <article className="rounded-2xl border border-ciano/50 bg-fundo/80 p-6 md:p-8">
-                    {/* Kind badge */}
-                    <span className="inline-block rounded-full bg-ciano/15 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-ciano">
-                        {KIND_LABELS[item.kind] ?? item.kind}
-                    </span>
+                    {/* Kind badges */}
+                    <div className="flex flex-wrap gap-2">
+                        <span className="inline-block rounded-full bg-ciano/15 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-ciano">
+                            {KIND_LABELS[item.kind] ?? item.kind}
+                        </span>
+                        {item.source_type && (
+                            <span className="inline-block rounded-full bg-acento/15 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-acento">
+                                {SOURCE_TYPE_LABELS[item.source_type] || item.source_type}
+                            </span>
+                        )}
+                        {item.featured && (
+                            <span className="inline-block rounded-full bg-cta/15 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-cta">
+                                ⭐ Destaque
+                            </span>
+                        )}
+                    </div>
 
-                    <h1 className="mt-3 text-2xl font-black leading-tight text-cta md:text-3xl">
+                    <h1 className="mt-4 text-2xl font-black leading-tight text-cta md:text-3xl">
                         {item.title}
                     </h1>
 
+                    {item.authors && (
+                        <p className="mt-2 text-sm font-semibold text-texto/70 italic">Por: {item.authors}</p>
+                    )}
+
                     {/* Meta row */}
-                    <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-xs text-texto/60">
+                    <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs text-texto/60">
                         {item.source_name && (
                             <span>
                                 <span className="font-semibold uppercase tracking-wide">Fonte:</span>{" "}
@@ -108,6 +131,11 @@ export function AcervoItemPage() {
                                 {new Date(item.published_at).toLocaleDateString("pt-BR")}
                             </span>
                         )}
+                        {item.doi && (
+                            <span>
+                                <span className="font-semibold uppercase tracking-wide">DOI:</span> {item.doi}
+                            </span>
+                        )}
                         {item.city && (
                             <span>
                                 <span className="font-semibold uppercase tracking-wide">Cidade:</span>{" "}
@@ -118,7 +146,7 @@ export function AcervoItemPage() {
 
                     {/* Tags */}
                     {item.tags.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-1">
+                        <div className="mt-4 flex flex-wrap gap-1">
                             {item.tags.map((tag) => (
                                 <span
                                     className="rounded-full border border-ciano/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ciano/80"
@@ -130,11 +158,19 @@ export function AcervoItemPage() {
                         </div>
                     )}
 
-                    <hr className="my-6 border-ciano/20" />
+                    <hr className="my-8 border-ciano/20" />
+
+                    {/* Curator Note */}
+                    {item.curator_note && (
+                        <div className="mb-8 rounded-xl border border-acento/30 bg-acento/5 p-5 italic text-texto/90">
+                            <span className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-acento">Nota da Curadoria</span>
+                            <p className="text-sm">"{item.curator_note}"</p>
+                        </div>
+                    )}
 
                     {/* Excerpt */}
                     {item.excerpt && (
-                        <p className="mb-4 text-base font-semibold text-texto/90">{item.excerpt}</p>
+                        <p className="mb-6 text-base font-semibold leading-relaxed text-texto/90">{item.excerpt}</p>
                     )}
 
                     {/* Body */}
@@ -143,12 +179,12 @@ export function AcervoItemPage() {
                     {/* External link CTA */}
                     {item.source_url && !item.content_md && (
                         <a
-                            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-cta px-5 py-3 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
+                            className="mt-8 inline-flex items-center gap-2 rounded-lg bg-cta px-6 py-4 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
                             href={item.source_url}
                             rel="noopener noreferrer"
                             target="_blank"
                         >
-                            Acessar fonte →
+                            Acessar fonte completa →
                         </a>
                     )}
                 </article>

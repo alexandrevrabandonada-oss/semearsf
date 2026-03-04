@@ -207,6 +207,11 @@ export type AcervoItem = {
   city: string;
   tags: string[];
   meta: Record<string, unknown>;
+  curator_note: string | null;
+  authors: string | null;
+  doi: string | null;
+  featured: boolean;
+  source_type: string | null;
   created_at: string;
 };
 
@@ -215,6 +220,8 @@ export type ListAcervoParams = {
   q?: string;
   tag?: string;
   year?: number;
+  featured?: boolean;
+  source_type?: string;
   limit?: number;
   offset?: number;
 };
@@ -236,23 +243,30 @@ function rowToAcervoItem(row: Record<string, unknown>): AcervoItem {
     meta: row.meta && typeof row.meta === "object" && !Array.isArray(row.meta)
       ? (row.meta as Record<string, unknown>)
       : {},
+    curator_note: typeof row.curator_note === "string" ? row.curator_note : null,
+    authors: typeof row.authors === "string" ? row.authors : null,
+    doi: typeof row.doi === "string" ? row.doi : null,
+    featured: Boolean(row.featured),
+    source_type: typeof row.source_type === "string" ? row.source_type : null,
     created_at: typeof row.created_at === "string" ? row.created_at : ""
   };
 }
 
 export async function listAcervoItems(params: ListAcervoParams = {}): Promise<AcervoItem[]> {
   try {
-    const { kind, q, tag, year, limit = 50, offset = 0 } = params;
+    const { kind, q, tag, year, featured, source_type, limit = 50, offset = 0 } = params;
     const supabase = assertSupabase();
 
     let query = supabase
       .from("acervo_items")
-      .select("id, kind, title, slug, excerpt, source_name, source_url, published_at, year, city, tags, created_at")
+      .select("id, kind, title, slug, excerpt, source_name, source_url, published_at, year, city, tags, featured, source_type, created_at")
       .order("published_at", { ascending: false, nullsFirst: false })
       .range(offset, offset + limit - 1);
 
     if (kind) query = query.eq("kind", kind);
     if (year) query = query.eq("year", year);
+    if (featured !== undefined) query = query.eq("featured", featured);
+    if (source_type) query = query.eq("source_type", source_type);
     if (tag) query = query.contains("tags", [tag]);
     if (q) query = query.textSearch("search_vec", q, { config: "portuguese", type: "websearch" });
 
@@ -264,12 +278,16 @@ export async function listAcervoItems(params: ListAcervoParams = {}): Promise<Ac
   }
 }
 
+export async function listFeaturedAcervo(limit = 6): Promise<AcervoItem[]> {
+  return listAcervoItems({ featured: true, limit });
+}
+
 export async function getAcervoBySlug(slug: string): Promise<AcervoItem | null> {
   try {
     const supabase = assertSupabase();
     const { data, error } = await supabase
       .from("acervo_items")
-      .select("id, kind, title, slug, excerpt, content_md, source_name, source_url, published_at, year, city, tags, meta, created_at")
+      .select("id, kind, title, slug, excerpt, content_md, source_name, source_url, published_at, year, city, tags, meta, curator_note, authors, doi, featured, source_type, created_at")
       .eq("slug", slug)
       .maybeSingle();
     if (error) throw error;

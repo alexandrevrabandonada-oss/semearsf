@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+
+import { listFeaturedAcervo, type AcervoItem } from "../../lib/api";
 
 const areas = [
     {
@@ -28,8 +31,25 @@ const areas = [
 ];
 
 export function AcervoPage() {
+    const [featured, setFeatured] = useState<AcervoItem[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function load() {
+            try {
+                const data = await listFeaturedAcervo(6);
+                setFeatured(data);
+            } catch (err) {
+                console.error("Erro ao carregar destaques:", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        void load();
+    }, []);
+
     return (
-        <section className="space-y-6">
+        <section className="space-y-8">
             <div className="rounded-2xl border border-ciano/60 bg-fundo/80 p-6 md:p-8">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-ciano">Acervo Vivo</p>
                 <h1 className="mt-2 text-2xl font-black uppercase tracking-wide text-cta md:text-4xl">
@@ -57,6 +77,35 @@ export function AcervoPage() {
                     </Link>
                 ))}
             </div>
+
+            {featured.length > 0 && (
+                <div className="space-y-4">
+                    <h2 className="text-xl font-black uppercase tracking-wider text-cta">Destaques do Acervo</h2>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        {featured.map((item) => (
+                            <Link
+                                className="flex flex-col gap-2 rounded-xl border border-ciano/30 bg-fundo/60 p-5 transition-all hover:border-ciano hover:bg-fundo/80"
+                                key={item.id}
+                                to={`/acervo/item/${item.slug}`}
+                            >
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="rounded-full bg-ciano/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-ciano">
+                                        {item.kind}
+                                    </span>
+                                    {item.year && <span className="text-xs text-texto/50">{item.year}</span>}
+                                </div>
+                                <h3 className="font-bold text-texto">{item.title}</h3>
+                                {item.excerpt && <p className="line-clamp-2 text-xs text-texto/70">{item.excerpt}</p>}
+                                <span className="text-xs font-semibold text-ciano/70 hover:text-ciano">Ler mais →</span>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {loading && featured.length === 0 && (
+                <p className="text-center text-sm text-texto/50">Carregando destaques...</p>
+            )}
         </section>
     );
 }

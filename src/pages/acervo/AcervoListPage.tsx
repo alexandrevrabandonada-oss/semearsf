@@ -34,6 +34,13 @@ const KIND_LABELS: Record<AcervoKind, string> = {
     photo: "Foto"
 };
 
+const SOURCE_TYPE_LABELS: Record<string, string> = {
+    cientifico: "Científico",
+    imprensa: "Imprensa",
+    institucional: "Institucional",
+    pessoal: "Pessoal"
+};
+
 function isAcervoArea(value: string | undefined): value is AcervoArea {
     return value === "artigos" || value === "noticias" || value === "midias";
 }
@@ -47,6 +54,8 @@ export function AcervoListPage() {
     const [search, setSearch] = useState("");
     const [tagFilter, setTagFilter] = useState("");
     const [yearFilter, setYearFilter] = useState("");
+    const [sourceTypeFilter, setSourceTypeFilter] = useState("");
+    const [featuredOnly, setFeaturedOnly] = useState(false);
 
     useEffect(() => {
         if (!isAcervoArea(area)) return;
@@ -61,6 +70,8 @@ export function AcervoListPage() {
                 setSearch("");
                 setTagFilter("");
                 setYearFilter("");
+                setSourceTypeFilter("");
+                setFeaturedOnly(false);
                 // Fetch all kinds for this area in parallel, merge, sort
                 const results = await Promise.all(
                     kinds.map((k) => listAcervoItems({ kind: k as AcervoKind, limit: 100 }))
@@ -96,15 +107,22 @@ export function AcervoListPage() {
         [items]
     );
 
+    const allSourceTypes = useMemo(
+        () => Array.from(new Set(items.map((i) => i.source_type).filter((t): t is string => t !== null))).sort(),
+        [items]
+    );
+
     const filtered = useMemo(() => {
         const q = search.toLowerCase();
         return items.filter((item) => {
-            const matchSearch = !q || item.title.toLowerCase().includes(q) || (item.excerpt ?? "").toLowerCase().includes(q);
+            const matchSearch = !q || item.title.toLowerCase().includes(q) || (item.excerpt ?? "").toLowerCase().includes(q) || (item.authors ?? "").toLowerCase().includes(q);
             const matchTag = !tagFilter || item.tags.includes(tagFilter);
             const matchYear = !yearFilter || String(item.year ?? "") === yearFilter;
-            return matchSearch && matchTag && matchYear;
+            const matchSourceType = !sourceTypeFilter || item.source_type === sourceTypeFilter;
+            const matchFeatured = !featuredOnly || item.featured;
+            return matchSearch && matchTag && matchYear && matchSourceType && matchFeatured;
         });
-    }, [items, search, tagFilter, yearFilter]);
+    }, [items, search, tagFilter, yearFilter, sourceTypeFilter, featuredOnly]);
 
     if (!isAcervoArea(area)) {
         return (
@@ -128,13 +146,13 @@ export function AcervoListPage() {
 
             {/* Filters */}
             <div className="rounded-2xl border border-ciano/30 bg-fundo/60 p-4">
-                <div className="grid gap-3 md:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-4">
                     <label className="block">
                         <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-texto/70">Busca</span>
                         <input
                             className="w-full rounded-md border border-ciano/40 bg-base px-3 py-2 text-sm text-texto outline-none focus:border-ciano"
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Título ou resumo..."
+                            placeholder="Título, autor ou resumo..."
                             type="search"
                             value={search}
                         />
@@ -151,21 +169,32 @@ export function AcervoListPage() {
                         </select>
                     </label>
                     <label className="block">
-                        <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-texto/70">Ano</span>
+                        <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-texto/70">Fonte</span>
                         <select
                             className="w-full rounded-md border border-ciano/40 bg-base px-3 py-2 text-sm text-texto outline-none focus:border-ciano"
-                            onChange={(e) => setYearFilter(e.target.value)}
-                            value={yearFilter}
+                            onChange={(e) => setSourceTypeFilter(e.target.value)}
+                            value={sourceTypeFilter}
                         >
-                            <option value="">Todos</option>
-                            {allYears.map((y) => <option key={y} value={y}>{y}</option>)}
+                            <option value="">Todas</option>
+                            {allSourceTypes.map((t) => <option key={t} value={t}>{SOURCE_TYPE_LABELS[t] || t}</option>)}
                         </select>
                     </label>
+                    <div className="flex flex-col justify-end">
+                        <label className="flex cursor-pointer items-center gap-2">
+                            <input
+                                checked={featuredOnly}
+                                className="size-4 rounded border-ciano/40 bg-base text-ciano focus:ring-ciano"
+                                onChange={(e) => setFeaturedOnly(e.target.checked)}
+                                type="checkbox"
+                            />
+                            <span className="text-xs font-semibold uppercase tracking-wide text-texto/70">Apenas Destaques</span>
+                        </label>
+                    </div>
                 </div>
-                {(search || tagFilter || yearFilter) && (
+                {(search || tagFilter || yearFilter || sourceTypeFilter || featuredOnly) && (
                     <button
                         className="mt-3 text-xs font-semibold text-ciano/80 underline hover:text-ciano"
-                        onClick={() => { setSearch(""); setTagFilter(""); setYearFilter(""); }}
+                        onClick={() => { setSearch(""); setTagFilter(""); setYearFilter(""); setSourceTypeFilter(""); setFeaturedOnly(false); }}
                         type="button"
                     >
                         Limpar filtros
@@ -205,6 +234,14 @@ export function AcervoListPage() {
                                             <span className="shrink-0 rounded-full bg-ciano/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-ciano">
                                                 {KIND_LABELS[item.kind]}
                                             </span>
+                                            {item.source_type && (
+                                                <span className="shrink-0 rounded-full bg-acento/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-acento">
+                                                    {SOURCE_TYPE_LABELS[item.source_type] || item.source_type}
+                                                </span>
+                                            )}
+                                            {item.featured && (
+                                                <span className="shrink-0 text-xs">⭐</span>
+                                            )}
                                             <p className="font-bold text-texto">{item.title}</p>
                                         </div>
                                         {item.published_at && (
@@ -213,6 +250,9 @@ export function AcervoListPage() {
                                             </span>
                                         )}
                                     </div>
+                                    {item.authors && (
+                                        <p className="text-[10px] font-semibold text-texto/60 italic">Por: {item.authors}</p>
+                                    )}
                                     {item.excerpt && (
                                         <p className="line-clamp-2 text-xs text-texto/70">{item.excerpt}</p>
                                     )}
