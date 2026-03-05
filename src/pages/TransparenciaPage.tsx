@@ -31,6 +31,14 @@ function getMonthYear(dateStr: string): { month: string; year: string } {
   return { month, year };
 }
 
+function normalizeMonthParam(value: string | null): string {
+  if (!value) return "all";
+  if (value === "all") return value;
+  const month = Number.parseInt(value, 10);
+  if (!Number.isFinite(month) || month < 1 || month > 12) return "all";
+  return String(month).padStart(2, "0");
+}
+
 export function TransparenciaPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [summary, setSummary] = useState<TransparencySummary | null>(null);
@@ -44,13 +52,14 @@ export function TransparenciaPage() {
   const [selectedYear, setSelectedYear] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [vendorQuery, setVendorQuery] = useState("");
+  const [filtersHydrated, setFiltersHydrated] = useState(false);
 
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    const month = searchParams.get("month") || "all";
+    const month = normalizeMonthParam(searchParams.get("month"));
     const year = searchParams.get("year") || "all";
     const category = searchParams.get("category") || "all";
     const q = searchParams.get("q") || "";
@@ -59,6 +68,7 @@ export function TransparenciaPage() {
     setSelectedYear((current) => (current === year ? current : year));
     setSelectedCategory((current) => (current === category ? current : category));
     setVendorQuery((current) => (current === q ? current : q));
+    setFiltersHydrated(true);
   }, [searchParams]);
 
   useEffect(() => {
@@ -125,6 +135,8 @@ export function TransparenciaPage() {
   }, [viewerExpense]);
 
   useEffect(() => {
+    if (!filtersHydrated) return;
+
     const nextParams = new URLSearchParams();
     if (selectedMonth !== "all") nextParams.set("month", selectedMonth);
     if (selectedYear !== "all") nextParams.set("year", selectedYear);
@@ -136,23 +148,27 @@ export function TransparenciaPage() {
     if (current !== next) {
       setSearchParams(nextParams, { replace: true });
     }
-  }, [selectedMonth, selectedYear, selectedCategory, vendorQuery, searchParams, setSearchParams]);
+  }, [filtersHydrated, selectedMonth, selectedYear, selectedCategory, vendorQuery, searchParams, setSearchParams]);
 
   const monthOptions = useMemo(() => {
     const values = new Set<string>();
     expenses.forEach((exp) => values.add(getMonthYear(exp.occurred_on).month));
+    if (selectedMonth !== "all") values.add(selectedMonth);
     return Array.from(values).sort((a, b) => Number(a) - Number(b));
-  }, [expenses]);
+  }, [expenses, selectedMonth]);
 
   const yearOptions = useMemo(() => {
     const values = new Set<string>();
     expenses.forEach((exp) => values.add(getMonthYear(exp.occurred_on).year));
+    if (selectedYear !== "all") values.add(selectedYear);
     return Array.from(values).sort((a, b) => Number(b) - Number(a));
-  }, [expenses]);
+  }, [expenses, selectedYear]);
 
   const categoryOptions = useMemo(() => {
-    return Array.from(new Set(expenses.map((exp) => exp.category))).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [expenses]);
+    const values = new Set(expenses.map((exp) => exp.category));
+    if (selectedCategory !== "all") values.add(selectedCategory);
+    return Array.from(values).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [expenses, selectedCategory]);
 
   const filteredExpenses = useMemo(() => {
     const vendorTerm = vendorQuery.trim().toLowerCase();

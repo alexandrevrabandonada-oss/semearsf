@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react
 import { useSearchParams } from "react-router-dom";
 
 import { LoadingCard } from "../components/LoadingCard";
-import { getMeasurementsDownsampled, getStationOverview, getStationHealth, type DownsampledMeasurement, type StationOverview, type StationHealth } from "../lib/api";
+import type { DownsampledMeasurement, StationOverview, StationHealth } from "../lib/api";
 import { classifyOmsPollutant } from "../lib/airQuality";
 
 const ENV_HINT = " Verifique .env.local (VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY).";
@@ -89,8 +89,9 @@ export function DadosPage() {
       try {
         setLoadingStations(true);
         setError(null);
-        const data = await getStationOverview();
-        const health = await getStationHealth();
+        const api = await import("../lib/api");
+        const data = await api.getStationOverview();
+        const health = await api.getStationHealth();
         
         setStations(data);
         
@@ -125,9 +126,10 @@ export function DadosPage() {
       if (!silent) setLoadingMeasurements(true);
       setError(null);
       
+      const api = await import("../lib/api");
       const [data24h, data7d] = await Promise.all([
-        getMeasurementsDownsampled(stationId, "24h"),
-        getMeasurementsDownsampled(stationId, "7d")
+        api.getMeasurementsDownsampled(stationId, "24h"),
+        api.getMeasurementsDownsampled(stationId, "7d")
       ]);
       
       setMeasurements24h(data24h);

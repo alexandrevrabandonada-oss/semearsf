@@ -51,6 +51,9 @@ export function Footer() {
             <li>
               <Link to="/privacidade-lgpd" className="transition-colors hover:text-brand-primary">Privacidade e LGPD</Link>
             </li>
+            <li>
+              <Link to="/governanca" className="transition-colors hover:text-brand-primary">Governança</Link>
+            </li>
           </ul>
         </nav>
       </div>

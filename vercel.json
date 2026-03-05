@@ -13,6 +13,10 @@
       "destination": "/api/share/relatorios?slug=:slug"
     },
     {
+      "source": "/s/boletim/:ym",
+      "destination": "/api/share/boletim?ym=:ym"
+    },
+    {
       "source": "/s/dossies/:slug",
       "destination": "/api/share/dossies?slug=:slug"
     },

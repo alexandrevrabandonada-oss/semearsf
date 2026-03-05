@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { listAcervoItems, listBlogPosts, getStationOverview, listUpcomingEvents, getTransparencySummary, listFeaturedCollections, listFeaturedCorridors, listLatestReports, type AcervoItem, type Event, type StationOverview, type BlogPost, type TransparencySummary, type AcervoCollection, type ClimateCorridor, type ReportDocument } from "../lib/api";
+import type { AcervoItem, Event, StationOverview, BlogPost, TransparencySummary, AcervoCollection, ClimateCorridor, ReportDocument } from "../lib/api";
 import { useInstallPrompt } from "../hooks/useInstallPrompt";
 import { getOptimizedCover } from "../lib/imageOptimization";
 
@@ -22,15 +22,16 @@ export function HomePage() {
     async function load() {
       try {
         setLoading(true);
+        const api = await import("../lib/api");
         const [stationsData, eventsData, acervoData, blogData, transData, collectionsData, corridorsData, reportsData] = await Promise.all([
-          getStationOverview(),
-          listUpcomingEvents(),
-          listAcervoItems({ featured: true, limit: 6 }),
-          listBlogPosts({ limit: 1 }),
-          getTransparencySummary(),
-          listFeaturedCollections(3),
-          listFeaturedCorridors(3),
-          listLatestReports(3)
+          api.getStationOverview(),
+          api.listUpcomingEvents(),
+          api.listAcervoItems({ featured: true, limit: 6 }),
+          api.listBlogPosts({ limit: 1 }),
+          api.getTransparencySummary(),
+          api.listFeaturedCollections(3),
+          api.listFeaturedCorridors(3),
+          api.listLatestReports(3)
         ]);
         setStations(stationsData);
         setEvents(eventsData.slice(0, 3));

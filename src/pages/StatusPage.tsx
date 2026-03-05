@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { getOpsKpisMonth, getSystemStatus, type OpsKPI, type SystemStatus } from "../lib/api";
 import { getContrastAuditResults } from "../lib/contrastAudit";
 
@@ -49,6 +49,7 @@ function buildMonthlyBulletinText(monthLabel: string, year: number, kpis: OpsKPI
 
 export function StatusPage() {
   const now = new Date();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +60,7 @@ export function StatusPage() {
   const [monthlyLoading, setMonthlyLoading] = useState(true);
   const [monthlyError, setMonthlyError] = useState<string | null>(null);
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+  const [filtersHydrated, setFiltersHydrated] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -75,6 +77,32 @@ export function StatusPage() {
     }
     void load();
   }, []);
+
+  useEffect(() => {
+    const yearParam = Number.parseInt(searchParams.get("year") || "", 10);
+    const monthParam = Number.parseInt(searchParams.get("month") || "", 10);
+
+    if (Number.isFinite(yearParam)) {
+      setSelectedYear(yearParam);
+    }
+    if (Number.isFinite(monthParam) && monthParam >= 1 && monthParam <= 12) {
+      setSelectedMonth(monthParam);
+    }
+
+    setFiltersHydrated(true);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!filtersHydrated) return;
+
+    const nextParams = new URLSearchParams();
+    nextParams.set("year", String(selectedYear));
+    nextParams.set("month", String(selectedMonth));
+
+    if (searchParams.toString() !== nextParams.toString()) {
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [filtersHydrated, searchParams, selectedMonth, selectedYear, setSearchParams]);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,9 +144,10 @@ export function StatusPage() {
     blog: "Blog",
     acervo: "Acervo",
     dossies: "Dossies",
-    relatorios: "Relatorios"
+    relatorios: "Relatorios",
+    boletim: "Boletim"
   };
-  const socialKindsOrder = ["dados", "agenda", "blog", "acervo", "dossies", "relatorios"];
+  const socialKindsOrder = ["dados", "agenda", "blog", "acervo", "dossies", "relatorios", "boletim"];
   const socialByKind = status?.social?.by_kind ?? {};
   const isDevAccessibilityVisible = import.meta.env.MODE !== "production";
   const contrastAudit = getContrastAuditResults();
@@ -170,6 +199,28 @@ export function StatusPage() {
     } catch (err) {
       console.error("Falha ao copiar resumo:", err);
       setCopyFeedback("Nao foi possivel copiar.");
+      window.setTimeout(() => setCopyFeedback(null), 2400);
+    }
+  };
+
+  const handleShareBulletin = async () => {
+    const shareUrl = `${window.location.origin}/s/boletim/${selectedYear}-${String(selectedMonth).padStart(2, "0")}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `Boletim SEMEAR — ${monthLabel}/${selectedYear}`,
+          text: monthlyBulletin,
+          url: shareUrl
+        });
+        setCopyFeedback("Link do boletim compartilhado.");
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopyFeedback("Link do boletim copiado.");
+      }
+    } catch (err) {
+      console.error("Falha ao compartilhar boletim:", err);
+      setCopyFeedback("Nao foi possivel compartilhar.");
+    } finally {
       window.setTimeout(() => setCopyFeedback(null), 2400);
     }
   };
@@ -282,6 +333,14 @@ export function StatusPage() {
               >
                 Ver gastos do mes
               </Link>
+              <button
+                type="button"
+                onClick={() => { void handleShareBulletin(); }}
+                disabled={monthlyLoading || Boolean(monthlyError)}
+                className="rounded-lg border border-success/20 bg-success/10 px-4 py-2 text-xs font-bold uppercase tracking-wide text-success hover:bg-success/20 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Compartilhar boletim
+              </button>
               <button
                 type="button"
                 onClick={handleDownloadMonthlyCsv}
@@ -655,3 +714,6 @@ export function StatusPage() {
     </section>
   );
 }
+
+
+

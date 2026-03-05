@@ -41,25 +41,26 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (!id.includes("node_modules")) return undefined;
+          const normalizedId = id.replace(/\\/g, "/");
+          if (!normalizedId.includes("node_modules")) return undefined;
 
-          if (id.includes("/react-dom/") || id.includes("/react/")) {
+          if (normalizedId.includes("/react-dom/") || normalizedId.includes("/react/")) {
             return "vendor-react";
           }
 
-          if (id.includes("/react-router-dom/") || id.includes("/@remix-run/router/")) {
+          if (normalizedId.includes("/react-router-dom/") || normalizedId.includes("/@remix-run/router/")) {
             return "vendor-router";
           }
 
-          if (id.includes("/@supabase/")) {
+          if (normalizedId.includes("/@supabase/")) {
             return "vendor-supabase";
           }
 
-          if (id.includes("/leaflet/") || id.includes("/react-leaflet/")) {
+          if (normalizedId.includes("/leaflet/") || normalizedId.includes("/react-leaflet/")) {
             return "vendor-maps";
           }
 
-          if (id.includes("/recharts/") || id.includes("/victory-vendor/")) {
+          if (normalizedId.includes("/recharts/") || normalizedId.includes("/victory-vendor/")) {
             return "vendor-charts";
           }
 
