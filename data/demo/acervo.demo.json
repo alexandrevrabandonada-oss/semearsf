@@ -187,5 +187,157 @@
             "demo": true,
             "year": 2024
         }
+    },
+    {
+        "slug": "demo-acervo-artigo-5",
+        "title": "Cidadania Digital e Dados Abertos em Saúde Ambiental",
+        "excerpt": "Como plataformas abertas transformam a vigilância popular em ferramenta de justiça socioambiental.",
+        "kind": "paper",
+        "source_type": "academic_journal",
+        "source_name": "Revista Tecnologia Social",
+        "source_url": "https://example.com/artigo-5",
+        "published_at": "2024-05-30T00:00:00Z",
+        "tags": [
+            "dados abertos",
+            "cidadania",
+            "tecnologia social"
+        ],
+        "curator_note": "Referência importante para entender o posicionamento do SEMEAR como plataforma de tecnologia social.",
+        "meta": {
+            "demo": true,
+            "year": 2024
+        }
+    },
+    {
+        "slug": "demo-acervo-artigo-6",
+        "title": "Sensoramento Ambiental em Contextos de Vulnerabilidade",
+        "excerpt": "Adaptações de metodologia para monitoramento em favelas e territórios precários do Rio de Janeiro.",
+        "kind": "paper",
+        "source_type": "thesis",
+        "source_name": "Dissertação Mestrado PPG UFF",
+        "published_at": "2023-09-12T00:00:00Z",
+        "tags": [
+            "vulnerabilidade social",
+            "favelado",
+            "metodologia"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2023
+        }
+    },
+    {
+        "slug": "demo-acervo-news-5",
+        "title": "Rede SEMEAR expande para 8 cidades do Rio de Janeiro",
+        "excerpt": "Projeto aprovado para operação em São Gonçalo, Niterói, Duque de Caxias e outras regiões metropolitanas.",
+        "kind": "news",
+        "source_type": "announcement",
+        "source_name": "UFF Notícias",
+        "published_at": "2024-11-08T00:00:00Z",
+        "tags": [
+            "expansão",
+            "metropolitana"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2024
+        }
+    },
+    {
+        "slug": "demo-acervo-news-6",
+        "title": "Moradores conquistam dispositivo de monitoramento da qualidade do ar no bairro",
+        "excerpt": "Ação coletiva de pressão resultou na instalação de primeira estação em comunidade periférica de Volta Redonda.",
+        "kind": "news",
+        "source_type": "press",
+        "source_name": "Agência Pública",
+        "published_at": "2024-07-20T00:00:00Z",
+        "tags": [
+            "mobilização",
+            "comunidade"
+        ],
+        "curator_note": "Exemplar de como o SEMEAR potencia organização territorial.",
+        "meta": {
+            "demo": true,
+            "year": 2024
+        }
+    },
+    {
+        "slug": "demo-acervo-video-3",
+        "title": "Oficina Online: Montagem de Sensores para Iniciantes",
+        "excerpt": "Tutorial passo-a-passo de como soldar e calibrar componentes de uma estação de monitoramento de PM2.5.",
+        "kind": "video",
+        "source_type": "tutorial",
+        "source_name": "YouTube SEMEAR",
+        "published_at": "2024-03-10T00:00:00Z",
+        "tags": [
+            "tutorial",
+            "hardware",
+            "diy"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2024,
+            "media": [
+                {
+                    "type": "youtube",
+                    "url": "https://youtube.com/watch?v=dQw4w9WgXcQ"
+                }
+            ]
+        }
+    },
+    {
+        "slug": "demo-acervo-artigo-7",
+        "title": "Inversão Térmica e Poluição em Vales Industriais",
+        "excerpt": "Análise de fenômenos meteorológicos que amplificam concentrações de poluentes na bacia aérea do Médio Paraíba.",
+        "kind": "paper",
+        "source_type": "academic_journal",
+        "source_name": "Journal of Applied Meteorology",
+        "source_url": "https://example.com/artigo-7",
+        "published_at": "2023-08-22T00:00:00Z",
+        "tags": [
+            "meteorologia",
+            "modelagem",
+            "poluição"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2023
+        }
+    },
+    {
+        "slug": "demo-acervo-news-7",
+        "title": "Estudo aponta correlação entre poluição e hospitalizações pediátricas",
+        "excerpt": "Dados do SEMEAR cruzados com registros de saúde revelam padrão claro de sazonalidade.",
+        "kind": "news",
+        "source_type": "press",
+        "source_name": "O Dia",
+        "published_at": "2024-02-14T00:00:00Z",
+        "tags": [
+            "saúde",
+            "dados epidemiológicos"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2024
+        }
+    },
+    {
+        "slug": "demo-acervo-artigo-8",
+        "title": "Memória Oral e Testemunho Ambiental na Construção de Política Pública",
+        "excerpt": "Como relatos de comunidades atingidas por poluição transformam-se em evidência para formulação de políticas.",
+        "kind": "paper",
+        "source_type": "book_chapter",
+        "source_name": "Livro: Justiça Ambiental no Brasil",
+        "published_at": "2022-06-15T00:00:00Z",
+        "tags": [
+            "justiça ambiental",
+            "memória oral",
+            "política pública"
+        ],
+        "curator_note": "Referência central para entender o lugar do testemunho na epistemologia do SEMEAR.",
+        "meta": {
+            "demo": true,
+            "year": 2022
+        }
     }
 ]

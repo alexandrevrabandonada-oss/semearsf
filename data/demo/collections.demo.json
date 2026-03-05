@@ -3,49 +3,40 @@
         "slug": "demo-dossie-justica-climatica",
         "title": "Justiça Climática e Saúde",
         "excerpt": "Compilação de evidências científicas e fotorreportagens sobre as desigualdades na mitigação das ondas de calor em habitações precárias.",
-        "content_html": "<p>A exposição a eventos climáticos extremos não afeta Volta Redonda de maneira uniforme. Bairros com maior adensamento urbano e menor cobertura vegetal registram temperaturas de superfície mais altas, configurando ilhas de calor severas. Este dossiê compila relatórios que estabelecem o nexo causal entre vulnerabilidade da infraestrutura urbana (saneamento, moradia e drenagem) e impactos à saúde em ondas de calor recentes.</p><blockquote><p>O conceito de Injustiça Climática baseia-se na constatação de que as populações marginalizadas que menos emitiram gases de efeito estufa sofrem as piores e mais letais consequências das alterações do microclima e poluição atmosférica.</p></blockquote><p>Conduzimos mapeamentos em áreas críticas de Volta Redonda e do Sul Fluminense, integrando a leitura de microestações SEMEAR com relatos socioambientais locais.</p>",
         "featured": true,
         "position": 1,
+        "tags": ["justiça climática", "saúde", "desigualdade"],
         "items": [
             "demo-acervo-artigo-4",
             "demo-acervo-artigo-3",
             "demo-acervo-video-1",
             "demo-acervo-news-2"
-        ],
-        "meta": {
-            "demo": true
-        }
+        ]
     },
     {
         "slug": "demo-dossie-tecnologias-monitoramento",
         "title": "Monitoramento em Baixo Custo",
         "excerpt": "Inovações em calibração de sensores ópticos e mobilização em oficinas comunitárias.",
-        "content_html": "<p>Um dos marcos tecnológicos do SEMEAR foi a diminuição do custo de acesso a medidores ambientais, desmistificando a precisão do material particulado monitorado a lazer (PM2.5/PM10).</p><p>Este dossiê detalha a engenharia do projeto, agrupando publicações que comparam microestações móveis com estações governamentais de referência na FIOCRUZ.</p><p>Explore ensaios práticos sobre degradação óptica por maresia, tutorais de soldagem e cartilhas instrucionais de como engajar jovens estudantes de escolas públicas na montagem dos kits com peças acessíveis via internet.</p>",
         "featured": true,
         "position": 2,
+        "tags": ["tecnologia", "sensores", "participação"],
         "items": [
             "demo-blog-tutorial-instalacao",
             "demo-acervo-artigo-1"
-        ],
-        "meta": {
-            "demo": true
-        }
+        ]
     },
     {
         "slug": "demo-dossie-memoria-industrial-vr",
         "title": "Memórias Industriais: Volta Redonda",
         "excerpt": "Arquivos orais, reportagens e denúncias retratando décadas de coexistência entre indústria pesada e áreas residenciais no Sul Fluminense.",
-        "content_html": "<p>Desde 1970, o avanço industrial e logístico consolidou bairros densos próximos a eixos de produção e transporte, com relatos de deposição de fuligem em áreas residenciais.</p><h2>Um Retrato em Fuligem</h2><p>Entrevistamos fundadores de associações locais para traçar a linha do tempo da evolução urbana de Volta Redonda. Ao correlacionar mudanças no uso do solo e episódios de piora da qualidade do ar com o aumento de sintomas respiratórios, as narrativas trazem a dimensão humana muitas vezes ignorada por índices polucionais estritos.</p>",
         "featured": true,
         "position": 3,
+        "tags": ["memória", "indústria", "história local"],
         "items": [
             "demo-acervo-artigo-2",
             "demo-acervo-video-1",
             "demo-acervo-news-1",
             "demo-blog-entrevista-lideranca-comunitaria"
-        ],
-        "meta": {
-            "demo": true
-        }
+        ]
     }
 ]

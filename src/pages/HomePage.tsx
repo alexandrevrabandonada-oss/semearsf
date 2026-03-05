@@ -284,21 +284,39 @@ export function HomePage() {
             ))}
           </div>
         ) : collections.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center space-y-4">
-            <p className="text-base font-semibold text-text-primary">Novos dossiês serão publicados em breve</p>
-            <p className="text-sm text-text-secondary">Explore nossa coleção de documentos históricos enquanto isso:</p>
-            <div className="flex flex-wrap gap-3 justify-center">
-              <Link className="inline-flex items-center gap-2 rounded-lg border border-brand-primary px-4 py-2 text-sm font-bold text-brand-primary hover:bg-brand-primary-soft transition-colors" to="/acervo">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7 12a5 5 0 1110 0 5 5 0 01-10 0z" />
+          <div className="rounded-2xl border border-brand-primary/20 bg-gradient-to-br from-brand-primary/5 via-transparent to-transparent p-12 text-center space-y-6">
+            <div className="mx-auto h-16 w-16 rounded-full bg-brand-primary/10 flex items-center justify-center">
+              <svg className="h-8 w-8 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            
+            <div className="space-y-2">
+              <p className="text-lg font-black text-text-primary">Explore o Acervo Completo</p>
+              <p className="text-base text-text-secondary leading-relaxed max-w-2xl mx-auto">
+                Estamos preparando dossiês temáticos curados sobre qualidade do ar, memória industrial e saúde. 
+                Enquanto isso, mergulhe em nosso acervo de documentos, fotografias, artigos científicos e testemunhos.
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+              <Link 
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-primary px-6 py-3 text-sm font-bold text-white transition-all hover:bg-brand-primary-dark hover:shadow-md"
+                to="/acervo"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m-6-4a9 9 0 110 18 9 9 0 010-18z" />
                 </svg>
                 Explorar Acervo
               </Link>
-              <Link className="inline-flex items-center gap-2 rounded-lg border border-brand-primary px-4 py-2 text-sm font-bold text-brand-primary hover:bg-brand-primary-soft transition-colors" to="/acervo/linha">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17H3v-6h10m0 0v-6h8v6m-8 6v6h8v-6m-8 0h8" />
+              <Link 
+                className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-brand-primary bg-white px-6 py-3 text-sm font-bold text-brand-primary transition-all hover:bg-brand-primary hover:text-white"
+                to="/acervo/linha"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                Ver Timeline
+                Ver Linha do Tempo
               </Link>
             </div>
           </div>
