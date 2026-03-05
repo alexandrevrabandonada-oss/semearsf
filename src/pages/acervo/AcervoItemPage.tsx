@@ -28,7 +28,7 @@ function SimpleMarkdown({ text }: { text: string }) {
         .replace(/\*(.+?)\*/g, "<em>$1</em>")
         .replace(/\n/g, "<br />");
     // eslint-disable-next-line react/no-danger
-    return <div className="text-sm leading-relaxed text-texto/90" dangerouslySetInnerHTML={{ __html: html }} />;
+    return <div className="text-sm leading-relaxed text-text-primary" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export function AcervoItemPage() {
@@ -113,44 +113,44 @@ export function AcervoItemPage() {
     return (
         <section className="space-y-6">
             <Link
-                className="inline-flex items-center gap-1 text-xs font-semibold text-ciano/70 hover:text-ciano"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-brand-primary/70 hover:text-brand-primary"
                 to="/acervo"
             >
                 ← Voltar ao Acervo
             </Link>
 
             {loading ? (
-                <p aria-live="polite" className="text-sm text-texto/80" role="status">Carregando item...</p>
+                <p aria-live="polite" className="text-sm text-text-secondary" role="status">Carregando item...</p>
             ) : error ? (
-                <p aria-live="assertive" className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto" role="alert">
+                <p aria-live="assertive" className="rounded-md border border-error/30 bg-error/10 p-3 text-sm text-error" role="alert">
                     {error}
                 </p>
             ) : !item ? (
-                <div className="rounded-2xl border border-ciano/30 bg-fundo/80 p-10 text-center">
+                <div className="rounded-2xl border border-border-subtle bg-white p-10 text-center">
                     <p className="text-4xl">🔍</p>
-                    <p aria-live="polite" className="mt-3 text-sm font-semibold text-texto/70" role="status">
+                    <p aria-live="polite" className="mt-3 text-sm font-semibold text-text-secondary" role="status">
                         Item não encontrado. Verifique o link ou volte ao acervo.
                     </p>
                 </div>
             ) : (
-                <article className="rounded-2xl border border-ciano/50 bg-fundo/80 p-6 md:p-8">
+                <article className="rounded-2xl border border-border-subtle bg-white p-6 md:p-8">
                     {/* Kind badges */}
                     <div className="flex flex-wrap gap-2">
-                        <span className="inline-block rounded-full bg-ciano/15 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-ciano">
+                        <span className="inline-block rounded-full bg-brand-primary/10 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-brand-primary">
                             {KIND_LABELS[item.kind] ?? item.kind}
                         </span>
                         {item.source_type && (
-                            <span className="inline-block rounded-full bg-acento/15 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-acento">
+                            <span className="inline-block rounded-full bg-accent-green/10 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-accent-green">
                                 {SOURCE_TYPE_LABELS[item.source_type] || item.source_type}
                             </span>
                         )}
                         {item.featured && (
-                            <span className="inline-block rounded-full bg-cta/15 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-cta">
+                            <span className="inline-block rounded-full bg-brand-primary/10 px-3 py-0.5 text-xs font-bold uppercase tracking-widest text-brand-primary">
                                 ⭐ Destaque
                             </span>
                         )}
                         <button
-                            className="inline-flex items-center gap-1 rounded-full bg-ciano/10 px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-ciano hover:bg-ciano/20"
+                            className="inline-flex items-center gap-1 rounded-full bg-brand-primary/10 px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-brand-primary hover:bg-brand-primary/20"
                             onClick={() => {
                                 const url = `${window.location.origin}/s/acervo/${item.slug}`;
                                 if (navigator.share) {
@@ -171,29 +171,29 @@ export function AcervoItemPage() {
                         {item.year && (
                             <Link
                                 to={`/acervo/linha?year=${item.year}`}
-                                className="inline-flex items-center gap-1 rounded-full bg-acento/10 px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-acento hover:bg-acento/20 transition-colors"
+                                className="inline-flex items-center gap-1 rounded-full bg-accent-green/10 px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent-green hover:bg-accent-green/20 transition-colors"
                             >
                                 ⏳ Ver na linha do tempo
                             </Link>
                         )}
                     </div>
 
-                    <h1 className="mt-4 text-2xl font-black leading-tight text-cta md:text-3xl">
+                    <h1 className="mt-4 text-2xl font-black leading-tight text-brand-primary md:text-3xl">
                         {item.title}
                     </h1>
 
                     {item.authors && (
-                        <p className="mt-2 text-sm font-semibold text-texto/70 italic">Por: {item.authors}</p>
+                        <p className="mt-2 text-sm font-semibold text-text-secondary italic">Por: {item.authors}</p>
                     )}
 
                     {/* Meta row */}
-                    <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs text-texto/60">
+                    <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs text-text-secondary">
                         {item.source_name && (
                             <span>
                                 <span className="font-semibold uppercase tracking-wide">Fonte:</span>{" "}
                                 {item.source_url ? (
                                     <a
-                                        className="text-ciano hover:underline"
+                                        className="text-brand-primary hover:underline"
                                         href={item.source_url}
                                         rel="noopener noreferrer"
                                         target="_blank"
@@ -227,7 +227,7 @@ export function AcervoItemPage() {
                         <div className="mt-4 flex flex-wrap gap-1">
                             {item.tags.map((tag) => (
                                 <span
-                                    className="rounded-full border border-ciano/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ciano/80"
+                                    className="rounded-full border border-brand-primary/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary/80"
                                     key={tag}
                                 >
                                     {tag}
@@ -238,8 +238,8 @@ export function AcervoItemPage() {
 
                     {/* Associated Collections (Chips) */}
                     {collections.length > 0 && (
-                        <div className="mt-8 rounded-xl border border-cta/30 bg-cta/5 p-5">
-                            <span className="block mb-3 text-xs font-bold uppercase tracking-widest text-cta">
+                        <div className="mt-8 rounded-xl border border-brand-primary/20 bg-brand-primary/5 p-5">
+                            <span className="block mb-3 text-xs font-bold uppercase tracking-widest text-brand-primary">
                                 📚 Este item está nos dossiês:
                             </span>
                             <div className="flex flex-wrap gap-2">
@@ -247,7 +247,7 @@ export function AcervoItemPage() {
                                     <Link
                                         key={col.id}
                                         to={`/dossies/${col.slug}`}
-                                        className="rounded-full bg-cta/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-cta hover:bg-cta/25 transition-colors"
+                                        className="rounded-full bg-brand-primary/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-primary hover:bg-brand-primary/20 transition-colors"
                                     >
                                         → {col.title}
                                     </Link>
@@ -256,19 +256,19 @@ export function AcervoItemPage() {
                         </div>
                     )}
 
-                    <hr className="my-8 border-ciano/20" />
+                    <hr className="my-8 border-border-subtle" />
 
                     {/* Curator Note */}
                     {item.curator_note && (
-                        <div className="mb-8 rounded-xl border border-acento/30 bg-acento/5 p-5 italic text-texto/90">
-                            <span className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-acento">Nota da Curadoria</span>
+                        <div className="mb-8 rounded-xl border border-brand-primary/20 bg-brand-primary/5 p-5 italic text-text-primary">
+                            <span className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-brand-primary">Nota da Curadoria</span>
                             <p className="text-sm">"{item.curator_note}"</p>
                         </div>
                     )}
 
                     {/* Excerpt */}
                     {item.excerpt && (
-                        <p className="mb-6 text-base font-semibold leading-relaxed text-texto/90">{item.excerpt}</p>
+                        <p className="mb-6 text-base font-semibold leading-relaxed text-text-primary">{item.excerpt}</p>
                     )}
 
                     {/* Body */}
@@ -283,7 +283,7 @@ export function AcervoItemPage() {
                                     <button
                                         key={idx}
                                         onClick={() => setActiveMedia(m)}
-                                        className="inline-flex items-center gap-2 rounded-lg bg-cta px-5 py-3 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
+                                        className="inline-flex items-center gap-2 rounded-lg bg-brand-primary px-5 py-3 text-sm font-black uppercase tracking-wide text-white transition-colors hover:bg-brand-primary/90"
                                         type="button"
                                         aria-label={isPdf ? "Abrir PDF" : "Ver imagem"}
                                     >
@@ -298,7 +298,7 @@ export function AcervoItemPage() {
                     {/* External link CTA */}
                     {item.source_url && !item.content_md && (!item.media || item.media.length === 0) && (
                         <a
-                            className="mt-8 mb-8 inline-flex items-center gap-2 rounded-lg bg-cta px-6 py-4 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
+                            className="mt-8 mb-8 inline-flex items-center gap-2 rounded-lg bg-brand-primary px-6 py-4 text-sm font-black uppercase tracking-wide text-white transition-colors hover:bg-brand-primary/90"
                             href={item.source_url}
                             rel="noopener noreferrer"
                             target="_blank"
@@ -309,8 +309,8 @@ export function AcervoItemPage() {
 
                     {/* Related Items */}
                     {related.length > 0 && (
-                        <div className="mt-10 border-t border-ciano/20 pt-8">
-                            <h3 className="mb-6 text-sm font-black uppercase tracking-widest text-ciano">
+                        <div className="mt-10 border-t border-border-subtle pt-8">
+                            <h3 className="mb-6 text-sm font-black uppercase tracking-widest text-brand-primary">
                                 Relacionados neste dossiê
                             </h3>
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -318,12 +318,12 @@ export function AcervoItemPage() {
                                     <Link
                                         key={rel.id}
                                         to={`/acervo/item/${rel.slug}`}
-                                        className="group flex flex-col rounded-xl border border-ciano/20 bg-fundo/50 p-4 transition-all hover:bg-base/20 hover:border-ciano"
+                                        className="group flex flex-col rounded-xl border border-border-subtle bg-bg-surface p-4 transition-all hover:border-brand-primary/30 hover:shadow-md"
                                     >
-                                        <span className="mb-2 inline-block self-start rounded-full bg-ciano/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-ciano group-hover:bg-ciano/20 transition-colors">
+                                        <span className="mb-2 inline-block self-start rounded-full bg-brand-primary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-brand-primary group-hover:bg-brand-primary/20 transition-colors">
                                             {KIND_LABELS[rel.kind] ?? rel.kind}
                                         </span>
-                                        <h4 className="text-sm font-bold text-texto group-hover:text-ciano line-clamp-2 leading-snug">
+                                        <h4 className="text-sm font-bold text-text-primary group-hover:text-brand-primary line-clamp-2 leading-snug">
                                             {rel.title}
                                         </h4>
                                     </Link>
@@ -361,7 +361,7 @@ export function AcervoItemPage() {
                         </a>
                         <button
                             ref={modalCloseButtonRef}
-                            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-danger px-3 py-2 text-white transition-all hover:bg-danger/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+                            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 py-2 text-white transition-all hover:bg-error/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
                             onClick={() => setActiveMedia(null)}
                             aria-label="Fechar visualizador de mídia (pressione ESC)"
                         >

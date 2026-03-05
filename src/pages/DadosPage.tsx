@@ -123,30 +123,40 @@ export function DadosPage() {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-2xl border border-ciano/60 bg-fundo/80 p-6 md:p-8">
-        <h1 className="text-2xl font-black uppercase tracking-wide text-cta md:text-4xl">Dados</h1>
-        <p className="mt-3 text-sm text-texto/90">
-          [Placeholder] Painel ao vivo sem dados ficticios. As informacoes abaixo refletem somente o que esta no banco.
+      <div className="rounded-2xl border border-border-subtle bg-white p-6 md:p-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12.066 11.2l-3.574 2.005a.5.5 0 00-.066.713l.483.352a.5.5 0 00.756-.072l3.539-8.529a.5.5 0 00-.671-.672L11 7.322a.5.5 0 00-.066.713l.483.352a.5.5 0 00.756-.072l3.539-8.529a.5.5 0 00-.671-.672L11 7.322z" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-2xl font-black text-text-primary md:text-4xl">Monitoramento Ambiental</h1>
+            <p className="text-xs font-semibold tracking-wider text-text-secondary mt-1 uppercase">Qualidade do Ar em Tempo Real</p>
+          </div>
+        </div>
+        <p className="mt-4 text-base leading-relaxed text-text-secondary">
+          Acompanhe as leituras de qualidade do ar de nossas estações públicas em Volta Redonda e no Sul Fluminense. Dados científicos atualizados, acessíveis e exportáveis.
         </p>
       </div>
 
-      <section className="rounded-2xl border border-primaria/50 bg-base/70 p-6">
-        <h2 className="text-lg font-bold text-ciano">Estacao</h2>
+      <section className="rounded-2xl border border-border-subtle bg-white p-6">
+        <h2 className="text-lg font-bold text-brand-primary">Estação de Monitoramento</h2>
         {loadingStations ? (
-          <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
-            Carregando estacoes...
+          <p aria-live="polite" className="mt-3 text-sm text-text-secondary" role="status">
+            Carregando estações...
           </p>
         ) : null}
         {!loadingStations && !stations.length ? (
-          <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
-            Nenhuma estacao encontrada.
+          <p aria-live="polite" className="mt-3 text-sm text-text-secondary" role="status">
+            Nenhuma estação encontrada.
           </p>
         ) : null}
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <label className="block">
-            <span className="mb-1 block text-sm font-semibold text-texto">Selecione uma estacao</span>
+            <span className="mb-1 block text-sm font-semibold text-text-primary">Selecione uma estação</span>
             <select
-              className="w-full rounded-md border border-ciano/40 bg-fundo px-3 py-2 text-texto outline-none focus:border-ciano"
+              className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-text-primary outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
               disabled={!stations.length}
               onChange={(e) => setSelectedStationId(e.target.value || null)}
               value={selectedStationId ?? ""}
@@ -161,7 +171,7 @@ export function DadosPage() {
           </label>
           <div className="flex gap-2 w-full md:w-auto">
             <button
-              className="flex-1 md:flex-none rounded-md border border-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-cta transition-colors hover:bg-cta hover:text-base disabled:opacity-60"
+              className="flex-1 md:flex-none rounded-md border border-brand-primary px-4 py-2 text-sm font-black uppercase tracking-wide text-brand-primary transition-colors hover:bg-brand-primary hover:text-white disabled:opacity-60"
               disabled={!selectedStation}
               onClick={() => {
                 if (!selectedStation) return;
@@ -181,7 +191,7 @@ export function DadosPage() {
               Compartilhar
             </button>
             <button
-              className="flex-1 md:flex-none rounded-md bg-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 md:flex-none rounded-md bg-brand-primary px-4 py-2 text-sm font-black uppercase tracking-wide text-white transition-colors hover:bg-brand-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
               disabled={!selectedStationId || loadingMeasurements}
               onClick={() => selectedStationId && void loadMeasurements(selectedStationId, selectedRange)}
               type="button"
@@ -189,7 +199,7 @@ export function DadosPage() {
               Atualizar agora
             </button>
             <button
-              className="flex-1 md:flex-none rounded-md border border-ciano px-4 py-2 text-sm font-black uppercase tracking-wide text-ciano transition-colors hover:bg-ciano hover:text-base disabled:opacity-60"
+              className="flex-1 md:flex-none rounded-md border border-brand-primary px-4 py-2 text-sm font-black uppercase tracking-wide text-brand-primary transition-colors hover:bg-brand-primary hover:text-white disabled:opacity-60"
               disabled={!selectedStation || measurements.length === 0}
               onClick={() => {
                 if (!selectedStation || measurements.length === 0) return;
@@ -206,7 +216,6 @@ export function DadosPage() {
                     row.humidity ?? "",
                     row.quality_flag ?? ""
                   ];
-                  // Escape values if they contain commas (though none of these should)
                   csvRows.push(values.map(v => typeof v === 'string' && v.includes(',') ? `"${v}"` : String(v)).join(","));
                 }
 
@@ -231,7 +240,7 @@ export function DadosPage() {
 
         <div className="mt-4 flex flex-wrap gap-2">
           <button
-            className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${selectedRange === "24h" ? "bg-ciano text-base" : "border border-ciano/40 bg-fundo text-texto hover:bg-fundo/80"
+            className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${selectedRange === "24h" ? "bg-brand-primary text-white" : "border border-border-subtle bg-white text-text-primary hover:bg-bg-surface"
               }`}
             onClick={() => setSelectedRange("24h")}
             type="button"
@@ -239,7 +248,7 @@ export function DadosPage() {
             24h
           </button>
           <button
-            className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${selectedRange === "7d" ? "bg-ciano text-base" : "border border-ciano/40 bg-fundo text-texto hover:bg-fundo/80"
+            className={`rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${selectedRange === "7d" ? "bg-brand-primary text-white" : "border border-border-subtle bg-white text-text-primary hover:bg-bg-surface"
               }`}
             onClick={() => setSelectedRange("7d")}
             type="button"
@@ -249,41 +258,41 @@ export function DadosPage() {
         </div>
 
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <div className="rounded-lg border border-ciano/40 bg-fundo/80 p-4">
-            <p className="text-xs uppercase tracking-wide text-ciano">Status</p>
-            <p className={`mt-1 text-sm font-bold ${isOnline ? "text-primaria" : "text-acento"}`}>
+          <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
+            <p className="text-xs uppercase tracking-wide text-brand-primary">Status</p>
+            <p className={`mt-1 text-sm font-bold ${isOnline ? "text-accent-green" : "text-error"}`}>
               {selectedStationId ? (isOnline ? "Online" : "Offline") : "-"}
             </p>
           </div>
-          <div className="rounded-lg border border-ciano/40 bg-fundo/80 p-4">
-            <p className="text-xs uppercase tracking-wide text-ciano">Ultima atualizacao</p>
-            <p className="mt-1 text-sm font-bold text-texto">{selectedStationId ? formatDate(lastUpdate) : "-"}</p>
+          <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
+            <p className="text-xs uppercase tracking-wide text-brand-primary">Última atualização</p>
+            <p className="mt-1 text-sm font-bold text-text-primary">{selectedStationId ? formatDate(lastUpdate) : "-"}</p>
           </div>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-acento/60 bg-fundo/70 p-6">
-        <h2 className="text-lg font-bold text-cta">Medicoes consolidadas por bucket ({selectedRange})</h2>
+      <section className="rounded-2xl border border-border-subtle bg-white p-6">
+        <h2 className="text-lg font-bold text-brand-primary">Medições consolidadas por bucket ({selectedRange})</h2>
         {!selectedStationId ? (
-          <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
-            Selecione uma estacao para ver as medicoes.
+          <p aria-live="polite" className="mt-3 text-sm text-text-secondary" role="status">
+            Selecione uma estação para ver as medições.
           </p>
         ) : null}
         {selectedStationId && loadingMeasurements ? (
-          <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
-            Carregando medicoes...
+          <p aria-live="polite" className="mt-3 text-sm text-text-secondary" role="status">
+            Carregando medições...
           </p>
         ) : null}
         {selectedStationId && !loadingMeasurements && !measurements.length ? (
-          <p aria-live="polite" className="mt-3 text-sm text-texto/80" role="status">
-            Nao ha medicoes para esta estacao.
+          <p aria-live="polite" className="mt-3 text-sm text-text-secondary" role="status">
+            Não há medições para esta estação.
           </p>
         ) : null}
         {selectedStationId && !loadingMeasurements && measurements.length ? (
           <div className="mt-4 overflow-x-auto">
             <table className="min-w-full border-collapse text-sm">
               <thead>
-                <tr className="border-b border-ciano/40 text-left text-xs uppercase tracking-wide text-ciano">
+                <tr className="border-b border-border-subtle text-left text-xs uppercase tracking-wide text-brand-primary">
                   <th className="px-3 py-2 font-bold">ts</th>
                   <th className="px-3 py-2 font-bold">pm25</th>
                   <th className="px-3 py-2 font-bold">pm10</th>
@@ -294,13 +303,13 @@ export function DadosPage() {
               </thead>
               <tbody>
                 {measurements.map((row) => (
-                  <tr className="border-b border-base/80" key={String(row.bucket_ts)}>
-                    <td className="px-3 py-2 text-texto/90">{formatDate(row.bucket_ts)}</td>
-                    <td className="px-3 py-2 text-texto/90">{formatCellValue(row.pm25)}</td>
-                    <td className="px-3 py-2 text-texto/90">{formatCellValue(row.pm10)}</td>
-                    <td className="px-3 py-2 text-texto/90">{formatCellValue(row.temp)}</td>
-                    <td className="px-3 py-2 text-texto/90">{formatCellValue(row.humidity)}</td>
-                    <td className="px-3 py-2 text-texto/90">{formatCellValue(row.quality_flag)}</td>
+                  <tr className="border-b border-border-subtle/50" key={String(row.bucket_ts)}>
+                    <td className="px-3 py-2 text-text-primary">{formatDate(row.bucket_ts)}</td>
+                    <td className="px-3 py-2 text-text-primary">{formatCellValue(row.pm25)}</td>
+                    <td className="px-3 py-2 text-text-primary">{formatCellValue(row.pm10)}</td>
+                    <td className="px-3 py-2 text-text-primary">{formatCellValue(row.temp)}</td>
+                    <td className="px-3 py-2 text-text-primary">{formatCellValue(row.humidity)}</td>
+                    <td className="px-3 py-2 text-text-primary">{formatCellValue(row.quality_flag)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -308,21 +317,21 @@ export function DadosPage() {
           </div>
         ) : null}
 
-        <div className="mt-6 rounded-lg border border-dashed border-cta/60 bg-base/60 p-4">
-          <p className="text-sm font-semibold text-cta">[Placeholder de grafico]</p>
-          <p className="mt-1 text-xs text-texto/80">
-            Area reservada para visualizacao grafica das medicoes (sem biblioteca de chart neste momento).
+        <div className="mt-6 rounded-lg border border-dashed border-brand-primary/30 bg-brand-primary/5 p-4">
+          <p className="text-sm font-semibold text-brand-primary">[Placeholder de gráfico]</p>
+          <p className="mt-1 text-xs text-text-secondary">
+            Área reservada para visualização gráfica das medições (sem biblioteca de chart neste momento).
           </p>
         </div>
       </section>
 
       {successMessage ? (
-        <p aria-live="polite" className="rounded-md border border-primaria/70 bg-primaria/15 p-3 text-sm text-texto" role="status">
+        <p aria-live="polite" className="rounded-md border border-accent-green/30 bg-accent-green/10 p-3 text-sm text-accent-green" role="status">
           {successMessage}
         </p>
       ) : null}
       {error ? (
-        <p aria-live="assertive" className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto" role="alert">
+        <p aria-live="assertive" className="rounded-md border border-error/30 bg-error/10 p-3 text-sm text-error" role="alert">
           {error}
         </p>
       ) : null}

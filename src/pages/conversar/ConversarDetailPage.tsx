@@ -18,7 +18,7 @@ function SimpleMarkdown({ text }: { text: string }) {
         .replace(/\*(.+?)\*/g, "<em>$1</em>")
         .replace(/\n/g, "<br />");
     // eslint-disable-next-line react/no-danger
-    return <div className="space-y-4 text-base leading-relaxed text-texto/90" dangerouslySetInnerHTML={{ __html: html }} />;
+    return <div className="space-y-4 text-base leading-relaxed text-text-primary" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export function ConversarDetailPage() {
@@ -112,7 +112,7 @@ export function ConversarDetailPage() {
     if (loading) {
         return (
             <div className="flex min-h-[50vh] items-center justify-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-cta border-t-transparent" />
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
             </div>
         );
     }
@@ -120,69 +120,69 @@ export function ConversarDetailPage() {
     if (error || !conversation) {
         return (
             <div className="mx-auto max-w-4xl px-4 py-12 text-center">
-                <p className="text-red-500">{error || "Conversa não encontrada"}</p>
-                <Link to="/conversar" className="mt-4 inline-block text-cta underline">Voltar para a lista</Link>
+                <p className="text-error">{error || "Conversa não encontrada"}</p>
+                <Link to="/conversar" className="mt-4 inline-block text-brand-primary underline">Voltar para a lista</Link>
             </div>
         );
     }
 
     return (
         <main className="mx-auto max-w-4xl px-4 py-8 md:py-12">
-            <Link to="/conversar" className="mb-6 inline-flex items-center text-sm font-semibold text-ciano hover:underline">
+            <Link to="/conversar" className="mb-6 inline-flex items-center text-sm font-semibold text-brand-primary hover:underline">
                 ← Voltar para Conversar
             </Link>
 
             <article className="mb-16">
-                <h1 className="mb-6 text-3xl font-black md:text-5xl">{conversation.title}</h1>
+                <h1 className="mb-6 text-3xl font-black text-text-primary md:text-5xl">{conversation.title}</h1>
                 {conversation.excerpt && (
-                    <p className="mb-8 border-l-4 border-ciano/30 pl-4 text-xl italic text-texto-secundario">
+                    <p className="mb-8 border-l-4 border-brand-primary/30 pl-4 text-xl italic text-text-secondary">
                         {conversation.excerpt}
                     </p>
                 )}
-                <div className="prose prose-invert max-w-none">
+                <div className="prose prose-lg max-w-none">
                     {conversation.body_md ? (
                         <SimpleMarkdown text={conversation.body_md} />
                     ) : (
-                        <p className="italic text-texto-secundario">Esta conversa não possui descrição detalhada ainda.</p>
+                        <p className="italic text-text-secondary">Esta conversa não possui descrição detalhada ainda.</p>
                     )}
                 </div>
             </article>
 
-            <section className="border-t border-ciano/10 pt-16">
-                <h2 className="mb-8 text-2xl font-black uppercase tracking-wider text-cta">Comentários e Contribuições</h2>
+            <section className="border-t border-brand-primary/10 pt-16">
+                <h2 className="mb-8 text-2xl font-black uppercase tracking-wider text-brand-primary">Comentários e Contribuições</h2>
 
                 <div className="mb-12 space-y-6">
                     {comments.length === 0 ? (
-                        <p className="italic text-texto-secundario">Nenhum comentário ainda. Seja o primeiro a participar!</p>
+                        <p className="italic text-text-secondary">Nenhum comentário ainda. Seja o primeiro a participar!</p>
                     ) : (
                         comments.map((comment) => (
-                            <div key={comment.id} className="rounded-2xl border border-ciano/10 bg-fundo-card p-6">
+                            <div key={comment.id} className="rounded-2xl border border-brand-primary/10 bg-white p-6">
                                 <div className="mb-2 flex items-center justify-between">
-                                    <span className="font-bold text-base">{comment.name}</span>
+                                    <span className="font-bold text-text-primary text-base">{comment.name}</span>
                                     <div className="flex items-center gap-4">
-                                        <span className="text-xs text-texto-secundario">
+                                        <span className="text-xs text-text-secondary">
                                             {new Date(comment.created_at).toLocaleDateString('pt-BR')}
                                         </span>
                                         <button
                                             onClick={() => handleReport(comment.id)}
                                             disabled={reportedIds.has(comment.id)}
-                                            className="text-[10px] font-bold uppercase tracking-wider text-red-500/50 hover:text-red-500 disabled:opacity-30"
+                                            className="text-[10px] font-bold uppercase tracking-wider text-error/50 hover:text-error disabled:opacity-30"
                                         >
                                             {reportedIds.has(comment.id) ? "Denunciado" : "Denunciar"}
                                         </button>
                                     </div>
                                 </div>
-                                <p className="whitespace-pre-wrap text-texto/90">{comment.body}</p>
+                                <p className="whitespace-pre-wrap text-text-primary">{comment.body}</p>
                             </div>
                         ))
                     )}
                 </div>
 
-                <form onSubmit={handleSubmit} className="rounded-2xl border border-cta/30 bg-cta/5 p-6 md:p-8">
-                    <h3 className="mb-6 text-xl font-bold">Deixe sua contribuição</h3>
+                <form onSubmit={handleSubmit} className="rounded-2xl border border-brand-primary/20 bg-brand-primary/5 p-6 md:p-8">
+                    <h3 className="mb-6 text-xl font-bold text-text-primary">Deixe sua contribuição</h3>
 
                     {submitSuccess && (
-                        <div className={`mb-6 rounded-lg border p-4 text-sm font-bold ${submitSuccess.type === 'success' ? 'border-green-500/30 bg-green-500/10 text-green-500' : 'border-yellow-500/30 bg-yellow-500/10 text-yellow-500'}`}>
+                        <div className={`mb-6 rounded-lg border p-4 text-sm font-bold ${submitSuccess.type === 'success' ? 'border-accent-green/30 bg-accent-green/10 text-accent-green' : 'border-warning/30 bg-warning/10 text-warning'}`}>
                             {submitSuccess.msg}
                         </div>
                     )}
@@ -199,7 +199,7 @@ export function ConversarDetailPage() {
                             />
                         </div>
                         <div>
-                            <label htmlFor="name" className="mb-2 block text-xs font-bold uppercase tracking-wider text-texto-secundario">
+                            <label htmlFor="name" className="mb-2 block text-xs font-bold uppercase tracking-wider text-text-secondary">
                                 Seu nome ou organização
                             </label>
                             <input
@@ -208,12 +208,12 @@ export function ConversarDetailPage() {
                                 required
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full rounded-lg border border-ciano/30 bg-fundo px-4 py-2 text-texto focus:border-cta focus:outline-none focus:ring-1 focus:ring-cta"
+                                className="w-full rounded-lg border border-brand-primary/30 bg-white px-4 py-2 text-text-primary focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
                                 placeholder="Ex: Maria Santos"
                             />
                         </div>
                         <div>
-                            <label htmlFor="body" className="mb-2 block text-xs font-bold uppercase tracking-wider text-texto-secundario">
+                            <label htmlFor="body" className="mb-2 block text-xs font-bold uppercase tracking-wider text-text-secondary">
                                 Mensagem
                             </label>
                             <textarea
@@ -222,14 +222,14 @@ export function ConversarDetailPage() {
                                 rows={4}
                                 value={body}
                                 onChange={(e) => setBody(e.target.value)}
-                                className="w-full rounded-lg border border-ciano/30 bg-fundo px-4 py-2 text-texto focus:border-cta focus:outline-none focus:ring-1 focus:ring-cta"
+                                className="w-full rounded-lg border border-brand-primary/30 bg-white px-4 py-2 text-text-primary focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary"
                                 placeholder="Compartilhe seu relato, dúvida ou sugestão..."
                             />
                         </div>
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="mt-2 inline-flex items-center justify-center rounded-lg bg-cta px-6 py-3 font-black uppercase tracking-widest text-base transition-all hover:brightness-110 disabled:opacity-50"
+                            className="mt-2 inline-flex items-center justify-center rounded-lg bg-brand-primary px-6 py-3 font-black uppercase tracking-widest text-white transition-all hover:brightness-110 disabled:opacity-50"
                         >
                             {submitting ? "Enviando..." : "Publicar Comentário"}
                         </button>
