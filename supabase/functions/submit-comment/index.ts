@@ -30,16 +30,42 @@ serve(async (req) => {
         const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
         const ipHash = await getIpHash(ip)
 
-        // 1. Honeypot check
+        // 1. Validate required fields
+        if (!conversation_id || !name || !commentBody) {
+            return new Response(JSON.stringify({ error: 'Campos obrigatórios faltando' }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 400,
+            })
+        }
+
+        // 2. Honeypot check (hidden field for spam bots)
         if (honeypot && honeypot.length > 0) {
-            console.warn(`Spam detectado (honeypot): IP=${ip}`)
+            console.warn(`[Spam] Honeypot triggered: IP=${ip}, UA=${userAgent}`)
             return new Response(JSON.stringify({ error: 'Spam detected' }), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                 status: 400,
             })
         }
 
-        // 2. Rate limit check (max 3 comments in 10 minutes)
+        // 3. Name and body basic validation
+        const cleanName = name.trim().slice(0, 100)
+        const cleanBody = commentBody.trim()
+
+        if (cleanName.length < 2) {
+            return new Response(JSON.stringify({ error: 'Nome muito curto (mínimo 2 caracteres)' }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 400,
+            })
+        }
+
+        if (cleanBody.length < 3 || cleanBody.length > 2000) {
+            return new Response(JSON.stringify({ error: 'Comentário deve ter entre 3 e 2000 caracteres' }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 400,
+            })
+        }
+
+        // 4. Rate limit check (max 3 comments in 10 minutes per IP)
         const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString()
         const { count, error: countError } = await supabaseClient
             .from('conversation_comments')
@@ -49,39 +75,55 @@ serve(async (req) => {
 
         if (countError) throw countError
         if (count !== null && count >= 3) {
+            console.warn(`[RateLimit] IP exceeded 3 comments in 10 min: ${ipHash}`)
             return new Response(JSON.stringify({ error: 'Limite de comentários atingido. Tente novamente em alguns minutos.' }), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                 status: 429,
             })
         }
 
-        // 3. Heuristic: if body is too short or too long, maybe queue for moderation
+        // 5. Heuristics for automatic moderation queue
+        // Queue if: too short, too long, or suspect patterns
         let moderationStatus = 'published'
-        if (commentBody.length < 2 || commentBody.length > 2000) {
+        const suspectPatterns = [
+            /https?:\/\//gi,  // URLs (often spam)
+        ]
+        
+        if (cleanBody.length < 3 || cleanBody.length > 1500) {
             moderationStatus = 'queued'
+        } else if (suspectPatterns.some(p => p.test(cleanBody))) {
+            // URLs trigger moderation (unless very short, legitimate links)
+            const urlCount = (cleanBody.match(/https?:\/\//gi) || []).length
+            if (urlCount > 1 || cleanBody.split(' ').length < 20) {
+                moderationStatus = 'queued'
+            }
         }
 
-        // 4. Insert comment
+        // 6. Insert comment
         const { data, error: insertError } = await supabaseClient
             .from('conversation_comments')
             .insert({
                 conversation_id,
-                name: name.slice(0, 50),
-                body: commentBody,
+                name: cleanName,
+                body: cleanBody,
                 ip_hash: ipHash,
                 user_agent: userAgent,
-                moderation_status: moderationStatus
+                moderation_status: moderationStatus,
+                created_at: new Date().toISOString()
             })
             .select()
             .single()
 
         if (insertError) throw insertError
 
+        console.log(`[Comment] Submitted by ${cleanName}, status=${moderationStatus}`)
+
         return new Response(JSON.stringify({ data, status: moderationStatus }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 200,
         })
     } catch (error) {
+        console.error('[Error] submit-comment:', error.message)
         return new Response(JSON.stringify({ error: error.message }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
