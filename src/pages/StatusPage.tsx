@@ -6,6 +6,7 @@ export function StatusPage() {
     const [status, setStatus] = useState<SystemStatus | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showOpsHelp, setShowOpsHelp] = useState(false);
 
     useEffect(() => {
         async function load() {
@@ -26,6 +27,8 @@ export function StatusPage() {
     const formatCurrency = (cents: number) => {
         return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     };
+
+    const formatNumber = (value: number) => value.toLocaleString("pt-BR");
 
     if (loading) {
         return (
@@ -61,7 +64,6 @@ export function StatusPage() {
             </header>
 
             <div className="grid gap-6 md:grid-cols-3">
-                {/* Monitoring Card */}
                 <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 flex flex-col">
                     <h2 className="text-xs font-black uppercase tracking-widest text-cta">Rede de Monitoramento</h2>
                     <div className="mt-6 flex flex-col gap-4">
@@ -84,7 +86,6 @@ export function StatusPage() {
                     </div>
                 </div>
 
-                {/* Push Alerts Card */}
                 <div className="rounded-2xl border border-acento/40 bg-fundo/60 p-6 flex flex-col">
                     <h2 className="text-xs font-black uppercase tracking-widest text-cta">Alertas (7 dias)</h2>
                     <div className="mt-6 flex flex-col gap-4">
@@ -117,7 +118,6 @@ export function StatusPage() {
                     </div>
                 </div>
 
-                {/* Transparency Card */}
                 <div className="rounded-2xl border border-primaria/40 bg-fundo/60 p-6 flex flex-col">
                     <h2 className="text-xs font-black uppercase tracking-widest text-cta">Transparência</h2>
                     <div className="mt-6 flex flex-col gap-4">
@@ -137,7 +137,6 @@ export function StatusPage() {
                     <Link to="/transparencia" className="mt-auto pt-6 text-xs font-bold text-ciano hover:underline">Detalhes financeiros →</Link>
                 </div>
 
-                {/* Content Signals */}
                 <div className="rounded-2xl border border-acento/40 bg-fundo/60 p-6 flex flex-col">
                     <h2 className="text-xs font-black uppercase tracking-widest text-cta">Sinais de Conteúdo</h2>
                     <div className="mt-6 space-y-4 flex-1">
@@ -157,26 +156,25 @@ export function StatusPage() {
                     <p className="mt-auto text-[10px] text-texto/40 uppercase tracking-tighter">Sincronizado</p>
                 </div>
 
-                {/* Network Health Card */}
                 <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 flex flex-col">
                     <h2 className="text-xs font-black uppercase tracking-widest text-cta">Saúde da Rede</h2>
                     <div className="mt-6 flex flex-col gap-3">
                         <div className="flex items-center gap-2">
-                            <div style={{ backgroundColor: '#22c55e', borderRadius: '4px', width: '20px', height: '20px' }}></div>
+                            <div style={{ backgroundColor: "#22c55e", borderRadius: "4px", width: "20px", height: "20px" }}></div>
                             <div className="flex-1">
                                 <span className="text-[10px] font-bold uppercase text-texto/70">Excelente</span>
                                 <span className="text-sm font-black text-texto ml-auto">{status.network_health?.ok || 0}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div style={{ backgroundColor: '#eab308', borderRadius: '4px', width: '20px', height: '20px' }}></div>
+                            <div style={{ backgroundColor: "#eab308", borderRadius: "4px", width: "20px", height: "20px" }}></div>
                             <div className="flex-1">
                                 <span className="text-[10px] font-bold uppercase text-texto/70">Degradado</span>
                                 <span className="text-sm font-black text-texto ml-auto">{status.network_health?.degraded || 0}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div style={{ backgroundColor: '#ef4444', borderRadius: '4px', width: '20px', height: '20px' }}></div>
+                            <div style={{ backgroundColor: "#ef4444", borderRadius: "4px", width: "20px", height: "20px" }}></div>
                             <div className="flex-1">
                                 <span className="text-[10px] font-bold uppercase text-texto/70">Offline</span>
                                 <span className="text-sm font-black text-texto ml-auto">{status.network_health?.offline || 0}</span>
@@ -185,50 +183,112 @@ export function StatusPage() {
                     </div>
                 </div>
 
-                {/* Social Reach Card */}
                 <div className="rounded-2xl border border-base/40 bg-fundo/60 p-6 flex flex-col md:col-span-3">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <h2 className="text-xs font-black uppercase tracking-widest text-cta">Alcance Social (7 dias)</h2>
-                            <div className="mt-4 flex items-end gap-3">
-                                <span className="text-5xl font-black text-base">{status.social.total_7d}</span>
-                                <span className="mb-2 text-[10px] font-bold uppercase tracking-tighter text-texto/40 italic">Cliques de compartilhamento</span>
-                            </div>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <h2 className="text-xs font-black uppercase tracking-widest text-cta">Operação (últimos 7 dias)</h2>
+                        <button
+                            type="button"
+                            onClick={() => setShowOpsHelp(true)}
+                            className="text-left text-xs font-bold text-ciano hover:underline sm:text-right"
+                        >
+                            Como ler estes números?
+                        </button>
+                    </div>
+
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="rounded-xl border border-ciano/20 bg-base/20 p-4">
+                            <p className="text-2xl font-black text-ciano">{formatNumber(status.operations.kpis.total_measurements)}</p>
+                            <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Total de medições</p>
+                            <p className="mt-1 text-xs text-texto/50">Registros válidos recebidos no período.</p>
                         </div>
-                        <div className="text-right">
-                            <p className="text-[10px] font-bold uppercase text-texto/30 tracking-widest">Top Engajamento</p>
-                            <div className="mt-2 space-y-1">
-                                {status.social.top_slugs.length === 0 ? (
-                                    <p className="text-[10px] text-texto/20 italic">Sem dados recentes</p>
-                                ) : (
-                                    status.social.top_slugs.map((item, idx) => (
-                                        <div key={idx} className="flex flex-col items-end justify-center mb-1">
-                                            <div className="flex items-center gap-2 text-[10px]">
-                                                <span className="text-texto/40 font-mono">/{item.slug}</span>
-                                                <span className="font-black text-base italic">{item.count}</span>
-                                            </div>
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-ciano/50">
-                                                {item.kind === 'dossies' ? 'Dossiê' : item.kind === 'dados' ? 'Estação' : item.kind}
-                                            </span>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
+                        <div className="rounded-xl border border-primaria/20 bg-base/20 p-4">
+                            <p className="text-2xl font-black text-primaria">{formatNumber(status.operations.kpis.inserted_count)}</p>
+                            <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Ingest inserido</p>
+                            <p className="mt-1 text-xs text-texto/50">Entradas novas gravadas pela rotina hardenizada.</p>
+                        </div>
+                        <div className="rounded-xl border border-acento/20 bg-base/20 p-4">
+                            <p className="text-2xl font-black text-acento">{formatNumber(status.operations.kpis.duplicated_count)}</p>
+                            <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Ingest duplicado</p>
+                            <p className="mt-1 text-xs text-texto/50">Repetições detectadas e não reinseridas.</p>
+                        </div>
+                        <div className="rounded-xl border border-base/40 bg-base/20 p-4">
+                            <p className="text-2xl font-black text-base">{formatNumber(status.operations.kpis.total_push_alerts)}</p>
+                            <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Alertas disparados</p>
+                            <p className="mt-1 text-xs text-texto/50">Eventos `push_events` com trigger ativo.</p>
+                        </div>
+                        <div className="rounded-xl border border-base/40 bg-base/20 p-4">
+                            <p className="text-2xl font-black text-texto">{formatNumber(status.operations.kpis.published_events_count)}</p>
+                            <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Eventos publicados</p>
+                            <p className="mt-1 text-xs text-texto/50">Entradas de agenda com `status = published`.</p>
+                        </div>
+                        <div className="rounded-xl border border-base/40 bg-base/20 p-4">
+                            <p className="text-2xl font-black text-texto">{formatNumber(status.operations.kpis.published_content_items_count)}</p>
+                            <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Acervo + blog publicados</p>
+                            <p className="mt-1 text-xs text-texto/50">Soma de itens publicados em acervo e blog.</p>
+                        </div>
+                        <div className="rounded-xl border border-amber-500/30 bg-base/20 p-4">
+                            <p className="text-2xl font-black text-amber-500">{formatNumber(status.operations.kpis.scheduled_content_items_count)}</p>
+                            <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Agendados</p>
+                            <p className="mt-1 text-xs text-texto/50">Itens com publicação futura (blog + acervo).</p>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 rounded-xl border border-ciano/15 bg-base/10 p-4">
+                        <p className="text-[11px] font-bold uppercase tracking-wide text-ciano">Medições por estação (7 dias)</p>
+                        <div className="mt-2 grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
+                            {status.operations.station_metrics.length === 0 ? (
+                                <p className="text-xs text-texto/50 italic">Sem dados no período.</p>
+                            ) : (
+                                status.operations.station_metrics.map((station, idx) => (
+                                    <div key={`${station.station_code}-${idx}`} className="flex items-center justify-between rounded-md bg-fundo/40 px-3 py-2 text-xs">
+                                        <span className="font-mono text-texto/70">{station.station_code || station.station_name}</span>
+                                        <span className="font-black text-ciano">{formatNumber(station.measurements_count)}</span>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Feed Consolidado */}
+            {showOpsHelp && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowOpsHelp(false)}>
+                    <div
+                        className="w-full max-w-xl rounded-2xl border border-ciano/30 bg-fundo p-6 shadow-2xl"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="ops-help-title"
+                        onClick={(ev) => ev.stopPropagation()}
+                    >
+                        <h3 id="ops-help-title" className="text-lg font-black text-texto">Como ler estes números</h3>
+                        <p className="mt-3 text-sm text-texto/70">Todos os indicadores cobrem os últimos 7 dias corridos, em janela móvel.</p>
+                        <ul className="mt-4 space-y-2 text-sm text-texto/80">
+                            <li><span className="font-bold">Medições:</span> total de linhas em `measurements` no período.</li>
+                            <li><span className="font-bold">Ingest inserido/duplicado:</span> contagem em `ingest_logs` da rotina hardenizada.</li>
+                            <li><span className="font-bold">Alertas disparados:</span> total de `push_events` com trigger verdadeiro.</li>
+                            <li><span className="font-bold">Eventos publicados:</span> registros de agenda com `status = published` no período.</li>
+                            <li><span className="font-bold">Acervo + blog publicados:</span> soma de novos itens de acervo e posts publicados.</li>
+                            <li><span className="font-bold">Agendados:</span> total de conteúdos com `publish_at` no futuro.</li>
+                        </ul>
+                        <button
+                            type="button"
+                            onClick={() => setShowOpsHelp(false)}
+                            className="mt-6 rounded-lg bg-ciano/15 px-4 py-2 text-xs font-bold uppercase tracking-wide text-ciano hover:bg-ciano/25"
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="grid gap-10 md:grid-cols-2">
-                {/* Atividades e Blog */}
                 <div className="space-y-6">
                     <h3 className="text-xl font-black text-cta uppercase tracking-widest">Próximos Passos</h3>
                     <div className="space-y-4">
                         {status.content.upcoming_events.length === 0 ? (
                             <p className="text-sm text-texto/40 italic">Nenhum evento agendado.</p>
                         ) : (
-                            status.content.upcoming_events.map(ev => (
+                            status.content.upcoming_events.map((ev) => (
                                 <div key={ev.id} className="border-l-2 border-acento pl-4">
                                     <p className="text-[10px] font-bold text-acento uppercase">{new Date(ev.start_at).toLocaleDateString()}</p>
                                     <p className="text-sm font-bold text-texto">{ev.title}</p>
@@ -243,7 +303,7 @@ export function StatusPage() {
                             {status.content.latest_blog.length === 0 ? (
                                 <p className="text-xs text-texto/40 italic">Nenhum post disponível.</p>
                             ) : (
-                                status.content.latest_blog.map(post => (
+                                status.content.latest_blog.map((post) => (
                                     <Link to={`/blog/${post.slug}`} key={post.id} className="block group">
                                         <p className="text-xs font-bold text-texto group-hover:text-ciano transition-colors">{post.title}</p>
                                         <p className="text-[10px] text-texto/50 uppercase">{new Date(post.published_at!).toLocaleDateString()}</p>
@@ -254,14 +314,13 @@ export function StatusPage() {
                     </div>
                 </div>
 
-                {/* Acervo */}
                 <div className="space-y-6">
                     <h3 className="text-xl font-black text-cta uppercase tracking-widest">Memória Digital</h3>
                     <div className="space-y-4">
                         {status.content.latest_acervo.length === 0 ? (
                             <p className="text-sm text-texto/40 italic">Acervo vazio.</p>
                         ) : (
-                            status.content.latest_acervo.map(item => (
+                            status.content.latest_acervo.map((item) => (
                                 <Link to={`/acervo/item/${item.slug}`} key={item.id} className="flex flex-col border border-ciano/20 bg-base/20 rounded-xl p-4 hover:border-ciano/40 transition-all">
                                     <span className="text-[10px] font-bold text-ciano uppercase tracking-widest">{item.kind}</span>
                                     <span className="text-sm font-bold text-texto mt-1">{item.title}</span>
@@ -274,3 +333,5 @@ export function StatusPage() {
         </section>
     );
 }
+
+

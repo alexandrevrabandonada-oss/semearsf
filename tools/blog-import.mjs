@@ -25,6 +25,17 @@ function parseEnvFile(filePath) {
     return env;
 }
 
+function normalizeBlogItem(item) {
+    if (!item || typeof item !== "object") return item;
+    const normalized = { ...item };
+
+    if (!normalized.publish_at && normalized.published_at) {
+        normalized.publish_at = normalized.published_at;
+    }
+
+    return normalized;
+}
+
 async function run() {
     const env = fs.existsSync(".env.local") ? parseEnvFile(".env.local") : parseEnvFile(".env");
     const url = env.VITE_SUPABASE_URL || env.SUPABASE_URL;
@@ -46,7 +57,6 @@ async function run() {
 
     console.log(`Iniciando importação de ${items.length} posts do blog...`);
 
-    // Fetch existing slugs to determine inserted vs updated
     const { data: existing, error: selectError } = await supabase.from("blog_posts").select("slug");
     if (selectError) {
         console.error(`[ERRO CRÍTICO] Falha ao buscar posts do blog: ${selectError.message}`);
@@ -58,7 +68,8 @@ async function run() {
     let updated = 0;
     let errors = 0;
 
-    for (const item of items) {
+    for (const rawItem of items) {
+        const item = normalizeBlogItem(rawItem);
         const isUpdate = existingSlugs.has(item.slug);
 
         const { error } = await supabase

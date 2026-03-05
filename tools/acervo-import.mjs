@@ -25,6 +25,21 @@ function parseEnvFile(filePath) {
     return env;
 }
 
+function normalizeAcervoItem(item) {
+    if (!item || typeof item !== "object") return item;
+    const normalized = { ...item };
+
+    if (!normalized.publish_at && normalized.published_at) {
+        if (typeof normalized.published_at === "string" && /^\d{4}-\d{2}-\d{2}$/.test(normalized.published_at)) {
+            normalized.publish_at = `${normalized.published_at}T00:00:00Z`;
+        } else {
+            normalized.publish_at = normalized.published_at;
+        }
+    }
+
+    return normalized;
+}
+
 async function run() {
     const env = fs.existsSync(".env.local") ? parseEnvFile(".env.local") : parseEnvFile(".env");
     const url = env.VITE_SUPABASE_URL || env.SUPABASE_URL;
@@ -46,7 +61,6 @@ async function run() {
 
     console.log(`Iniciando importação de ${items.length} itens no acervo...`);
 
-    // Fetch existing slugs to determine inserted vs updated
     const { data: existing, error: selectError } = await supabase.from("acervo_items").select("slug");
     if (selectError) {
         console.error(`[ERRO CRÍTICO] Falha ao buscar itens existentes: ${selectError.message}`);
@@ -58,7 +72,8 @@ async function run() {
     let updated = 0;
     let errors = 0;
 
-    for (const item of items) {
+    for (const rawItem of items) {
+        const item = normalizeAcervoItem(rawItem);
         const isUpdate = existingSlugs.has(item.slug);
 
         const { error } = await supabase

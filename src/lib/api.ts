@@ -256,6 +256,7 @@ export type AcervoItem = {
   source_name: string | null;
   source_url: string | null;
   published_at: string | null;
+  publish_at: string | null;
   year: number | null;
   city: string;
   tags: string[];
@@ -294,6 +295,7 @@ function rowToAcervoItem(row: Record<string, unknown>): AcervoItem {
     source_name: typeof row.source_name === "string" ? row.source_name : null,
     source_url: typeof row.source_url === "string" ? row.source_url : null,
     published_at: typeof row.published_at === "string" ? row.published_at : null,
+    publish_at: typeof row.publish_at === "string" ? row.publish_at : null,
     year: typeof row.year === "number" ? row.year : null,
     city: typeof row.city === "string" ? row.city : "Volta Redonda",
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
@@ -319,7 +321,7 @@ export async function listAcervoItems(params: ListAcervoParams = {}): Promise<Ac
 
     let query = supabase
       .from("acervo_items")
-      .select("id, kind, title, slug, excerpt, cover_url, cover_thumb_url, cover_small_url, source_name, source_url, published_at, year, city, tags, featured, source_type, created_at")
+      .select("id, kind, title, slug, excerpt, cover_url, cover_thumb_url, cover_small_url, source_name, source_url, published_at, publish_at, year, city, tags, featured, source_type, created_at")
       .order("published_at", { ascending: false, nullsFirst: false })
       .range(offset, offset + limit - 1);
 
@@ -332,7 +334,9 @@ export async function listAcervoItems(params: ListAcervoParams = {}): Promise<Ac
 
     const { data, error } = await query;
     if (error) throw error;
-    return ((data ?? []) as Record<string, unknown>[]).map(rowToAcervoItem);
+    return ((data ?? []) as Record<string, unknown>[])
+      .map(rowToAcervoItem)
+      .filter((item) => isPublishTimeReached(item.publish_at));
   } catch (error) {
     throw toAppError("Falha ao listar itens do acervo", error);
   }
@@ -347,12 +351,14 @@ export async function getAcervoBySlug(slug: string): Promise<AcervoItem | null> 
     const supabase = assertSupabase();
     const { data, error } = await supabase
       .from("acervo_items")
-      .select("id, kind, title, slug, excerpt, content_md, source_name, source_url, published_at, year, city, tags, meta, curator_note, authors, doi, featured, source_type, created_at")
+      .select("id, kind, title, slug, excerpt, content_md, source_name, source_url, published_at, publish_at, year, city, tags, meta, curator_note, authors, doi, featured, source_type, created_at")
       .eq("slug", slug)
       .maybeSingle();
     if (error) throw error;
     if (!data) return null;
-    return rowToAcervoItem(data as Record<string, unknown>);
+    const item = rowToAcervoItem(data as Record<string, unknown>);
+    if (!isPublishTimeReached(item.publish_at)) return null;
+    return item;
   } catch (error) {
     throw toAppError("Falha ao carregar item do acervo", error);
   }
@@ -379,7 +385,7 @@ export async function getAcervoByYear(year: number, limit = 200): Promise<Acervo
     const supabase = assertSupabase();
     const { data, error } = await supabase.rpc("get_acervo_by_year", { p_year: year, p_limit: limit });
     if (error) throw error;
-    return ((data || []) as Record<string, unknown>[]).map(rowToAcervoItem);
+    return ((data || []) as Record<string, unknown>[]).map(rowToAcervoItem).filter((item) => isPublishTimeReached(item.publish_at));
   } catch (error) {
     throw toAppError("Falha ao carregar itens da linha do tempo", error);
   }
@@ -400,9 +406,15 @@ export type BlogPost = {
   cover_small_url: string | null;
   tags: string[];
   published_at: string | null;
+  publish_at: string | null;
   status: "draft" | "published";
   created_at: string;
 };
+
+function isPublishTimeReached(publishAt: string | null): boolean {
+  if (!publishAt) return true;
+  return new Date(publishAt).getTime() <= Date.now();
+}
 
 export type ListBlogParams = {
   q?: string;
@@ -423,6 +435,7 @@ function rowToBlogPost(row: Record<string, unknown>): BlogPost {
     cover_small_url: typeof row.cover_small_url === "string" ? row.cover_small_url : null,
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
     published_at: typeof row.published_at === "string" ? row.published_at : null,
+    publish_at: typeof row.publish_at === "string" ? row.publish_at : null,
     status: (row.status as "draft" | "published") ?? "draft",
     created_at: typeof row.created_at === "string" ? row.created_at : ""
   };
@@ -435,7 +448,7 @@ export async function listBlogPosts(params: ListBlogParams = {}): Promise<BlogPo
 
     let query = supabase
       .from("blog_posts")
-      .select("id, slug, title, excerpt, cover_url, cover_thumb_url, cover_small_url, tags, published_at, status, created_at")
+      .select("id, slug, title, excerpt, cover_url, cover_thumb_url, cover_small_url, tags, published_at, publish_at, status, created_at")
       .eq("status", "published")
       .order("published_at", { ascending: false, nullsFirst: false })
       .range(offset, offset + limit - 1);
@@ -447,7 +460,9 @@ export async function listBlogPosts(params: ListBlogParams = {}): Promise<BlogPo
 
     const { data, error } = await query;
     if (error) throw error;
-    return ((data ?? []) as Record<string, unknown>[]).map(rowToBlogPost);
+    return ((data ?? []) as Record<string, unknown>[])
+      .map(rowToBlogPost)
+      .filter((post) => isPublishTimeReached(post.publish_at));
   } catch (error) {
     throw toAppError("Falha ao listar posts do blog", error);
   }
@@ -464,7 +479,9 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
       .maybeSingle();
     if (error) throw error;
     if (!data) return null;
-    return rowToBlogPost(data as Record<string, unknown>);
+    const post = rowToBlogPost(data as Record<string, unknown>);
+    if (!isPublishTimeReached(post.publish_at)) return null;
+    return post;
   } catch (error) {
     throw toAppError("Falha ao carregar post do blog", error);
   }
@@ -559,6 +576,47 @@ export async function getTransparencySummary(): Promise<TransparencySummary> {
 // Status do Sistema
 // ─────────────────────────────────────────
 
+export type OpsKPI = {
+  total_measurements: number;
+  inserted_count: number;
+  duplicated_count: number;
+  total_push_alerts: number;
+  published_events_count: number;
+  published_acervo_items_count: number;
+  published_blog_posts_count: number;
+  published_content_items_count: number;
+  scheduled_acervo_items_count: number;
+  scheduled_blog_posts_count: number;
+  scheduled_content_items_count: number;
+};
+
+export type StationKPI = {
+  station_code: string;
+  station_name: string;
+  measurements_count: number;
+};
+
+function toSafeNumber(value: unknown): number {
+  const parsed = typeof value === "number" ? value : Number(value ?? 0);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function normalizeOpsKpi(raw?: Partial<OpsKPI> | null): OpsKPI {
+  return {
+    total_measurements: toSafeNumber(raw?.total_measurements),
+    inserted_count: toSafeNumber(raw?.inserted_count),
+    duplicated_count: toSafeNumber(raw?.duplicated_count),
+    total_push_alerts: toSafeNumber(raw?.total_push_alerts),
+    published_events_count: toSafeNumber(raw?.published_events_count),
+    published_acervo_items_count: toSafeNumber(raw?.published_acervo_items_count),
+    published_blog_posts_count: toSafeNumber(raw?.published_blog_posts_count),
+    published_content_items_count: toSafeNumber(raw?.published_content_items_count),
+    scheduled_acervo_items_count: toSafeNumber(raw?.scheduled_acervo_items_count),
+    scheduled_blog_posts_count: toSafeNumber(raw?.scheduled_blog_posts_count),
+    scheduled_content_items_count: toSafeNumber(raw?.scheduled_content_items_count)
+  };
+}
+
 export type SystemStatus = {
   monitoring: {
     stations_count: number;
@@ -588,6 +646,10 @@ export type SystemStatus = {
     degraded: number;
     offline: number;
     unknown: number;
+  };
+  operations: {
+    kpis: OpsKPI;
+    station_metrics: StationKPI[];
   };
 };
 
@@ -637,7 +699,10 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         .select("pollutant")
         .gt("ts", sevenDaysAgo),
       // Network health
-      supabase.rpc("get_station_health")
+      supabase.rpc("get_station_health"),
+      // Operations KPIs
+      supabase.rpc("get_ops_kpis_7d"),
+      supabase.rpc("get_station_kpis_7d")
     ]);
 
     const events = results[0];
@@ -650,6 +715,8 @@ export async function getSystemStatus(): Promise<SystemStatus> {
     const alertsStations = results[7] as { data: any[] };
     const alertsPollutants = results[8] as { data: any[] };
     const stationHealthData = results[9] as { data: StationHealth[] };
+    const opsKpiResult = results[10] as { data: OpsKPI[] };
+    const stationKpiResult = results[11] as { data: StationKPI[] };
 
     // Count top stations and pollutants
     const stationCounts = new Map<string, number>();
@@ -692,7 +759,7 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       },
       content: {
         upcoming_events: (events.data ?? []) as EventSummary[],
-        latest_acervo: (acervo.data ?? []) as any[],
+        latest_acervo: ((acervo.data ?? []) as any[]).filter((item) => isPublishTimeReached(String(item.publish_at ?? "") || null)),
         latest_blog: blog
       },
       transparency,
@@ -704,6 +771,14 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         total_7d: alerts7d.count || 0,
         top_stations: topStations,
         top_pollutants: topPollutants
+      },
+      operations: {
+        kpis: normalizeOpsKpi(opsKpiResult.data?.[0]),
+        station_metrics: (stationKpiResult.data || []).map((row) => ({
+          station_code: String(row.station_code ?? "-"),
+          station_name: String(row.station_name ?? "Estação"),
+          measurements_count: toSafeNumber(row.measurements_count)
+        }))
       },
       network_health: networkHealth
     };
@@ -726,7 +801,7 @@ export async function searchAcervo(q: string, limit = 10): Promise<AcervoItem[]>
       .limit(limit);
 
     if (error) throw error;
-    return data as AcervoItem[];
+    return (data as AcervoItem[]).filter((item) => isPublishTimeReached(item.publish_at ?? null));
   } catch (error) {
     throw toAppError("Falha ao buscar no acervo", error);
   }
@@ -746,7 +821,7 @@ export async function searchBlog(q: string, limit = 10): Promise<BlogPost[]> {
       .limit(limit);
 
     if (error) throw error;
-    return data as BlogPost[];
+    return (data as BlogPost[]).filter((post) => isPublishTimeReached(post.publish_at ?? null));
   } catch (error) {
     throw toAppError("Falha ao buscar no blog", error);
   }
@@ -1213,5 +1288,13 @@ export async function getCorridorBySlug(slug: string): Promise<ClimateCorridorWi
     throw toAppError("Falha ao carregar corredor climático", error);
   }
 }
+
+
+
+
+
+
+
+
 
 
