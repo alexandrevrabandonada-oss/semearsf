@@ -12,6 +12,10 @@ type IngestPayload = {
   temp?: unknown;
   humidity?: unknown;
   quality_flag?: unknown;
+  battery_v?: unknown;
+  rssi?: unknown;
+  firmware?: unknown;
+  device_temp?: unknown;
 };
 
 function json(status: number, body: Record<string, unknown>) {
@@ -107,6 +111,10 @@ Deno.serve(async (req) => {
   const temp = toNumberOrNull(payload.temp);
   const humidity = toNumberOrNull(payload.humidity);
   const qualityFlag = payload.quality_flag ?? null;
+  const batteryV = toNumberOrNull(payload.battery_v);
+  const rssi = toNumberOrNull(payload.rssi);
+  const firmware = typeof payload.firmware === "string" ? payload.firmware.trim() : null;
+  const deviceTemp = toNumberOrNull(payload.device_temp);
 
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false }
@@ -125,19 +133,42 @@ Deno.serve(async (req) => {
     return json(404, { ok: false, error: "station_not_found" });
   }
 
-  const { error: insertError } = await supabase.from("measurements").insert({
-    station_id: station.id,
-    ts,
-    pm25,
-    pm10,
-    temp,
-    humidity,
-    quality_flag: qualityFlag
-  });
+  const { error: insertError, data: insertData } = await supabase
+    .from("measurements")
+    .upsert(
+      {
+        station_id: station.id,
+        ts,
+        pm25,
+        pm10,
+        temp,
+        humidity,
+        quality_flag: qualityFlag
+      },
+      { onConflict: "station_id,ts", ignoreDuplicates: true }
+    )
+    .select();
 
   if (insertError) {
+    // Log failure
+    await supabase.from("ingest_logs").insert({
+      station_code: stationCode,
+      pm25,
+      pm10,
+      battery_v: batteryV,
+      rssi: typeof payload.rssi === "number" ? payload.rssi : null,
+      firmware,
+      device_temp: deviceTemp,
+      inserted: false,
+      duplicated: false,
+      error_reason: insertError.message
+    }).catch(() => {});
+
     return json(500, { ok: false, error: "measurement_insert_failed" });
   }
+
+  const wasInserted = (insertData || []).length > 0;
+  const wasDuplicated = !wasInserted;
 
   const { error: updateError } = await supabase
     .from("stations")
@@ -145,8 +176,23 @@ Deno.serve(async (req) => {
     .eq("id", station.id);
 
   if (updateError) {
-    return json(500, { ok: false, error: "station_update_failed" });
+    // Log but don't fail - station update is secondary
+    console.error(`Failed to update station ${station.id}:`, updateError.message);
   }
+
+  // Log to ingest_logs
+  await supabase.from("ingest_logs").insert({
+    station_code: stationCode,
+    pm25,
+    pm10,
+    battery_v: batteryV,
+    rssi: typeof payload.rssi === "number" ? payload.rssi : null,
+    firmware,
+    device_temp: deviceTemp,
+    inserted: wasInserted,
+    duplicated: wasDuplicated,
+    error_reason: null
+  }).catch(() => {});
 
   // --- Advanced Push Notification Alerts ---
   try {
@@ -240,5 +286,10 @@ Deno.serve(async (req) => {
     console.error("[PushAlert] Failed to process alerts:", err.message);
   }
 
-  return json(200, { ok: true });
+  return json(200, { 
+    ok: true,
+    inserted: wasInserted,
+    duplicated: wasDuplicated,
+    station_code: stationCode
+  });
 });

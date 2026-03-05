@@ -22,6 +22,7 @@
     "ship:content": "npm run acervo:import && npm run collections:import && npm run blog:import && npm run transparency:import && npm run done",
     "ship:all": "npm run ship:infra && npm run ship:content",
     "simulate:sensor": "node tools/simulate-sensor.mjs",
+    "simulate:sensor:retry": "node tools/simulate-sensor.mjs --retry",
     "smoke": "node tools/db-smoke.mjs",
     "test:smoke:ui": "playwright test --grep @smoke",
     "test:a11y": "playwright test --grep @a11y",
