@@ -37,8 +37,8 @@ export function Footer() {
 
         {/* Description */}
         <div className="flex flex-col items-center gap-2 text-center text-sm text-text-secondary md:flex-row md:justify-between md:text-left">
-          <p>Plataforma pública de monitoramento e memória socioambiental</p>
-          <p className="text-xs font-semibold text-brand-primary">Projeto financiado por emenda parlamentar</p>
+          <p>Plataforma pública-universitária de monitoramento e memória socioambiental</p>
+          <p className="text-xs font-semibold text-brand-primary">Financiado por emenda parlamentar</p>
         </div>
       </div>
     </footer>

@@ -57,27 +57,32 @@ export function HomePage() {
   return (
     <section className="space-y-8">
       {/* Hero Section - Institutional Portal */}
-      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm md:p-12">
+      <div className="rounded-2xl border border-border-subtle bg-gradient-to-br from-white via-white to-bg-surface/30 p-8 shadow-sm md:p-12">
         {/* Institutional Lockup */}
-        <div className="mb-6 flex flex-wrap items-center gap-4 border-b border-border-subtle pb-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-primary text-white font-black text-xl">
+        <div className="mb-8 flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-3xl font-black uppercase tracking-[0.18em] text-brand-primary-dark md:text-4xl">
+                SEMEAR
+              </h2>
+              <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Coordenação: Universidade Federal Fluminense
+              </p>
+            </div>
+            <div className="ml-auto flex h-10 w-10 items-center justify-center rounded-lg border border-border-subtle bg-white text-[10px] font-bold tracking-[0.12em] text-text-primary/60" aria-label="Universidade Federal Fluminense">
               UFF
             </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Universidade Federal Fluminense</span>
-              <span className="text-base font-black uppercase tracking-wide text-brand-primary">SEMEAR</span>
-            </div>
           </div>
+          <div className="h-1 w-24 bg-accent-green rounded-full" aria-hidden="true" />
         </div>
 
         {/* Main Heading with clear hierarchy */}
-        <div className="space-y-4">
+        <div className="space-y-4 border-t border-border-subtle pt-6">
           <h1 className="text-4xl font-black leading-tight text-text-primary md:text-5xl lg:text-6xl">
             Monitoramento da Qualidade do Ar e Memória Socioambiental
           </h1>
           <p className="max-w-3xl text-base text-text-secondary md:text-lg leading-relaxed">
-            Portal público-universitário que reúne dados científicos em tempo real, acervo histórico curado e agenda de atividades participativas.
+            Plataforma pública-universitária que reúne dados científicos em tempo real, acervo histórico curado, rodas de conversa inclusivas e atividades participativas de vigilância popular em saúde.
           </p>
         </div>
 
@@ -279,8 +284,23 @@ export function HomePage() {
             ))}
           </div>
         ) : collections.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
-            <p className="text-sm text-text-secondary">Nenhuma coleção em destaque no momento.</p>
+          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center space-y-4">
+            <p className="text-base font-semibold text-text-primary">Novos dossiês serão publicados em breve</p>
+            <p className="text-sm text-text-secondary">Explore nossa coleção de documentos históricos enquanto isso:</p>
+            <div className="flex flex-wrap gap-3 justify-center">
+              <Link className="inline-flex items-center gap-2 rounded-lg border border-brand-primary px-4 py-2 text-sm font-bold text-brand-primary hover:bg-brand-primary-soft transition-colors" to="/acervo">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7 12a5 5 0 1110 0 5 5 0 01-10 0z" />
+                </svg>
+                Explorar Acervo
+              </Link>
+              <Link className="inline-flex items-center gap-2 rounded-lg border border-brand-primary px-4 py-2 text-sm font-bold text-brand-primary hover:bg-brand-primary-soft transition-colors" to="/acervo/linha">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17H3v-6h10m0 0v-6h8v6m-8 6v6h8v-6m-8 0h8" />
+                </svg>
+                Ver Timeline
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-3">

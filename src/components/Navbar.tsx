@@ -60,13 +60,13 @@ export function Navbar() {
       {/* Brand identity */}
       <div className="border-b border-border-subtle bg-bg-surface">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 md:px-6">
-          <div className="flex items-center gap-3">
-            <span className="inline-flex min-h-[32px] items-center rounded border border-border-subtle bg-bg-surface px-2 text-[11px] font-bold tracking-[0.12em] text-text-secondary" aria-label="Universidade Federal Fluminense">
-              UFF
+          <div className="flex items-center gap-4">
+            <span className="text-lg font-black uppercase tracking-[0.18em] text-brand-primary-dark md:text-xl">
+              {import.meta.env.VITE_PROJECT_NAME || "SEMEAR"}
             </span>
             <span className="h-6 w-px bg-border-subtle" aria-hidden="true" />
-            <span className="text-sm font-black uppercase tracking-[0.18em] text-brand-primary-dark md:text-base">
-              {import.meta.env.VITE_PROJECT_NAME || "SEMEAR"}
+            <span className="inline-flex min-h-[32px] items-center rounded border border-border-subtle bg-bg-surface px-2 text-[10px] font-semibold tracking-[0.14em] text-text-secondary" aria-label="Universidade Federal Fluminense">
+              UFF
             </span>
           </div>
 
