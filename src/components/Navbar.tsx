@@ -8,13 +8,30 @@ const links = [
   { href: "/blog", label: "Blog" },
   { href: "/agenda", label: "Agenda" },
   { href: "/conversar", label: "Conversar" },
+  { href: "/corredores", label: "Corredores" },
   { href: "/dossies", label: "Dossiês" },
   { href: "/inscricoes", label: "Inscricoes" },
   { href: "/sobre", label: "Sobre" },
   { href: "/transparencia", label: "Transparencia" }
 ];
 
+import { useInstallPrompt } from "../hooks/useInstallPrompt";
+
 export function Navbar() {
+  const { prompt, clearPrompt } = useInstallPrompt();
+
+  const handleInstallClick = async () => {
+    if (!prompt) {
+      alert("Para instalar: no Android, clique nos três pontos e 'Instalar aplicativo'. No iOS, clique em Compartilhar e 'Adicionar à Tela de Início'.");
+      return;
+    }
+    await prompt.prompt();
+    const { outcome } = await prompt.userChoice;
+    if (outcome === 'accepted') {
+      clearPrompt();
+    }
+  };
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-ciano/50 bg-fundo/95 backdrop-blur">
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 md:px-6">
@@ -40,12 +57,10 @@ export function Navbar() {
           <li>
             <button
               className="ml-2 rounded-md border border-cta bg-cta/10 px-3 py-1 text-xs font-black uppercase tracking-wide text-cta transition-colors hover:bg-cta hover:text-base"
-              onClick={() => {
-                alert("Para instalar: no Android, clique nos três pontos e 'Instalar aplicativo'. No iOS, clique em Compartilhar e 'Adicionar à Tela de Início'.");
-              }}
+              onClick={handleInstallClick}
               type="button"
             >
-              Instalar
+              Instalar App
             </button>
           </li>
         </ul>

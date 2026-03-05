@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { listCollections, type AcervoCollection } from "../../lib/api";
+import { getOptimizedCover } from "../../lib/imageOptimization";
 
 export function CollectionsListPage() {
     const [collections, setCollections] = useState<AcervoCollection[]>([]);
@@ -48,7 +49,7 @@ export function CollectionsListPage() {
                             {col.cover_url && (
                                 <Link to={`/dossies/${col.slug}`} className="aspect-video w-full overflow-hidden bg-ciano/5 relative block">
                                     <img
-                                        src={col.cover_small_url || col.cover_thumb_url || col.cover_url}
+                                        src={getOptimizedCover(col, 'small') || ''}
                                         alt={col.title}
                                         loading="lazy"
                                         sizes="(max-width: 768px) 100vw, 50vw"

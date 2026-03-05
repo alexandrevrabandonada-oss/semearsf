@@ -1,6 +1,7 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getAcervoYearIndex, getAcervoByYear, type AcervoYearIndex, type AcervoItem } from "../../lib/api";
+import { getOptimizedCover } from "../../lib/imageOptimization";
 
 function TypeBadge({ kind }: { kind: string }) {
     const map: Record<string, { label: string; color: string }> = {
@@ -129,10 +130,11 @@ export function AcervoTimelinePage() {
                                 >
                                     {/* Thumbnail Fallback */}
                                     <div className="h-20 w-32 shrink-0 overflow-hidden rounded-md bg-fundo">
-                                        {item.cover_thumb_url ? (
+                                        {getOptimizedCover(item, 'thumb') ? (
                                             <img
-                                                src={item.cover_thumb_url}
+                                                src={getOptimizedCover(item, 'thumb')!}
                                                 alt={item.title}
+                                                loading="lazy"
                                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
                                         ) : (

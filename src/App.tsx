@@ -20,6 +20,8 @@ import { CollectionsListPage } from "./pages/acervo/CollectionsListPage";
 import { CollectionDetailPage } from "./pages/acervo/CollectionDetailPage";
 import { ConversarListPage } from "./pages/conversar/ConversarListPage";
 import { ConversarDetailPage } from "./pages/conversar/ConversarDetailPage";
+import { CorredoresListPage } from "./pages/corredores/CorredoresListPage";
+import { CorredoresDetailPage } from "./pages/corredores/CorredoresDetailPage";
 
 export default function App() {
   return (
@@ -31,6 +33,8 @@ export default function App() {
         <Route path="/agenda" element={<AgendaPage />} />
         <Route path="/conversar" element={<ConversarListPage />} />
         <Route path="/conversar/:slug" element={<ConversarDetailPage />} />
+        <Route path="/corredores" element={<CorredoresListPage />} />
+        <Route path="/corredores/:slug" element={<CorredoresDetailPage />} />
         <Route path="/inscricoes" element={<InscricoesPage />} />
         <Route path="/sobre" element={<SobrePage />} />
         <Route path="/transparencia" element={<TransparenciaPage />} />

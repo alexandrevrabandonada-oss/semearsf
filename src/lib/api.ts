@@ -1016,3 +1016,80 @@ export async function createConversationComment(payload: {
   }
 }
 
+// ─────────────────────────────────────────
+// Corredores Climáticos (Editorial Maps)
+// ─────────────────────────────────────────
+
+export type ClimateCorridor = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  geometry_json: any | null; // e.g. GeoJSON literal
+  featured: boolean;
+  created_at: string;
+  meta: any;
+};
+
+export type ClimateCorridorLink = {
+  corridor_id: string;
+  item_kind: "station" | "acervo" | "blog" | "event";
+  item_ref: string;
+  position: number;
+};
+
+export type ClimateCorridorWithLinks = ClimateCorridor & {
+  links: ClimateCorridorLink[];
+};
+
+export async function listCorridors(options?: { featuredOnly?: boolean }): Promise<ClimateCorridor[]> {
+  try {
+    const supabase = assertSupabase();
+    let query = supabase
+      .from("climate_corridors")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (options?.featuredOnly) {
+      query = query.eq("featured", true);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return (data || []) as ClimateCorridor[];
+  } catch (error) {
+    throw toAppError("Falha ao listar corredores climáticos", error);
+  }
+}
+
+export async function getCorridorBySlug(slug: string): Promise<ClimateCorridorWithLinks | null> {
+  try {
+    const supabase = assertSupabase();
+    const { data: corridor, error: corrError } = await supabase
+      .from("climate_corridors")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    if (corrError) throw corrError;
+    if (!corridor) return null;
+
+    const { data: links, error: linksError } = await supabase
+      .from("climate_corridor_links")
+      .select("*")
+      .eq("corridor_id", corridor.id)
+      .order("position", { ascending: true });
+
+    if (linksError) throw linksError;
+
+    return {
+      ...(corridor as ClimateCorridor),
+      links: (links || []) as ClimateCorridorLink[],
+    };
+  } catch (error) {
+    throw toAppError("Falha ao carregar corredor climático", error);
+  }
+}
+
+

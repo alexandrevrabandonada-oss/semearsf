@@ -14,6 +14,8 @@ export default defineConfig({
         theme_color: "#00e5ff",
         background_color: "#0a0a0a",
         display: "standalone",
+        orientation: "portrait-primary",
+        categories: ["education", "environment"],
         start_url: "/",
         icons: [
           {

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getCollectionBySlug, type CollectionWithItems } from "../../lib/api";
+import { getOptimizedCover } from "../../lib/imageOptimization";
 
 const KIND_LABELS: Record<string, string> = {
     paper: "Artigo científico",
@@ -76,8 +77,9 @@ export function CollectionDetailPage() {
                 {collection.cover_url && (
                     <div className="w-full md:w-1/3">
                         <img
-                            src={collection.cover_url}
+                            src={getOptimizedCover(collection, 'small') || ''}
                             alt={collection.title}
+                            loading="lazy"
                             className="rounded-2xl border border-ciano/30 shadow-lg"
                         />
                     </div>

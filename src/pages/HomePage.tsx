@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { listAcervoItems, listBlogPosts, getStationOverview, listUpcomingEvents, getTransparencySummary, listFeaturedCollections, type AcervoItem, type Event, type StationOverview, type BlogPost, type TransparencySummary, type AcervoCollection } from "../lib/api";
+import { listAcervoItems, listBlogPosts, getStationOverview, listUpcomingEvents, getTransparencySummary, listFeaturedCollections, listCorridors, type AcervoItem, type Event, type StationOverview, type BlogPost, type TransparencySummary, type AcervoCollection, type ClimateCorridor } from "../lib/api";
+import { useInstallPrompt } from "../hooks/useInstallPrompt";
+import { getOptimizedCover } from "../lib/imageOptimization";
 
 export function HomePage() {
+  const { prompt, clearPrompt } = useInstallPrompt();
   const [stations, setStations] = useState<StationOverview[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [acervo, setAcervo] = useState<AcervoItem[]>([]);
   const [latestBlog, setLatestBlog] = useState<BlogPost | null>(null);
   const [transparency, setTransparency] = useState<TransparencySummary | null>(null);
   const [collections, setCollections] = useState<AcervoCollection[]>([]);
+  const [corridors, setCorridors] = useState<ClimateCorridor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,13 +21,14 @@ export function HomePage() {
     async function load() {
       try {
         setLoading(true);
-        const [stationsData, eventsData, acervoData, blogData, transData, collectionsData] = await Promise.all([
+        const [stationsData, eventsData, acervoData, blogData, transData, collectionsData, corridorsData] = await Promise.all([
           getStationOverview(),
           listUpcomingEvents(),
           listAcervoItems({ featured: true, limit: 6 }),
           listBlogPosts({ limit: 1 }),
           getTransparencySummary(),
-          listFeaturedCollections(3)
+          listFeaturedCollections(3),
+          listCorridors({ featuredOnly: true })
         ]);
         setStations(stationsData);
         setEvents(eventsData.slice(0, 3));
@@ -31,6 +36,7 @@ export function HomePage() {
         setLatestBlog(blogData[0] || null);
         setTransparency(transData);
         setCollections(collectionsData as AcervoCollection[]);
+        setCorridors(corridorsData.slice(0, 3));
       } catch (err) {
         console.error("Erro ao carregar dados da home:", err);
         setError("Não foi possível carregar as informações em tempo real.");
@@ -79,6 +85,19 @@ export function HomePage() {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
+          {prompt && (
+            <button
+              onClick={async () => {
+                await prompt.prompt();
+                const { outcome } = await prompt.userChoice;
+                if (outcome === 'accepted') clearPrompt();
+              }}
+              className="group relative overflow-hidden rounded-lg bg-primaria px-5 py-3 text-sm font-black uppercase tracking-wide text-base transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primaria/20"
+            >
+              <div className="absolute inset-0 bg-white/20 translate-y-full transition-transform duration-300 group-hover:translate-y-0" />
+              <span className="relative flex items-center gap-2">📱 Baixar App</span>
+            </button>
+          )}
           <Link className="rounded-lg bg-cta px-5 py-3 text-sm font-black uppercase tracking-wide text-base transition-transform hover:-translate-y-0.5 hover:bg-cta/90" to="/dados">
             Ver dados agora
           </Link>
@@ -175,6 +194,50 @@ export function HomePage() {
         </div>
       </div>
 
+      {/* Featured Climate Corridors */}
+      <div className="rounded-2xl border border-cta/30 bg-cta/5 p-6 md:p-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-black uppercase tracking-wide text-cta md:text-2xl">Corredores Climáticos</h2>
+          <Link className="text-sm font-bold text-ciano hover:underline" to="/corredores">Ver mapa →</Link>
+        </div>
+        <p className="mt-2 text-sm text-texto/70">Navegue pelas rotas e recortes territoriais monitorados.</p>
+
+        {loading ? (
+          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite" aria-busy="true">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-40 animate-pulse rounded-xl bg-cta/10" />
+            ))}
+          </div>
+        ) : corridors.length === 0 ? (
+          <p className="mt-6 text-sm text-texto/50 italic" aria-live="polite">Nenhum corredor em destaque no momento.</p>
+        ) : (
+          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite">
+            {corridors.map((c) => (
+              <Link
+                key={c.id}
+                to={`/corredores/${c.slug}`}
+                className="group flex flex-col justify-between overflow-hidden rounded-xl border border-ciano/20 bg-fundo-card p-5 transition-all hover:-translate-y-1 hover:border-cta/50 hover:bg-ciano/10 hover:shadow-xl hover:shadow-cta/5"
+              >
+                <div>
+                  <h3 className="mb-2 text-lg font-black leading-tight text-texto transition-colors group-hover:text-cta">
+                    {c.title}
+                  </h3>
+                  {c.excerpt && (
+                    <p className="text-xs text-texto-secundario line-clamp-3">
+                      {c.excerpt}
+                    </p>
+                  )}
+                </div>
+                <div className="mt-4 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-ciano">
+                  <span>Explorar</span>
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Featured Collections (Dossiês) */}
       <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 md:p-8">
         <div className="flex items-center justify-between">
@@ -201,7 +264,7 @@ export function HomePage() {
                 {col.cover_url && (
                   <Link to={`/dossies/${col.slug}`} className="aspect-video w-full overflow-hidden bg-ciano/5 relative block">
                     <img
-                      src={col.cover_small_url || col.cover_thumb_url || col.cover_url}
+                      src={getOptimizedCover(col, 'thumb') || ''}
                       alt={col.title}
                       loading="lazy"
                       sizes="(max-width: 768px) 100vw, 33vw"

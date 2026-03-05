@@ -106,6 +106,55 @@ async function run() {
         }
     }
 
+    // 5. Conversas
+    const convsData = await safelyLoadJson("conversas.demo.json");
+    if (convsData) {
+        console.log(`💬 Inserting ${convsData.length} Roda de Conversa topics...`);
+        const { error } = await supabase.from("conversations").insert(convsData);
+        if (error) {
+            console.error("❌ Error Conversations:", error.message);
+            console.error("Full Error:", JSON.stringify(error, null, 2));
+        }
+    }
+
+    // 6. Corredores Climáticos
+    const corridorsData = await safelyLoadJson("corredores.demo.json");
+    if (corridorsData) {
+        console.log(`🗺️ Inserting ${corridorsData.length} Corredores...`);
+        const withoutLinks = corridorsData.map(c => {
+            const { links, ...rest } = c;
+            return rest;
+        });
+        const { error: e1 } = await supabase.from("climate_corridors").upsert(withoutLinks, { onConflict: "slug" });
+        if (e1) {
+            console.error("❌ Error Climate Corridors:", e1.message);
+        } else {
+            console.log("🔗 Binding Climate Corridor links...");
+            let rels = [];
+            for (const col of corridorsData) {
+                if (col.links && col.links.length > 0) {
+                    const { data: colDb } = await supabase.from("climate_corridors").select("id").eq("slug", col.slug).single();
+                    if (!colDb) continue;
+
+                    for (let i = 0; i < col.links.length; i++) {
+                        const link = col.links[i];
+                        rels.push({
+                            corridor_id: colDb.id,
+                            item_kind: link.item_kind,
+                            item_ref: link.item_ref,
+                            position: i
+                        });
+                    }
+                }
+            }
+
+            if (rels.length > 0) {
+                const { error: e2 } = await supabase.from("climate_corridor_links").upsert(rels, { onConflict: "corridor_id,item_kind,item_ref" });
+                if (e2) console.error("❌ Error Climate Corridor Links:", e2.message);
+            }
+        }
+    }
+
     console.log(`\n✅ DEMO OK`);
     process.exit(0);
 }

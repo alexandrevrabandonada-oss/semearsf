@@ -1,0 +1,12 @@
+[
+    {
+        "slug": "roda-de-conversa-caju-2024",
+        "title": "Roda de Conversa: O Futuro do Ar no Caju",
+        "excerpt": "Espaço aberto para relatos de moradores sobre a percepção da poluição e sugestões para novas estações.",
+        "body_md": "**Bem-vindos à nossa primeira roda de conversa digital!**\n\nO bairro do Caju tem sido o coração do nosso projeto piloto. Queremos ouvir de vocês: como tem sido a experiência de acompanhar os dados em tempo real? \n\n*   Você percebeu dias de 'cheiro forte' que coincidiram com os picos de PM2.5 no mapa?\n*   Quais ruas você acha que precisam de mais sensores?\n*   Como o PWA tem ajudado na mobilização local?\n\nSua mensagem será lida pela equipe da UFF e servirá de insumo para nossos próximos relatórios de impacto social.",
+        "status": "published",
+        "meta": {
+            "demo": true
+        }
+    }
+]

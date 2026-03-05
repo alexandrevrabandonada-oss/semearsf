@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { listBlogPosts, type BlogPost } from "../lib/api";
+import { getOptimizedCover } from "../lib/imageOptimization";
 
 export function BlogListPage() {
     const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -65,7 +66,7 @@ export function BlogListPage() {
                                     <img
                                         alt={post.title}
                                         className="h-full w-full object-cover transition-all duration-700 ease-in-out"
-                                        src={post.cover_small_url || post.cover_thumb_url || post.cover_url}
+                                        src={getOptimizedCover(post, 'thumb') || ''}
                                         loading="lazy"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                         style={

@@ -1,0 +1,40 @@
+[
+    {
+        "slug": "caminho-do-caju",
+        "title": "Caminho do Caju: Logística e Qualidade do Ar",
+        "excerpt": "Um dos bairros mais impactados pelas vias expressas e atividades portuárias. Observe a correlação entre o fluxo de caminhões pesados e os picos de material particulado.",
+        "featured": true,
+        "meta": {
+            "demo": true
+        },
+        "links": [
+            {
+                "item_kind": "station",
+                "item_ref": "caju-01"
+            },
+            {
+                "item_kind": "acervo",
+                "item_ref": "demo-news-caju-respirar"
+            },
+            {
+                "item_kind": "blog",
+                "item_ref": "demo-blog-analise-dados-setembro"
+            }
+        ]
+    },
+    {
+        "slug": "corredor-av-brasil",
+        "title": "Avenida Brasil: Ilha de Calor e Emissões",
+        "excerpt": "A principal artéria viária da cidade concentra as maiores temperaturas superficiais e concentrações de poluentes devido ao asfalto e trânsito intenso.",
+        "featured": true,
+        "meta": {
+            "demo": true
+        },
+        "links": [
+            {
+                "item_kind": "acervo",
+                "item_ref": "demo-paper-impacto-pm25"
+            }
+        ]
+    }
+]

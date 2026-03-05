@@ -28,10 +28,10 @@ for (let i = 0; i < args.length; i++) {
     }
 }
 
-const { slug, file, kind, title, cover } = params;
+const { slug, file, kind, title, cover, "small-url": smallUrl, "thumb-url": thumbUrl } = params;
 
 if (!slug || !file || !kind) {
-    console.error("USO: node tools/acervo-upload.mjs --slug <slug> --file <caminho> --kind <pdf|image> [--title <titulo>] [--cover <true|false>]");
+    console.error("USO: node tools/acervo-upload.mjs --slug <slug> --file <caminho> --kind <pdf|image> [--title <titulo>] [--cover <true|false>] [--small-url <url>] [--thumb-url <url>]");
     process.exit(1);
 }
 
@@ -65,7 +65,7 @@ async function upload() {
         // 1. Get current item to append media
         const { data: item, error: fetchError } = await supabase
             .from("acervo_items")
-            .select("id, id, media")
+            .select("id, media")
             .eq("slug", slug)
             .maybeSingle();
 
@@ -87,9 +87,14 @@ async function upload() {
 
         if (cover === "true") {
             updateData.cover_url = publicUrl;
-            // TODO: Integrar transformação real no futuro
-            updateData.cover_thumb_url = publicUrl;
-            updateData.cover_small_url = publicUrl;
+        }
+
+        if (smallUrl) {
+            updateData.cover_small_url = smallUrl;
+        }
+
+        if (thumbUrl) {
+            updateData.cover_thumb_url = thumbUrl;
         }
 
         const { error: updateError } = await supabase
