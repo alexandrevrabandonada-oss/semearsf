@@ -37,7 +37,7 @@ export default async function handler(req: any, res: any) {
 
   const { data: post, error } = await supabase
     .from('blog_posts')
-    .select('title, excerpt, cover_url')
+    .select('title, excerpt, cover_url, published_at, created_at')
     .eq('slug', slug)
     .single();
 
@@ -45,10 +45,28 @@ export default async function handler(req: any, res: any) {
     return res.redirect(`/blog/${slug}`);
   }
 
+  const hostUrl = req.headers.host ? `https://${req.headers.host}` : 'https://semear-pwa.vercel.app';
   const title = `${post.title} | Blog SEMEAR`;
   const description = post.excerpt || 'Leia este artigo no Blog SEMEAR.';
-  const image = post.cover_url || 'https://semear-pwa.vercel.app/icons/icon-512.png';
-  const url = `https://semear-pwa.vercel.app/blog/${slug}`;
+
+  let subtitleText = post.excerpt || 'Leia este artigo';
+  let year = '';
+
+  if (post.published_at) {
+    year = new Date(post.published_at).getFullYear().toString();
+  } else if (post.created_at) {
+    year = new Date(post.created_at).getFullYear().toString();
+  }
+
+  if (year && !post.excerpt) {
+    subtitleText = `Publicado em ${year}`;
+  }
+
+  const safeTitle = encodeURIComponent(post.title);
+  const safeSubtitle = encodeURIComponent(subtitleText);
+
+  const image = post.cover_url || `${hostUrl}/api/og/card?kind=blog&title=${safeTitle}&subtitle=${safeSubtitle}`;
+  const url = `${hostUrl}/blog/${slug}`;
 
   const html = `
 <!DOCTYPE html>

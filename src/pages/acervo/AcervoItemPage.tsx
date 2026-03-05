@@ -156,6 +156,14 @@ export function AcervoItemPage() {
                         >
                             🔗 Compartilhar
                         </button>
+                        {item.year && (
+                            <Link
+                                to={`/acervo/linha?year=${item.year}`}
+                                className="inline-flex items-center gap-1 rounded-full bg-acento/10 px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-acento hover:bg-acento/20 transition-colors"
+                            >
+                                ⏳ Ver na linha do tempo
+                            </Link>
+                        )}
                     </div>
 
                     <h1 className="mt-4 text-2xl font-black leading-tight text-cta md:text-3xl">

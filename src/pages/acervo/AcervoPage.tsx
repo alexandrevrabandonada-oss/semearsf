@@ -61,6 +61,26 @@ export function AcervoPage() {
                 </p>
             </div>
 
+            <div className="grid gap-4 md:grid-cols-1 mb-4">
+                <Link
+                    className="group flex flex-col md:flex-row items-center gap-4 rounded-2xl border border-ciano/40 bg-ciano/5 p-6 transition-all hover:-translate-y-0.5 hover:bg-ciano/10 hover:border-ciano"
+                    to="/acervo/linha"
+                >
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-ciano/20 text-3xl">
+                        ⏳
+                    </div>
+                    <div className="flex-1 text-center md:text-left">
+                        <h2 className="text-xl font-black uppercase tracking-wide text-cta">Linha do Tempo</h2>
+                        <p className="mt-1 text-sm text-texto/80">
+                            Navegue por toda a história documentada do projeto ano a ano, do presente ao passado.
+                        </p>
+                    </div>
+                    <span className="mt-4 md:mt-0 px-4 py-2 rounded-lg bg-ciano text-[10px] font-black uppercase tracking-widest text-base group-hover:bg-ciano/90 transition-colors">
+                        Explorar História →
+                    </span>
+                </Link>
+            </div>
+
             <div className="grid gap-4 md:grid-cols-3">
                 {areas.map((area) => (
                     <Link

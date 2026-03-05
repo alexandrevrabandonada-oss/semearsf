@@ -30,6 +30,7 @@
     "collections:import": "node tools/collections-import.mjs",
     "transparency:import": "node tools/transparency-import.mjs",
     "demo:dados": "node tools/demo-measurements.mjs",
+    "demo:load": "node tools/demo-load.mjs",
     "done": "npm run verify && npm run smoke && npm run db:doctor && npm run env:doctor && npm run snapshot"
   },
   "dependencies": {

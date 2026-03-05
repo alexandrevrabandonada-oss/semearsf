@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { getAcervoYearIndex, getAcervoByYear, type AcervoYearIndex, type AcervoItem } from "../../lib/api";
 
 function TypeBadge({ kind }: { kind: string }) {
@@ -20,12 +20,19 @@ function TypeBadge({ kind }: { kind: string }) {
 }
 
 export function AcervoTimelinePage() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const queryYear = searchParams.get("year");
+    const selectedYear = queryYear ? parseInt(queryYear, 10) : null;
+
     const [index, setIndex] = useState<AcervoYearIndex[]>([]);
-    const [selectedYear, setSelectedYear] = useState<number | null>(null);
     const [items, setItems] = useState<AcervoItem[]>([]);
     const [isLoadingIndex, setIsLoadingIndex] = useState(true);
     const [isLoadingItems, setIsLoadingItems] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const handleSelectYear = (year: number) => {
+        setSearchParams({ year: String(year) }, { replace: true });
+    };
 
     useEffect(() => {
         async function loadIndex() {
@@ -33,8 +40,8 @@ export function AcervoTimelinePage() {
                 setIsLoadingIndex(true);
                 const data = await getAcervoYearIndex();
                 setIndex(data);
-                if (data.length > 0) {
-                    setSelectedYear(data[0].year);
+                if (data.length > 0 && !queryYear) {
+                    setSearchParams({ year: String(data[0].year) }, { replace: true });
                 }
             } catch (err: any) {
                 setError(err.message || "Erro ao carregar a linha do tempo.");
@@ -43,7 +50,7 @@ export function AcervoTimelinePage() {
             }
         }
         void loadIndex();
-    }, []);
+    }, [queryYear, setSearchParams]);
 
     useEffect(() => {
         async function loadItems() {
@@ -76,10 +83,10 @@ export function AcervoTimelinePage() {
                         {index.map((entry) => (
                             <button
                                 key={entry.year}
-                                onClick={() => setSelectedYear(entry.year)}
+                                onClick={() => handleSelectYear(entry.year)}
                                 className={`flex shrink-0 items-center justify-between rounded-md border px-4 py-3 text-left transition-colors md:w-full ${selectedYear === entry.year
-                                        ? "border-ciano bg-ciano/10 text-ciano"
-                                        : "border-texto/10 bg-base text-texto/70 hover:border-ciano/40 hover:text-texto"
+                                    ? "border-ciano bg-ciano/10 text-ciano"
+                                    : "border-texto/10 bg-base text-texto/70 hover:border-ciano/40 hover:text-texto"
                                     }`}
                             >
                                 <span className="font-mono text-lg font-black">{entry.year}</span>
@@ -137,8 +144,13 @@ export function AcervoTimelinePage() {
 
                                     {/* Data */}
                                     <div className="flex-1 space-y-2">
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex flex-wrap items-center gap-2">
                                             <TypeBadge kind={item.kind} />
+                                            {item.year && (
+                                                <span className="text-[10px] font-bold text-texto/60 uppercase tracking-widest bg-base px-2 py-0.5 rounded-sm border border-texto/10">
+                                                    {item.year}
+                                                </span>
+                                            )}
                                             {item.source_name && (
                                                 <span className="text-[10px] font-bold text-texto/50 uppercase tracking-wide truncate max-w-[120px]">
                                                     {item.source_name}
@@ -149,8 +161,14 @@ export function AcervoTimelinePage() {
                                             {item.title}
                                         </h3>
                                         {item.curator_note && (
-                                            <p className="text-xs italic text-texto/70 border-l-2 border-ciano/30 pl-2">
-                                                "{item.curator_note}"
+                                            <div className="mt-4 rounded-lg border border-acento/20 bg-acento/5 p-3 italic text-texto/90 transition-colors group-hover:border-acento/40">
+                                                <span className="mb-1 block text-[9px] font-black uppercase tracking-widest text-acento">Nota do curador</span>
+                                                <p className="text-xs">"{item.curator_note}"</p>
+                                            </div>
+                                        )}
+                                        {!item.curator_note && item.excerpt && (
+                                            <p className="text-xs text-texto/70 line-clamp-2">
+                                                {item.excerpt}
                                             </p>
                                         )}
                                     </div>

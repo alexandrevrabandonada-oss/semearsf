@@ -758,9 +758,12 @@ export interface CollectionWithItems extends AcervoCollection {
 export async function listCollections({ limit = 50 } = {}): Promise<AcervoCollection[]> {
   try {
     const supabase = assertSupabase();
+    // Order: featured first (true > false, so desc), then position asc (1, 2, 3), then created_at desc
     const { data, error } = await supabase
       .from("acervo_collections")
       .select("*")
+      .order("featured", { ascending: false, nullsFirst: false })
+      .order("position", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false })
       .limit(limit);
 

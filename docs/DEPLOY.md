@@ -26,12 +26,29 @@ npm run ship:content
 3. Importação da Transparência (`transparency:import`)
 4. Verificação final e snapshot (`done`)
 
-### 🧪 Modo Demo Local (Sensores)
-Para testes de UI ou desenvolvimento sem aguardar requisições reais do sensor físico, você pode injetar ruído artificial cronológico diretamente na estação `piloto` usando:
+### 🧪 Modo Demo Local (Conteúdo e Sensores)
+Para testes de UI ou demonstrações para stakeholders, você pode carregar uma massa de dados fictícia completa preenchendo todos os principais módulos da plataforma (Acervo, Blog, Transparência, Dossiês):
+
+```bash
+npm run demo:load
+```
+*Isto irá injetar conteúdo estático contendo a tag `meta: { demo: true }` no banco através da Service Role.*
+
+Para testes focados especificamente nos painéis de sensores (gerando um histórico imediato de Material Particulado falso na estação `piloto`), execute:
 ```bash
 npm run demo:dados
 ```
-*Isto criará 10 métricas simuladas nos últimos 50 minutos retroativos e forçará a estação como `online`.*
+
+#### Limpando Dados de Demonstração
+Todos os artefatos de demonstração são sinalizados nativamente no JSON. Para varrer completamente o seu banco de dados e prepará-lo para Produção, aplique as seguintes queries no painel SQL do Supabase:
+
+```sql
+delete from acervo_items where meta->>'demo' = 'true';
+delete from blog_posts where meta->>'demo' = 'true';
+delete from acervo_collections where meta->>'demo' = 'true';
+delete from transparency_expenses where meta->>'demo' = 'true';
+delete from transparency_links where meta->>'demo' = 'true';
+```
 
 ## Como Atualizar Conteúdo
 

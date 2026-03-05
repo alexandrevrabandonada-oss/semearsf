@@ -1,0 +1,51 @@
+[
+    {
+        "slug": "demo-dossie-justica-climatica",
+        "title": "Justiça Climática e Saúde",
+        "excerpt": "Compilação de evidências científicas e fotorreportagens sobre as desigualdades na mitigação das ondas de calor em habitações precárias.",
+        "content_html": "<p>A exposição a eventos climáticos extremos não afeta o Rio de Janeiro de maneira uniforme. Bairros da Zona Norte da capital registram temperaturas de superfície até 15°C mais altas do que as regiões arborizadas da Zona Sul, configurando ilhas de calor severas. Este dossiê compila os relatórios que estabelecem o nexo causal entre a vulnerabilidade da infraestrutura urbana (falta de saneamento básico, telhados de fibrocimento) com a letalidade perante as ondas de calor históricas de 2023.</p><blockquote><p>O conceito de Injustiça Climática baseia-se na constatação de que as populações marginalizadas que menos emitiram gases de efeito estufa sofrem as piores e mais letais consequências das alterações do microclima e poluição atmosférica.</p></blockquote><p>Conduzimos mapeamentos em áreas críticas (Caju, Manguinhos e Bangu), integrando a leitura de microestações SEMEAR com relatos socioambientais locais.</p>",
+        "featured": true,
+        "position": 1,
+        "items": [
+            "demo-acervo-artigo-4",
+            "demo-acervo-artigo-3",
+            "demo-acervo-video-1",
+            "demo-acervo-news-2"
+        ],
+        "meta": {
+            "demo": true
+        }
+    },
+    {
+        "slug": "demo-dossie-tecnologias-monitoramento",
+        "title": "Monitoramento em Baixo Custo",
+        "excerpt": "Inovações em calibração de sensores ópticos e mobilização em oficinas comunitárias.",
+        "content_html": "<p>Um dos marcos tecnológicos do SEMEAR foi a diminuição do custo de acesso a medidores ambientais, desmistificando a precisão do material particulado monitorado a lazer (PM2.5/PM10).</p><p>Este dossiê detalha a engenharia do projeto, agrupando publicações que comparam microestações móveis com estações governamentais de referência na FIOCRUZ.</p><p>Explore ensaios práticos sobre degradação óptica por maresia, tutorais de soldagem e cartilhas instrucionais de como engajar jovens estudantes de escolas públicas na montagem dos kits com peças acessíveis via internet.</p>",
+        "featured": true,
+        "position": 2,
+        "items": [
+            "demo-blog-tutorial-instalacao",
+            "demo-acervo-artigo-1"
+        ],
+        "meta": {
+            "demo": true
+        }
+    },
+    {
+        "slug": "demo-dossie-memoria-caju",
+        "title": "Memórias Gasômetro: Porto do Rio",
+        "excerpt": "Arquivos orais, reportagens e denúncias retratando décadas de coexistência entre indústrias pesadas e residências na Região Portuária.",
+        "content_html": "<p>Desde 1970, o avanço industrial em volta da Avenida Brasil consolidou bairros densos na linha de chegada de transportes e usinas que lançam fuligem nas residências vizinhas.</p><h2>Um Retrato em Fuligem</h2><p>Entrevistamos fundadores da Associação de Moradores para traçar a linha do tempo da evolução urbana do porto do Rio de Janeiro. Ao correlacionar a expansão do Viaduto do Gasômetro com o surgimento exacerbado de asma pediátrica nas imediações, as narrativas trazem a dimensão humana muitas vezes ignorada por índices polucionais estritos.</p>",
+        "featured": true,
+        "position": 3,
+        "items": [
+            "demo-acervo-artigo-2",
+            "demo-acervo-video-1",
+            "demo-acervo-news-1",
+            "demo-blog-entrevista-lideranca-comunitaria"
+        ],
+        "meta": {
+            "demo": true
+        }
+    }
+]

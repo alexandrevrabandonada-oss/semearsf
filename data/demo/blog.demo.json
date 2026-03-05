@@ -1,0 +1,53 @@
+[
+    {
+        "slug": "demo-blog-analise-dados-setembro",
+        "title": "Análise da Qualidade do Ar em Setembro: Impacto das Queimadas",
+        "excerpt": "Um mergulho profundo nos dados da rede de monitores durante a pior semana de seca e queimadas no Rio de Janeiro.",
+        "content_html": "<p>Em setembro de 2024, a cidade do Rio de Janeiro enfrentou um dos piores cenários de poluição atmosférica da última década. As estações de monitoramento cidadão do projeto SEMEAR registraram picos de <strong>PM2.5</strong> que ultrapassaram em 400% o limite recomendado pela Organização Mundial da Saúde (OMS).</p><h3>O Fenômeno</h3><p>O transporte de plumas de fumaça da Amazônia e do Pantanal, aliado a um forte bloqueio atmosférico, impediu a dispersão natural dos poluentes. Nossos sensores no Caju e em Manguinhos confirmaram que as comunidades no entorno de vias expressas sofreram o dobro do impacto.</p><p>As consequências para a saúde pública são imediatas: postos de saúde da região reportaram um aumento de 30% nos atendimentos respiratórios pediátricos. A transparência e o acesso em tempo real a esses dados são ferramentas cruciais de mobilização por políticas climáticas.</p>",
+        "published_at": "2024-09-20T10:00:00Z",
+        "status": "published",
+        "tags": [
+            "análise",
+            "relatórios",
+            "queimadas"
+        ],
+        "author_name": "Equipe de Dados SEMEAR",
+        "meta": {
+            "demo": true
+        }
+    },
+    {
+        "slug": "demo-blog-tutorial-instalacao",
+        "title": "Guia Prático: Como instalar seu próprio sensor de PM2.5",
+        "excerpt": "Aprenda a montar e configurar a estação de monitoramento participativo de baixo custo em sua comunidade.",
+        "content_html": "<p>A democratização da infraestrutura de dados começa na base. Este guia detalhado vai te ensinar a montar uma estação que afere concentração de material particulado e umidade relativa, conectado via rede WiFi para integrar nosso mapa público.</p><h3>Lista de Peças</h2><ul><li>Microcontrolador ESP8266 (ex: Wemos D1 Mini)</li><li>Sensor Laser Plantower PMS5003</li><li>Sensor de Temperatura DHT22</li><li>Caixa hermética pequena</li></ul><p>Com um custo de importação médio de R$ 250, organizamos oficinas locais de soldagem para montagem das caixas comunitárias. O firmware open-source está disponível em nosso repositório no GitHub.</p>",
+        "published_at": "2024-03-12T10:00:00Z",
+        "status": "published",
+        "tags": [
+            "tutoriais",
+            "hardware livre",
+            "faça você mesmo"
+        ],
+        "author_name": "Núcleo de Engenharias",
+        "meta": {
+            "demo": true
+        }
+    },
+    {
+        "slug": "demo-blog-entrevista-lideranca-comunitaria",
+        "title": "Memórias do Ar: Entrevista com Dona Jupira",
+        "excerpt": "Uma conversa sobre os tempos das 'cinzas brilhantes' da siderurgia e a luta histórica por ar limpo na periferia.",
+        "content_html": "<p>A história da qualidade do ar nunca se restringiu apenas a sensores e algoritmos; ela vive nos pulmões e memórias de quem resiste diariamente.</p><br/><h3>O pó brilhante</h3><p>Conversamos com Jupira Silva, moradora de Manguinhos desde os anos 1970. <em>\"Naquela época, a gente varria a calçada de manhã e juntava um pó diferente. A poeira brilhava quando o sol batia. A gente sabia de onde vinha, das chaminés ali da avenida. E o pior é que a gente respirava isso e achava que era o preço normal de morar perto do progresso.\"</em></p><p>Hoje, Dona Jupira integra o comitê comunitário que cuida do sensor instalado no telhado da associação de moradores. O engajamento territorial é o alicerce principal do projeto SEMEAR.</p>",
+        "published_at": "2023-10-05T10:00:00Z",
+        "status": "published",
+        "tags": [
+            "entrevistas",
+            "memória oral",
+            "comunidade"
+        ],
+        "author_name": "Núcleo de Jornalismo Cidadão",
+        "meta": {
+            "demo": true
+        }
+    }
+]

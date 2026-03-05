@@ -38,7 +38,7 @@ export default async function handler(req: any, res: any) {
 
   const { data: item, error } = await supabase
     .from('acervo_items')
-    .select('title, excerpt, cover_url')
+    .select('title, excerpt, cover_url, source_name, published_at, created_at, meta')
     .eq('slug', slug)
     .single();
 
@@ -46,10 +46,34 @@ export default async function handler(req: any, res: any) {
     return res.redirect(`/acervo/item/${slug}`);
   }
 
+  const hostUrl = req.headers.host ? `https://${req.headers.host}` : 'https://semear-pwa.vercel.app';
   const title = `${item.title} | Acervo SEMEAR`;
   const description = item.excerpt || 'Consulte este item no Acervo Digital SEMEAR.';
-  const image = item.cover_url || 'https://semear-pwa.vercel.app/icons/icon-512.png';
-  const url = `https://semear-pwa.vercel.app/acervo/item/${slug}`;
+
+  let subtitleText = description;
+  let year = '';
+
+  if (item.published_at) {
+    year = new Date(item.published_at).getFullYear().toString();
+  } else if (item.meta && typeof item.meta === 'object' && 'year' in item.meta) {
+    year = String((item.meta as any).year);
+  } else if (item.created_at) {
+    year = new Date(item.created_at).getFullYear().toString();
+  }
+
+  if (item.source_name && year) {
+    subtitleText = `${item.source_name} • ${year}`;
+  } else if (item.source_name) {
+    subtitleText = item.source_name;
+  } else if (year && !item.excerpt) {
+    subtitleText = `Publicado em ${year}`;
+  }
+
+  const safeTitle = encodeURIComponent(item.title);
+  const safeSubtitle = encodeURIComponent(subtitleText);
+
+  const image = item.cover_url || `${hostUrl}/api/og/card?kind=acervo&title=${safeTitle}&subtitle=${safeSubtitle}`;
+  const url = `${hostUrl}/acervo/item/${slug}`;
 
   const html = `
 <!DOCTYPE html>

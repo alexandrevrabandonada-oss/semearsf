@@ -1,0 +1,104 @@
+{
+    "portal_links": [
+        {
+            "id": 1,
+            "title": "Acompanhamento Orçamentário",
+            "url": "https://example.com/transparencia-uf",
+            "description": "Painel dinâmico da instituição fomento responsável por hospedar a nossa conta.",
+            "meta": {
+                "demo": true
+            }
+        },
+        {
+            "id": 2,
+            "title": "Termos de Referência (Equipamentos)",
+            "url": "https://example.com/editais",
+            "description": "PDFs consolidados detalhando as licitações de hardware de laboratório em 2023.",
+            "meta": {
+                "demo": true
+            }
+        }
+    ],
+    "finances": [
+        {
+            "category": "Equipamentos",
+            "amount_cents": 2500000,
+            "date": "2024-03-10",
+            "description": "Sensores a laser PMS5003 (Lote 500 un.)",
+            "document_url": "https://example.com/nf-500.pdf",
+            "meta": {
+                "demo": true
+            }
+        },
+        {
+            "category": "Bolsas",
+            "amount_cents": 1200000,
+            "date": "2024-02-15",
+            "description": "Bolsas de Pesquisa Doutorado FAPERJ (6 meses)",
+            "document_url": null,
+            "meta": {
+                "demo": true
+            }
+        },
+        {
+            "category": "Equipamentos",
+            "amount_cents": 350000,
+            "date": "2024-01-20",
+            "description": "Roteadores Industriais 4G LTE para módulos remotos",
+            "document_url": "https://example.com/nf-401.pdf",
+            "meta": {
+                "demo": true
+            }
+        },
+        {
+            "category": "Serviços",
+            "amount_cents": 180000,
+            "date": "2023-11-05",
+            "description": "Hospedagem Cloud AWS e Domínios (Renovação Anual)",
+            "document_url": null,
+            "meta": {
+                "demo": true
+            }
+        },
+        {
+            "category": "Insumos",
+            "amount_cents": 85000,
+            "date": "2023-10-14",
+            "description": "Impressão 3D Caixas Herméticas Filamento PETG",
+            "document_url": null,
+            "meta": {
+                "demo": true
+            }
+        },
+        {
+            "category": "Bolsas",
+            "amount_cents": 280000,
+            "date": "2023-09-02",
+            "description": "Bolsistas Jornalismo Cidadão IC (4 Unidades)",
+            "document_url": null,
+            "meta": {
+                "demo": true
+            }
+        },
+        {
+            "category": "Serviços",
+            "amount_cents": 620000,
+            "date": "2023-05-18",
+            "description": "Produtora Audiovisual Documentário Curta-metragem Semear Caju",
+            "document_url": "https://example.com/nf-docs.pdf",
+            "meta": {
+                "demo": true
+            }
+        },
+        {
+            "category": "Equipamentos",
+            "amount_cents": 420000,
+            "date": "2023-04-10",
+            "description": "Displays I2C OLED e Placas Shields customizadas JLC",
+            "document_url": null,
+            "meta": {
+                "demo": true
+            }
+        }
+    ]
+}

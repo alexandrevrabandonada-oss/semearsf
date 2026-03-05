@@ -1,0 +1,191 @@
+[
+    {
+        "slug": "demo-acervo-artigo-1",
+        "title": "Análise da dispersão de O3 na Baía da Guanabara",
+        "excerpt": "Estudo de simulação das concentrações de Ozônio modelado com dados coletados da rede de monitoramento participativo e radar Doppler.",
+        "kind": "paper",
+        "source_type": "academic_journal",
+        "source_name": "Revista Brasileira de Meteorologia",
+        "source_url": "https://example.com/artigo-rbb-1",
+        "published_at": "2024-05-12T00:00:00Z",
+        "tags": [
+            "ozônio",
+            "qualidade do ar",
+            "inversão térmica"
+        ],
+        "curator_note": "Artigo fundamental que cruza as medições da estação SEMEAR-Caju com dados de satélite.",
+        "meta": {
+            "demo": true,
+            "year": 2024,
+            "media": [
+                {
+                    "type": "pdf",
+                    "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+                }
+            ]
+        }
+    },
+    {
+        "slug": "demo-acervo-artigo-2",
+        "title": "Monitoramento de PM2.5 no Porto do Rio",
+        "excerpt": "Resultados de 2 anos de medições de Material Particulado de 2.5 micrômetros na zona portuária.",
+        "kind": "paper",
+        "source_type": "academic_journal",
+        "source_name": "Revista Engenharia Sanitária",
+        "source_url": "https://example.com/artigo-2",
+        "published_at": "2023-11-05T00:00:00Z",
+        "tags": [
+            "PM2.5",
+            "porto",
+            "saúde"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2023
+        }
+    },
+    {
+        "slug": "demo-acervo-artigo-3",
+        "title": "Indicadores de Saúde Respiratória e Cidadania",
+        "excerpt": "Modelos de aplicação da ciência cidadã em territórios periféricos para mobilização de saúde.",
+        "kind": "paper",
+        "source_type": "thesis",
+        "source_name": "Tese Doutorado UFF",
+        "published_at": "2022-02-18T00:00:00Z",
+        "tags": [
+            "ciência cidadã",
+            "saúde pública"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2022
+        }
+    },
+    {
+        "slug": "demo-acervo-artigo-4",
+        "title": "A Injustiça Climática como Fator Estrutural",
+        "excerpt": "Revisão bibliográfica sobre como os eventos extremos e ondas de calor afetam as áreas mais vulneráveis da região metropolitana.",
+        "kind": "paper",
+        "source_type": "book",
+        "source_name": "Editora Fiocruz",
+        "published_at": "2021-08-10T00:00:00Z",
+        "tags": [
+            "injustiça climática",
+            "ondas de calor"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2021
+        }
+    },
+    {
+        "slug": "demo-acervo-news-1",
+        "title": "Estação do SEMEAR registra recorde de poluição após queimadas",
+        "excerpt": "Concentrações de PM10 chegaram a 150µg/m³ no Caju durante a tarde de terça-feira.",
+        "kind": "news",
+        "source_type": "press",
+        "source_name": "Jornal Local RJ",
+        "published_at": "2024-09-02T14:30:00Z",
+        "tags": [
+            "queimadas",
+            "PM10"
+        ],
+        "curator_note": "A matéria da capa do jornal O Globo utilizou a API aberta do nosso projeto para fundamentar a denúncia.",
+        "meta": {
+            "demo": true,
+            "year": 2024
+        }
+    },
+    {
+        "slug": "demo-acervo-news-2",
+        "title": "Nova parceria com a Fiocruz amplia rede de sensores",
+        "excerpt": "Projeto prevê a instalação de mais 30 protótipos em escolas municipais.",
+        "kind": "news",
+        "source_type": "announcement",
+        "source_name": "Agência Brasil",
+        "published_at": "2024-10-15T09:00:00Z",
+        "tags": [
+            "sensores",
+            "parceria"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2024
+        }
+    },
+    {
+        "slug": "demo-acervo-news-3",
+        "title": "Vazamento de gás na refinaria atinge bairros vizinhos",
+        "excerpt": "Moradores acionaram a Defesa Civil após cheiro forte inundar Manguinhos.",
+        "kind": "news",
+        "source_type": "press",
+        "source_name": "Portal G1",
+        "published_at": "2023-04-22T00:00:00Z",
+        "tags": [
+            "refinaria",
+            "vazamento"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2023
+        }
+    },
+    {
+        "slug": "demo-acervo-news-4",
+        "title": "Fundo de Amparo à Pesquisa financia expansão da Ciência Cidadã",
+        "excerpt": "A FAPERJ liberou edital contemplando o consórcio UFF-UFRJ-TETO.",
+        "kind": "news",
+        "source_type": "announcement",
+        "source_name": "FAPERJ Notícias",
+        "published_at": "2022-12-01T00:00:00Z",
+        "tags": [
+            "fomento",
+            "faperj"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2022
+        }
+    },
+    {
+        "slug": "demo-acervo-video-1",
+        "title": "Documentário: O Ar que Respiramos",
+        "excerpt": "Curta-metragem reunindo depoimentos da comunidade sobre o cotidiano da poluição sob o Viaduto do Gasômetro.",
+        "kind": "video",
+        "source_type": "documentary",
+        "source_name": "Coletivo Mídia Cidadã",
+        "published_at": "2023-06-05T00:00:00Z",
+        "tags": [
+            "documentário",
+            "testemunho",
+            "gasômetro"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2023,
+            "media": [
+                {
+                    "type": "youtube",
+                    "url": "https://youtube.com/watch?v=dQw4w9WgXcQ"
+                }
+            ]
+        }
+    },
+    {
+        "slug": "demo-acervo-video-2",
+        "title": "Palestra Magna: Qualidade do Ar no Rio de Janeiro",
+        "excerpt": "Apresentação de resultados na COP-28 em painel de Ciência Aberta Brasileira.",
+        "kind": "video",
+        "source_type": "lecture",
+        "source_name": "YouTube SEMEAR",
+        "published_at": "2024-01-15T00:00:00Z",
+        "tags": [
+            "palestra",
+            "cop28"
+        ],
+        "meta": {
+            "demo": true,
+            "year": 2024
+        }
+    }
+]

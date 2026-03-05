@@ -1,9 +1,10 @@
 export default function handler(req: any, res: any) {
-    const { kind = 'SEMEAR', title = '', subtitle = '', pm25, pm10, time } = req.query;
+    const { kind = 'SEMEAR', title = '', subtitle = '', footer = '', pm25, pm10, time } = req.query;
 
     const safeTitle = String(title).substring(0, 100).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const safeSubtitle = String(subtitle).substring(0, 150).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const safeKind = String(kind).toUpperCase().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeKind = String(kind).substring(0, 30).toUpperCase().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeFooter = footer ? String(footer).substring(0, 80).toUpperCase().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : 'SEMEAR • UFF • EMENDA PARLAMENTAR';
 
     let contentBlock = `
     <!-- Title and Subtitle Block -->
@@ -12,9 +13,11 @@ export default function handler(req: any, res: any) {
             <div style="font-size: 64px; font-weight: 900; color: #E2E8F0; line-height: 1.1; margin-bottom: 24px;">
                 ${safeTitle}
             </div>
-            <div style="font-size: 32px; font-weight: normal; color: #94A3B8; line-height: 1.4;">
+            ${safeSubtitle ? `
+            <div style="font-size: 32px; font-weight: normal; color: #94A3B8; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
                 ${safeSubtitle}
             </div>
+            ` : ''}
         </div>
     </foreignObject>
     `;
@@ -66,7 +69,7 @@ export default function handler(req: any, res: any) {
 ${contentBlock}
 
     <g transform="translate(80, 560)">
-        <text x="0" y="0" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="#64748B" letter-spacing="2">SEMEAR • UFF • EMENDA PARLAMENTAR</text>
+        <text x="0" y="0" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="#64748B" letter-spacing="2">${safeFooter}</text>
     </g>
 </svg>`;
 

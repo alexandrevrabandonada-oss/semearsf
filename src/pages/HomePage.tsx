@@ -175,6 +175,94 @@ export function HomePage() {
         </div>
       </div>
 
+      {/* Featured Collections (Dossiês) */}
+      <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 md:p-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-black uppercase tracking-wide text-cta md:text-2xl">Dossiês em Destaque</h2>
+          <Link className="text-sm font-bold text-ciano hover:underline" to="/dossies">Ver todos →</Link>
+        </div>
+        <p className="mt-2 text-sm text-texto/70">Explore coleções temáticas curadas pelo nosso time.</p>
+
+        {loading ? (
+          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite" aria-busy="true">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-32 animate-pulse rounded-xl bg-ciano/5" />
+            ))}
+          </div>
+        ) : collections.length === 0 ? (
+          <p className="mt-6 text-sm text-texto/50 italic" aria-live="polite">Nenhuma coleção em destaque no momento.</p>
+        ) : (
+          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite">
+            {collections.map((col) => (
+              <div
+                key={col.id}
+                className="group flex flex-col overflow-hidden rounded-xl border border-ciano/20 bg-base/20 transition-all hover:border-ciano/50 hover:bg-base/40"
+              >
+                {col.cover_url && (
+                  <Link to={`/dossies/${col.slug}`} className="aspect-video w-full overflow-hidden bg-ciano/5 relative block">
+                    <img
+                      src={col.cover_small_url || col.cover_thumb_url || col.cover_url}
+                      alt={col.title}
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="h-full w-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105"
+                      style={
+                        (!col.cover_small_url && !col.cover_thumb_url) ? {} : {
+                          filter: 'blur(0)'
+                        }
+                      }
+                    />
+                  </Link>
+                )}
+                <div className="p-5 flex flex-col flex-1">
+                  <Link to={`/dossies/${col.slug}`}>
+                    <h3 className="text-lg font-bold text-texto transition-colors hover:text-ciano">{col.title}</h3>
+                  </Link>
+                  {col.excerpt && <p className="mt-2 text-xs text-texto/80 line-clamp-2">{col.excerpt}</p>}
+
+                  <div className="mt-4 flex flex-1 flex-wrap gap-2 content-start">
+                    {col.tags.slice(0, 2).map((tag) => (
+                      <span key={tag} className="rounded-full bg-ciano/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-ciano">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 flex gap-2">
+                    <Link
+                      to={`/dossies/${col.slug}`}
+                      className="flex-1 rounded-md bg-ciano px-3 py-2 text-center text-[10px] font-black uppercase tracking-widest text-base transition-colors hover:bg-ciano/90"
+                    >
+                      Abrir
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const shareUrl = `${window.location.origin}/s/dossies/${col.slug}`;
+                        if (navigator.share) {
+                          navigator.share({ title: col.title, text: col.excerpt || '', url: shareUrl }).catch(() => { });
+                        } else {
+                          navigator.clipboard.writeText(shareUrl);
+                          alert("Link copiado para a área de transferência!");
+                        }
+                      }}
+                      className="flex items-center justify-center rounded-md border border-ciano/40 bg-transparent px-3 py-2 text-ciano hover:bg-ciano hover:text-base transition-colors"
+                      aria-label="Compartilhar dossiê"
+                    >
+                      <span className="sr-only">Compartilhar</span>
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2">
         {/* Próximas Atividades */}
         <div className="flex flex-col rounded-2xl border border-acento/40 bg-fundo/60 p-6 transition-all hover:border-acento/60">
@@ -245,91 +333,6 @@ export function HomePage() {
         </div>
       </div>
 
-      {/* Featured Collections (Dossiês) */}
-      <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 md:p-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-black uppercase tracking-wide text-cta md:text-2xl">Dossiês em Destaque</h2>
-          <Link className="text-sm font-bold text-ciano hover:underline" to="/dossies">Ver todos →</Link>
-        </div>
-        <p className="mt-2 text-sm text-texto/70">Explore coleções temáticas curadas pelo nosso time.</p>
-
-        {loading ? (
-          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite" aria-busy="true">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 animate-pulse rounded-xl bg-ciano/5" />
-            ))}
-          </div>
-        ) : collections.length === 0 ? (
-          <p className="mt-6 text-sm text-texto/50 italic" aria-live="polite">Nenhuma coleção em destaque no momento.</p>
-        ) : (
-          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite">
-            {collections.map((col) => (
-              <div
-                key={col.id}
-                className="group flex flex-col overflow-hidden rounded-xl border border-ciano/20 bg-base/20 transition-all hover:border-ciano/50 hover:bg-base/40"
-              >
-                {col.cover_url && (
-                  <Link to={`/dossies/${col.slug}`} className="aspect-video w-full overflow-hidden bg-ciano/5 relative block">
-                    {/* CSS Blur Placeholder Pattern */}
-                    <img
-                      src={col.cover_small_url || col.cover_thumb_url || col.cover_url}
-                      alt={col.title}
-                      loading="lazy"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="h-full w-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105"
-                      style={
-                        (!col.cover_small_url && !col.cover_thumb_url) ? {} : {
-                          filter: 'blur(0)', // In a real implementation we would transition this on image load
-                        }
-                      }
-                    />
-                  </Link>
-                )}
-                <div className="p-5 flex flex-col flex-1">
-                  <Link to={`/dossies/${col.slug}`}>
-                    <h3 className="text-lg font-bold text-texto transition-colors hover:text-ciano">{col.title}</h3>
-                  </Link>
-                  {col.excerpt && <p className="mt-2 text-xs text-texto/80 line-clamp-2">{col.excerpt}</p>}
-
-                  <div className="mt-4 flex flex-1 flex-wrap gap-2 content-start">
-                    {col.tags.slice(0, 2).map((tag) => (
-                      <span key={tag} className="rounded-full bg-ciano/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-ciano">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-6 flex gap-2">
-                    <Link
-                      to={`/dossies/${col.slug}`}
-                      className="flex-1 rounded-md bg-ciano px-3 py-2 text-center text-[10px] font-black uppercase tracking-widest text-base transition-colors hover:bg-ciano/90"
-                    >
-                      Abrir
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const shareUrl = `${window.location.origin}/s/dossies/${col.slug}`;
-                        if (navigator.share) {
-                          navigator.share({ title: col.title, text: col.excerpt || '', url: shareUrl }).catch(() => { });
-                        } else {
-                          navigator.clipboard.writeText(shareUrl);
-                          alert("Link copiado para a área de transferência!");
-                        }
-                      }}
-                      className="rounded-md border border-ciano/30 px-3 py-2 flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-ciano transition-colors hover:bg-ciano hover:text-base"
-                      title="Compartilhar dossiê"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </section>
   );
 }
