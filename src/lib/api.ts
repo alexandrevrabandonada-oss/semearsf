@@ -493,6 +493,8 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
 // Relatorios
 // ─────────────────────────────────────────
 
+export type ReportKind = "relatorio" | "nota-tecnica" | "boletim" | "anexo";
+
 export type ReportDocument = {
   id: string;
   slug: string;
@@ -500,13 +502,28 @@ export type ReportDocument = {
   summary: string | null;
   published_at: string | null;
   year: number | null;
+  kind: ReportKind;
+  featured: boolean;
   pdf_url: string | null;
   cover_url: string | null;
   tags: string[];
   created_at: string;
 };
 
+export type ListReportsParams = {
+  year?: number;
+  kind?: ReportKind;
+  tag?: string;
+  q?: string;
+  limit?: number;
+};
+
 function rowToReportDocument(row: Record<string, unknown>): ReportDocument {
+  const kindRaw = typeof row.kind === "string" ? row.kind : "relatorio";
+  const kind = (["relatorio", "nota-tecnica", "boletim", "anexo"].includes(kindRaw)
+    ? kindRaw
+    : "relatorio") as ReportKind;
+
   return {
     id: String(row.id ?? ""),
     slug: String(row.slug ?? ""),
@@ -514,6 +531,8 @@ function rowToReportDocument(row: Record<string, unknown>): ReportDocument {
     summary: typeof row.summary === "string" ? row.summary : null,
     published_at: typeof row.published_at === "string" ? row.published_at : null,
     year: typeof row.year === "number" ? row.year : null,
+    kind,
+    featured: Boolean(row.featured),
     pdf_url: typeof row.pdf_url === "string" ? row.pdf_url : null,
     cover_url: typeof row.cover_url === "string" ? row.cover_url : null,
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
@@ -521,15 +540,30 @@ function rowToReportDocument(row: Record<string, unknown>): ReportDocument {
   };
 }
 
-export async function listReports(limit = 100): Promise<ReportDocument[]> {
+export async function listReports(params: ListReportsParams = {}): Promise<ReportDocument[]> {
   try {
+    const { year, kind, tag, q, limit = 100 } = params;
     const supabase = assertSupabase();
-    const { data, error } = await supabase
+
+    let query = supabase
       .from("reports")
       .select("*")
+      .order("featured", { ascending: false, nullsFirst: false })
       .order("published_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false })
       .limit(limit);
+
+    if (typeof year === "number") query = query.eq("year", year);
+    if (kind) query = query.eq("kind", kind);
+    if (tag) query = query.contains("tags", [tag]);
+    if (q) {
+      const term = q.trim();
+      if (term) {
+        query = query.or("title.ilike.%" + term + "%,summary.ilike.%" + term + "%");
+      }
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
     return ((data || []) as Record<string, unknown>[]).map(rowToReportDocument);
   } catch (error) {
@@ -538,7 +572,7 @@ export async function listReports(limit = 100): Promise<ReportDocument[]> {
 }
 
 export async function listLatestReports(limit = 3): Promise<ReportDocument[]> {
-  return listReports(limit);
+  return listReports({ limit });
 }
 
 export async function getReportBySlug(slug: string): Promise<ReportDocument | null> {
@@ -557,9 +591,13 @@ export async function getReportBySlug(slug: string): Promise<ReportDocument | nu
   }
 }
 
-// ─────────────────────────────────────────
-// Relatorios
-// ─────────────────────────────────────────
+export async function searchReports(q: string, limit = 10): Promise<ReportDocument[]> {
+  try {
+    return listReports({ q, limit });
+  } catch (error) {
+    throw toAppError("Falha ao buscar em relatórios", error);
+  }
+}
 
 export type TransparencyLink = {
   id: string;
@@ -1004,7 +1042,7 @@ export async function searchEvents(q: string, limit = 10): Promise<Event[]> {
 // ─────────────────────────────────────────
 
 export interface SearchResultItem {
-  kind: "acervo" | "blog";
+  kind: "acervo" | "blog" | "report";
   title: string;
   slug: string;
   excerpt: string;
@@ -1420,6 +1458,7 @@ export async function getCorridorBySlug(slug: string): Promise<ClimateCorridorWi
     throw toAppError("Falha ao carregar corredor climático", error);
   }
 }
+
 
 
 

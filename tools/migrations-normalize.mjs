@@ -15,7 +15,10 @@ if (!fs.existsSync(archiveDir)) {
 }
 
 const files = fs.readdirSync(migrationsDir).filter((name) => name.endsWith(".sql"));
-const invalid = files.filter((name) => !/^\d{14}_/.test(name));
+
+// A migration is valid when its filename starts with a 14-digit timestamp prefix.
+const isValidTimestampedMigration = (name) => /^\d{14}/.test(name);
+const invalid = files.filter((name) => !isValidTimestampedMigration(name));
 
 if (invalid.length === 0) {
   console.log("[migrations-normalize] moved: 0");

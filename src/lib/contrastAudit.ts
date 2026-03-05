@@ -5,6 +5,11 @@ type ContrastPair = {
   minRatio?: number;
 };
 
+export type ContrastAuditResult = ContrastPair & {
+  ratio: number;
+  passes: boolean;
+};
+
 const AA_NORMAL_TEXT = 4.5;
 
 const designPairs: ContrastPair[] = [
@@ -64,15 +69,26 @@ function contrastRatio(foreground: string, background: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+export function getContrastAuditResults(): ContrastAuditResult[] {
+  return designPairs.map((pair) => {
+    const ratio = contrastRatio(pair.foreground, pair.background);
+    const minRatio = pair.minRatio ?? AA_NORMAL_TEXT;
+    return {
+      ...pair,
+      ratio,
+      passes: ratio >= minRatio
+    };
+  });
+}
+
 export function runDevContrastAudit(): void {
   if (!import.meta.env.DEV) return;
 
-  designPairs.forEach((pair) => {
-    const ratio = contrastRatio(pair.foreground, pair.background);
+  getContrastAuditResults().forEach((pair) => {
     const minRatio = pair.minRatio ?? AA_NORMAL_TEXT;
-    if (ratio < minRatio) {
+    if (!pair.passes) {
       console.warn(
-        `[a11y][contrast] WARN ${pair.name} ratio=${ratio.toFixed(2)} expected>=${minRatio.toFixed(2)} (${pair.foreground} on ${pair.background})`
+        `[a11y][contrast] WARN ${pair.name} ratio=${pair.ratio.toFixed(2)} expected>=${minRatio.toFixed(2)} (${pair.foreground} on ${pair.background})`
       );
     }
   });

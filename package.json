@@ -39,7 +39,8 @@
     "reports:import": "node tools/reports-import.mjs",
     "reports:upload": "node tools/reports-upload.mjs",
     "db:normalize": "node tools/migrations-normalize.mjs",
-    "ship:reports": "npm run reports:import && npm run done"
+    "ship:reports": "npm run reports:import && npm run done",
+    "transparency:upload": "node tools/transparency-upload.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",

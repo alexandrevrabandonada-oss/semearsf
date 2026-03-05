@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getSystemStatus, type SystemStatus } from "../lib/api";
+import { getContrastAuditResults } from "../lib/contrastAudit";
 
 export function StatusPage() {
     const [status, setStatus] = useState<SystemStatus | null>(null);
@@ -40,6 +41,9 @@ export function StatusPage() {
     };
     const socialKindsOrder = ["dados", "agenda", "blog", "acervo", "dossies", "relatorios"];
     const socialByKind = status?.social?.by_kind ?? {};
+    const isDevAccessibilityVisible = import.meta.env.MODE !== "production";
+    const contrastAudit = getContrastAuditResults();
+    const contrastFailures = contrastAudit.filter((item) => !item.passes);
 
     if (loading) {
         return (
@@ -229,6 +233,37 @@ export function StatusPage() {
                         </div>
                     </div>
                 </div>
+
+                {isDevAccessibilityVisible && (
+                    <div className="rounded-2xl border border-amber-500/30 bg-fundo/60 p-6 flex flex-col md:col-span-3">
+                        <h2 className="text-xs font-black uppercase tracking-widest text-cta">Acessibilidade (dev)</h2>
+                        <div className="mt-4 flex flex-wrap items-end gap-6">
+                            <div>
+                                <p className="text-3xl font-black text-texto">{formatNumber(contrastAudit.length)}</p>
+                                <p className="text-[10px] font-bold uppercase tracking-wide text-texto/60">Combinações auditadas</p>
+                            </div>
+                            <div>
+                                <p className="text-3xl font-black text-amber-500">{formatNumber(contrastFailures.length)}</p>
+                                <p className="text-[10px] font-bold uppercase tracking-wide text-texto/60">Abaixo do AA</p>
+                            </div>
+                        </div>
+                        <div className="mt-4 space-y-2">
+                            {contrastAudit.map((item) => (
+                                <div key={item.name} className="flex flex-col gap-1 rounded-lg border border-base/20 bg-base/10 px-4 py-3 text-xs sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <p className="font-bold text-texto">{item.name}</p>
+                                        <p className="text-texto/60">{item.foreground} em {item.background}</p>
+                                    </div>
+                                    <div className="text-left sm:text-right">
+                                        <p className={item.passes ? "font-black text-green-600" : "font-black text-amber-500"}>{item.ratio.toFixed(2)}:1</p>
+                                        <p className="text-texto/60">mínimo {(item.minRatio ?? 4.5).toFixed(1)}:1</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="mt-3 text-xs text-texto/60">Este bloco aparece apenas fora de produção para revisar contraste do design system.</p>
+                    </div>
+                )}
 
                 <div className="rounded-2xl border border-base/40 bg-fundo/60 p-6 flex flex-col md:col-span-3">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

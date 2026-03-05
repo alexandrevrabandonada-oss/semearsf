@@ -44,6 +44,18 @@ O projeto SEMEAR foi desenvolvido com acessibilidade como requisito central, nã
 
 ---
 
+### Auditoria de Contraste em /status (modo dev)
+
+Quando o app roda fora de producao, a pagina `/status` exibe um bloco **Acessibilidade (dev)** com o resultado do `contrastAudit`.
+
+Como interpretar:
+- **Combinacoes auditadas:** total de pares de cor monitorados no design system.
+- **Abaixo do AA:** quantas combinacoes estao abaixo do minimo esperado para texto normal, em geral **4.5:1**.
+- **Razao `X:1`:** quanto maior, melhor. Valores acima do minimo passam; valores abaixo pedem ajuste de token, fundo ou peso/uso do texto.
+- O bloco e **apenas de desenvolvimento**. Em producao ele fica oculto para nao expor sinal interno de auditoria.
+
+---
+
 ## 2. Foco e Navegação por Teclado
 
 ### ✅ Implementado
