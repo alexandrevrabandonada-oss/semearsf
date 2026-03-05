@@ -922,3 +922,97 @@ export async function getCollectionBySlug(slug: string): Promise<CollectionWithI
     throw toAppError("Falha ao carregar dossiê", error);
   }
 }
+
+// ─────────────────────────────────────────
+// Conversar (Conversations & Comments)
+// ─────────────────────────────────────────
+
+export type Conversation = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  body_md: string | null;
+  status: "draft" | "published";
+  created_at: string;
+};
+
+export type ConversationComment = {
+  id: string;
+  conversation_id: string;
+  name: string;
+  body: string;
+  is_hidden: boolean;
+  created_at: string;
+};
+
+export async function listConversations(): Promise<Conversation[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("conversations")
+      .select("*")
+      .eq("status", "published")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return (data || []) as Conversation[];
+  } catch (error) {
+    throw toAppError("Falha ao listar rodas de conversa", error);
+  }
+}
+
+export async function getConversationBySlug(slug: string): Promise<Conversation | null> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("conversations")
+      .select("*")
+      .eq("slug", slug)
+      .eq("status", "published")
+      .maybeSingle();
+
+    if (error) throw error;
+    return (data || null) as Conversation | null;
+  } catch (error) {
+    throw toAppError("Falha ao carregar roda de conversa", error);
+  }
+}
+
+export async function listConversationComments(conversationId: string): Promise<ConversationComment[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("conversation_comments")
+      .select("*")
+      .eq("conversation_id", conversationId)
+      .eq("is_hidden", false)
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+    return (data || []) as ConversationComment[];
+  } catch (error) {
+    throw toAppError("Falha ao listar comentários", error);
+  }
+}
+
+export async function createConversationComment(payload: {
+  conversation_id: string;
+  name: string;
+  body: string;
+}): Promise<ConversationComment> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("conversation_comments")
+      .insert(payload)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as ConversationComment;
+  } catch (error) {
+    throw toAppError("Falha ao publicar comentário", error);
+  }
+}
+

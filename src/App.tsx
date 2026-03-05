@@ -18,6 +18,8 @@ import { StatusPage } from "./pages/StatusPage";
 import { SearchPage } from "./pages/SearchPage";
 import { CollectionsListPage } from "./pages/acervo/CollectionsListPage";
 import { CollectionDetailPage } from "./pages/acervo/CollectionDetailPage";
+import { ConversarListPage } from "./pages/conversar/ConversarListPage";
+import { ConversarDetailPage } from "./pages/conversar/ConversarDetailPage";
 
 export default function App() {
   return (
@@ -27,6 +29,8 @@ export default function App() {
         <Route path="/alertas" element={<AlertasPage />} />
         <Route path="/dados" element={<DadosPage />} />
         <Route path="/agenda" element={<AgendaPage />} />
+        <Route path="/conversar" element={<ConversarListPage />} />
+        <Route path="/conversar/:slug" element={<ConversarDetailPage />} />
         <Route path="/inscricoes" element={<InscricoesPage />} />
         <Route path="/sobre" element={<SobrePage />} />
         <Route path="/transparencia" element={<TransparenciaPage />} />

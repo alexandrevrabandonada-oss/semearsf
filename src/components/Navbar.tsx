@@ -7,6 +7,7 @@ const links = [
   { href: "/acervo/linha", label: "Linha do tempo" },
   { href: "/blog", label: "Blog" },
   { href: "/agenda", label: "Agenda" },
+  { href: "/conversar", label: "Conversar" },
   { href: "/dossies", label: "Dossiês" },
   { href: "/inscricoes", label: "Inscricoes" },
   { href: "/sobre", label: "Sobre" },
