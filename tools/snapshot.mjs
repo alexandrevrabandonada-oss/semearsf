@@ -9,8 +9,7 @@ function sh(cmd) {
   catch (e) {
     const stdOut = e.stdout?.toString() || "";
     const stdErr = e.stderr?.toString() || "";
-    // Avoid dumping massive Node stack traces. Just grab the top lines.
-    const combined = (stdOut + "\n" + stdErr).trim().split('\n').filter(Boolean).slice(0, 5).join('\n');
+    const combined = (stdOut + "\n" + stdErr).trim().split("\n").filter(Boolean).slice(0, 5).join("\n");
     return combined || "Error executing command";
   }
 }
@@ -43,7 +42,7 @@ function normalizeDbSmokeOutput(raw) {
 
 function listTree(dir, depth = 3, prefix = "") {
   if (!fs.existsSync(dir) || depth < 0) return [];
-  const items = fs.readdirSync(dir).filter(x => x !== "node_modules" && x !== ".git" && x !== "dist");
+  const items = fs.readdirSync(dir).filter((x) => x !== "node_modules" && x !== ".git" && x !== "dist");
   const out = [];
   for (const item of items) {
     const full = path.join(dir, item);
@@ -59,9 +58,68 @@ function extractRoutes(appPath) {
   const raw = fs.readFileSync(appPath, "utf8");
   const re = /path\s*=\s*["']([^"']+)["']/g;
   const found = new Set();
-  let m;
-  while ((m = re.exec(raw)) !== null) found.add(m[1]);
+  let match;
+  while ((match = re.exec(raw)) !== null) found.add(match[1]);
   return Array.from(found).sort();
+}
+
+function ensureDistManifest() {
+  const distDir = "dist";
+  const manifestPath = path.join(distDir, "manifest.json");
+  if (fs.existsSync(manifestPath) || !fs.existsSync(distDir)) return manifestPath;
+
+  const manifest = {};
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+        continue;
+      }
+
+      const relPath = path.relative(distDir, fullPath).replace(/\\/g, "/");
+      if (relPath === "manifest.json") continue;
+      manifest[relPath] = {
+        file: relPath,
+        type: relPath.endsWith(".js") ? "chunk" : "asset",
+        isEntry: relPath === "index.html"
+      };
+    }
+  };
+
+  walk(distDir);
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+  return manifestPath;
+}
+
+function readBuildChunksSummary() {
+  const manifestPath = ensureDistManifest();
+  if (!manifestPath || !fs.existsSync(manifestPath)) {
+    return ["_dist/manifest.json not found_"];
+  }
+
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  const assets = new Map();
+
+  for (const entry of Object.values(manifest)) {
+    if (!entry || typeof entry !== "object") continue;
+
+    const maybeAdd = (assetPath) => {
+      if (!assetPath || typeof assetPath !== "string") return;
+      const fullPath = path.join("dist", assetPath);
+      if (!fs.existsSync(fullPath) || assets.has(assetPath)) return;
+      assets.set(assetPath, fs.statSync(fullPath).size);
+    };
+
+    maybeAdd(entry.file);
+    for (const cssFile of entry.css || []) maybeAdd(cssFile);
+    for (const assetFile of entry.assets || []) maybeAdd(assetFile);
+  }
+
+  return Array.from(assets.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([assetPath, size]) => `- ${assetPath} (${(size / 1024).toFixed(2)} KiB)`);
 }
 
 const report = [];
@@ -114,13 +172,13 @@ report.push("");
 report.push("## Env keys present (names only)");
 if (fs.existsSync(".env")) {
   const raw = fs.readFileSync(".env", "utf8");
-  const keys = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith("#") && l.includes("=")).map(l => l.split("=")[0].trim());
+  const keys = raw.split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith("#") && l.includes("=")).map((l) => l.split("=")[0].trim());
   report.push("```");
   report.push(keys.join("\n"));
   report.push("```");
 } else if (fs.existsSync(".env.local")) {
   const raw = fs.readFileSync(".env.local", "utf8");
-  const keys = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith("#") && l.includes("=")).map(l => l.split("=")[0].trim());
+  const keys = raw.split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith("#") && l.includes("=")).map((l) => l.split("=")[0].trim());
   report.push("```");
   report.push(keys.join("\n"));
   report.push("```");
@@ -145,6 +203,10 @@ report.push("## Env Doctor");
 report.push("```text");
 report.push(sh("node tools/env-doctor.mjs"));
 report.push("```");
+report.push("");
+
+report.push("## Build Chunks Summary");
+report.push(readBuildChunksSummary().join("\n"));
 
 fs.mkdirSync("reports", { recursive: true });
 fs.writeFileSync("reports/state.md", report.join("\n") + "\n", "utf8");

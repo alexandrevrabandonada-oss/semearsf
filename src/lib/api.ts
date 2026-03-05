@@ -506,6 +506,7 @@ export type ReportDocument = {
   featured: boolean;
   pdf_url: string | null;
   cover_url: string | null;
+  cover_thumb_url: string | null;
   tags: string[];
   created_at: string;
 };
@@ -535,6 +536,7 @@ function rowToReportDocument(row: Record<string, unknown>): ReportDocument {
     featured: Boolean(row.featured),
     pdf_url: typeof row.pdf_url === "string" ? row.pdf_url : null,
     cover_url: typeof row.cover_url === "string" ? row.cover_url : null,
+    cover_thumb_url: typeof row.cover_thumb_url === "string" ? row.cover_thumb_url : null,
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
     created_at: typeof row.created_at === "string" ? row.created_at : ""
   };
@@ -724,6 +726,20 @@ function normalizeOpsKpi(raw?: Partial<OpsKPI> | null): OpsKPI {
     scheduled_blog_posts_count: toSafeNumber(raw?.scheduled_blog_posts_count),
     scheduled_content_items_count: toSafeNumber(raw?.scheduled_content_items_count)
   };
+}
+
+export async function getOpsKpisMonth(year: number, month: number): Promise<OpsKPI> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase.rpc("get_ops_kpis_month", {
+      p_year: year,
+      p_month: month
+    });
+    if (error) throw error;
+    return normalizeOpsKpi(data?.[0]);
+  } catch (error) {
+    throw toAppError("Falha ao buscar KPIs mensais de operacao", error);
+  }
 }
 
 export type SystemStatus = {
