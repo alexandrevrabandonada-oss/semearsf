@@ -36,6 +36,9 @@ const ConversarDetailPage = lazy(() => import("./pages/conversar/ConversarDetail
 const CorredoresListPage = lazy(() => import("./pages/corredores/CorredoresListPage").then(m => ({ default: m.CorredoresListPage })));
 const CorredoresDetailPage = lazy(() => import("./pages/corredores/CorredoresDetailPage").then(m => ({ default: m.CorredoresDetailPage })));
 
+// Mapa lazy-loaded
+const MapaPage = lazy(() => import("./pages/MapaPage").then(m => ({ default: m.MapaPage })));
+
 // Fallback loading component
 function LoadingFallback() {
   return (
@@ -61,6 +64,7 @@ export default function App() {
           <Route path="/conversar/:slug" element={<ConversarDetailPage />} />
           <Route path="/corredores" element={<CorredoresListPage />} />
           <Route path="/corredores/:slug" element={<CorredoresDetailPage />} />
+          <Route path="/mapa" element={<MapaPage />} />
           <Route path="/inscricoes" element={<InscricoesPage />} />
           <Route path="/sobre" element={<SobrePage />} />
           <Route path="/transparencia" element={<TransparenciaPage />} />

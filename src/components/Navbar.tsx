@@ -12,13 +12,14 @@ const links = [
   { href: "/agenda", label: "Agenda" },
   { href: "/conversar", label: "Conversar" },
   { href: "/corredores", label: "Corredores" },
+  { href: "/mapa", label: "Mapa" },
   { href: "/dossies", label: "Dossiês" },
   { href: "/inscricoes", label: "Inscricoes" },
   { href: "/sobre", label: "Sobre" },
   { href: "/transparencia", label: "Transparencia" }
 ];
 
-const primaryLinks = links.slice(0, 8);
+const primaryLinks = links.slice(0, 9);
 
 export function Navbar() {
   const { prompt, clearPrompt } = useInstallPrompt();

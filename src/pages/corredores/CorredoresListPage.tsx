@@ -59,6 +59,17 @@ export function CorredoresListPage() {
                 <p className="mx-auto max-w-3xl text-lg text-text-secondary md:mx-0 md:text-xl">
                     Navegue pelas rotas e recortes territoriais monitorados. Descubra os impactos reais e as soluções coletivas em Volta Redonda e no Sul Fluminense.
                 </p>
+                <div className="mt-6 flex justify-center md:justify-start">
+                    <Link
+                        to="/mapa"
+                        className="inline-flex items-center gap-2 rounded-md border border-brand-primary bg-white px-4 py-2 text-sm font-black uppercase tracking-wide text-brand-primary transition-colors hover:bg-brand-primary hover:text-white"
+                    >
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                        </svg>
+                        Ver Mapa
+                    </Link>
+                </div>
             </header>
 
             {corridors.length === 0 ? (
