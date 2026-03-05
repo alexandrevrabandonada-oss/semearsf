@@ -130,11 +130,17 @@ export function StatusPage() {
                 </div>
 
                 <div className="rounded-2xl border border-primaria/40 bg-fundo/60 p-6 flex flex-col">
-                    <h2 className="text-xs font-black uppercase tracking-widest text-cta">Transparência</h2>
+                    <h2 className="text-xs font-black uppercase tracking-widest text-cta">Transparência (7 dias / mês atual)</h2>
                     <div className="mt-6 flex flex-col gap-4">
                         <div className="flex flex-col">
                             <span className="text-2xl font-black text-primaria">{formatCurrency(status.transparency.current_month_total_cents)}</span>
                             <span className="text-[10px] font-bold uppercase tracking-tighter text-texto/40 italic">Total no mês atual</span>
+                            <span className="text-[10px] text-texto/50">{formatNumber(status.transparency.current_month_count)} lançamentos</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xl font-black text-ciano">{formatCurrency(status.transparency.last_7d_total_cents)}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-tighter text-texto/40 italic">Total nos últimos 7 dias</span>
+                            <span className="text-[10px] text-texto/50">{formatNumber(status.transparency.last_7d_count)} lançamentos</span>
                         </div>
                         <div className="space-y-2 mt-2">
                             {Object.entries(status.transparency.current_month_by_category).sort((a, b) => Number(b[1]) - Number(a[1])).slice(0, 3).map(([cat, amount]) => (
@@ -145,7 +151,18 @@ export function StatusPage() {
                             ))}
                         </div>
                     </div>
-                    <p className="mt-1 text-[10px] text-texto/40 uppercase tracking-tighter">{status.transparency.current_month_count} lançamentos no mês</p>
+                    <div className="mt-3 space-y-2">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-ciano/80">Top categorias (7 dias)</p>
+                        {Object.entries(status.transparency.last_7d_by_category).sort((a, b) => Number(b[1]) - Number(a[1])).slice(0, 3).map(([cat, amount]) => (
+                            <div className="flex justify-between items-center text-xs" key={`last7-${cat}`}>
+                                <span className="text-texto/60 capitalize">{cat}</span>
+                                <span className="font-bold text-texto">{formatCurrency(amount)}</span>
+                            </div>
+                        ))}
+                        {Object.keys(status.transparency.last_7d_by_category).length === 0 && (
+                            <p className="text-[10px] text-texto/50 italic">Sem lançamentos nos últimos 7 dias.</p>
+                        )}
+                    </div>
                     <Link to="/transparencia" className="mt-auto pt-3 text-xs font-bold text-ciano hover:underline">Detalhes financeiros →</Link>
                 </div>
 

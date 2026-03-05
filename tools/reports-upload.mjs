@@ -26,36 +26,41 @@ function parseEnvFile(filePath) {
   return env;
 }
 
+function parseArgs() {
+  const args = process.argv.slice(2);
+  const params = {};
+  for (let i = 0; i < args.length; i += 1) {
+    if (args[i].startsWith("--")) {
+      const key = args[i].slice(2);
+      const value = args[i + 1];
+      params[key] = value;
+      i += 1;
+    }
+  }
+  return params;
+}
+
 const env = fs.existsSync(".env.local") ? parseEnvFile(".env.local") : parseEnvFile(".env");
 const SUPABASE_URL = env.SUPABASE_URL || env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  console.error("ERRO: SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não encontrados.");
+  console.error("ERRO: SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY nao encontrados.");
   process.exit(1);
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const { slug, file, title } = parseArgs();
 
-const args = process.argv.slice(2);
-const params = {};
-for (let i = 0; i < args.length; i++) {
-  if (args[i].startsWith("--")) {
-    params[args[i].slice(2)] = args[i + 1];
-    i++;
-  }
-}
-
-const { slug, file } = params;
 if (!slug || !file) {
-  console.error("USO: node tools/reports-upload.mjs --slug <slug> --file <caminho-do-pdf>");
+  console.error("USO: node tools/reports-upload.mjs --slug <slug> --file <caminho-do-pdf> [--title <titulo-opcional>]");
   process.exit(1);
 }
 
 async function upload() {
   try {
     if (!fs.existsSync(file)) {
-      throw new Error(`Arquivo não encontrado: ${file}`);
+      throw new Error(`Arquivo nao encontrado: ${file}`);
     }
 
     const fileName = path.basename(file);
@@ -76,15 +81,23 @@ async function upload() {
     const { data: pub } = supabase.storage.from("reports").getPublicUrl(storagePath);
     const publicUrl = pub.publicUrl;
 
+    const payload = {
+      pdf_url: publicUrl,
+      ...(title ? { title } : {})
+    };
+
     const { error: updateError } = await supabase
       .from("reports")
-      .update({ pdf_url: publicUrl })
+      .update(payload)
       .eq("slug", slug);
 
     if (updateError) throw updateError;
 
-    console.log(`SUCESSO: pdf_url atualizado para ${slug}`);
-    console.log(publicUrl);
+    console.log(`OK: report atualizado para slug=${slug}`);
+    console.log(`URL: ${publicUrl}`);
+    if (title) {
+      console.log(`Titulo atualizado: ${title}`);
+    }
     process.exit(0);
   } catch (error) {
     console.error("FALHA:", error.message || error);

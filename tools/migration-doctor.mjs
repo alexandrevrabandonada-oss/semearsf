@@ -5,6 +5,7 @@ import path from "node:path";
 
 const TIMEOUT_MS = 15000;
 const MIGRATIONS_DIR = path.join(process.cwd(), "supabase", "migrations");
+const ARCHIVE_DIR = path.join(process.cwd(), "supabase", "_archive_migrations");
 const VERSION_REGEX = /\b\d{14}\b/g;
 
 function run(cmd) {
@@ -54,7 +55,14 @@ function extractVersions(text) {
 
 function getLocalMigrationFiles() {
   if (!fs.existsSync(MIGRATIONS_DIR)) return [];
-  return fs.readdirSync(MIGRATIONS_DIR).filter((file) => file.endsWith(".sql"));
+  return fs
+    .readdirSync(MIGRATIONS_DIR)
+    .filter((file) => file.endsWith(".sql") && /^\d{14}_/.test(file));
+}
+
+function getArchivedMigrationFiles() {
+  if (!fs.existsSync(ARCHIVE_DIR)) return [];
+  return fs.readdirSync(ARCHIVE_DIR).filter((file) => file.endsWith(".sql"));
 }
 
 function getLocalVersions(files) {
@@ -103,13 +111,10 @@ if (localListRes.success) {
 }
 
 const localFiles = getLocalMigrationFiles();
-if (localFiles.length > 0) {
-  console.log(`[OK] Filesystem Scan: ${localFiles.length} arquivos encontrados`);
-
-  const legacyFiles = localFiles.filter((file) => !/^\d{14}_/.test(file));
-  if (legacyFiles.length > 0) {
-    console.warn(`[WARN] Nomenclatura: ${legacyFiles.length} arquivos sem o prefixo de 14 digitos.`);
-  }
+const archivedFiles = getArchivedMigrationFiles();
+if (fs.existsSync(MIGRATIONS_DIR)) {
+  console.log(`[OK] Filesystem Scan (14 digitos): ${localFiles.length} arquivos encontrados`);
+  console.log(`      Arquivos arquivados: ${archivedFiles.length}`);
 
   const sorted = [...localFiles].sort().reverse();
   console.log("      Ultimas 5 migracoes locais:");

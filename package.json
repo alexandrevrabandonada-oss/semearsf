@@ -37,7 +37,9 @@
     "demo:load": "node tools/demo-load.mjs",
     "done": "npm run verify && npm run smoke && npm run db:doctor && npm run db:sync && npm run env:doctor && npm run snapshot",
     "reports:import": "node tools/reports-import.mjs",
-    "reports:upload": "node tools/reports-upload.mjs"
+    "reports:upload": "node tools/reports-upload.mjs",
+    "db:normalize": "node tools/migrations-normalize.mjs",
+    "ship:reports": "npm run reports:import && npm run done"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",

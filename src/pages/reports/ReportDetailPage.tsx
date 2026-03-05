@@ -3,13 +3,20 @@ import { Link, useParams } from "react-router-dom";
 
 import { getReportBySlug, type ReportDocument } from "../../lib/api";
 
+function getReportOpenKey(slug: string): string {
+  return `report_pdf_opened_${slug}`;
+}
+
 export function ReportDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const [report, setReport] = useState<ReportDocument | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [hasOpenedBefore, setHasOpenedBefore] = useState(false);
 
+  const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
 
@@ -17,23 +24,40 @@ export function ReportDetailPage() {
     const reportSlug = slug;
     if (!reportSlug) return;
     let cancelled = false;
+
     async function run() {
       try {
         setLoading(true);
         setError(null);
         const data = await getReportBySlug(String(reportSlug));
-        if (!cancelled) setReport(data);
+        if (!cancelled) {
+          setReport(data);
+          const opened = localStorage.getItem(getReportOpenKey(String(reportSlug))) === "1";
+          setHasOpenedBefore(opened);
+        }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : "Falha ao carregar relatório.");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
+
     void run();
     return () => {
       cancelled = true;
     };
   }, [slug]);
+
+  useEffect(() => {
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, []);
 
   useEffect(() => {
     if (isViewerOpen) {
@@ -44,7 +68,34 @@ export function ReportDetailPage() {
     }
 
     const onKeyDown = (ev: KeyboardEvent) => {
-      if (ev.key === "Escape" && isViewerOpen) setIsViewerOpen(false);
+      if (!isViewerOpen) return;
+
+      if (ev.key === "Escape") {
+        setIsViewerOpen(false);
+        return;
+      }
+
+      if (ev.key === "Tab" && modalRef.current) {
+        const focusable = Array.from(
+          modalRef.current.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((el) => !el.hasAttribute("disabled"));
+
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+
+        if (ev.shiftKey && active === first) {
+          ev.preventDefault();
+          last.focus();
+        } else if (!ev.shiftKey && active === last) {
+          ev.preventDefault();
+          first.focus();
+        }
+      }
     };
 
     document.addEventListener("keydown", onKeyDown);
@@ -72,6 +123,18 @@ export function ReportDetailPage() {
   }
 
   const hasPdf = Boolean(report.pdf_url);
+  const canOpenOffline = isOnline || hasOpenedBefore;
+
+  const markAsOpened = () => {
+    localStorage.setItem(getReportOpenKey(report.slug), "1");
+    setHasOpenedBefore(true);
+  };
+
+  const handleOpenPdf = () => {
+    if (!canOpenOffline) return;
+    markAsOpened();
+    setIsViewerOpen(true);
+  };
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/s/relatorios/${report.slug}`;
@@ -97,6 +160,17 @@ export function ReportDetailPage() {
         ← Voltar para relatórios
       </Link>
 
+      {!isOnline && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-50 p-4 text-sm text-amber-900" role="alert" aria-live="polite">
+          <p className="font-bold uppercase tracking-wide">Modo offline</p>
+          {hasOpenedBefore ? (
+            <p className="mt-1">Este PDF já foi acessado neste dispositivo. Você pode tentar abrir pelo cache local.</p>
+          ) : (
+            <p className="mt-1">Este PDF ainda não foi acessado neste dispositivo. Conecte-se à internet para baixar e visualizar.</p>
+          )}
+        </div>
+      )}
+
       <article className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Documento Oficial</p>
         <h1 className="mt-2 text-2xl font-black text-text-primary md:text-4xl">{report.title}</h1>
@@ -120,8 +194,8 @@ export function ReportDetailPage() {
         <div className="mt-6 flex flex-wrap gap-3">
           <button
             type="button"
-            disabled={!hasPdf}
-            onClick={() => setIsViewerOpen(true)}
+            disabled={!hasPdf || !canOpenOffline}
+            onClick={handleOpenPdf}
             className="inline-flex min-h-[44px] items-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-brand-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Abrir PDF
@@ -132,7 +206,7 @@ export function ReportDetailPage() {
             onClick={() => { void handleShare(); }}
             className="inline-flex min-h-[44px] items-center rounded-lg border border-border-subtle bg-white px-5 py-3 text-sm font-bold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg-surface"
           >
-            Compartilhar
+            Compartilhar relatório
           </button>
 
           {hasPdf && (
@@ -140,9 +214,19 @@ export function ReportDetailPage() {
               href={report.pdf_url as string}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={markAsOpened}
               className="inline-flex min-h-[44px] items-center rounded-lg border border-border-subtle bg-white px-5 py-3 text-sm font-bold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg-surface"
             >
               Abrir em nova aba
+            </a>
+          )}
+
+          {!isOnline && !hasOpenedBefore && (
+            <a
+              href="/relatorios"
+              className="inline-flex min-h-[44px] items-center rounded-lg border border-amber-500/30 bg-amber-50 px-5 py-3 text-sm font-bold uppercase tracking-wide text-amber-900"
+            >
+              Conectar para baixar
             </a>
           )}
         </div>
@@ -160,31 +244,35 @@ export function ReportDetailPage() {
         >
           <h2 id="report-viewer-title" className="sr-only">Visualizador de PDF</h2>
 
-          <div className="mb-3 flex w-full max-w-6xl justify-end gap-2">
-            <a
-              href={report.pdf_url as string}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
-            >
-              Abrir em nova aba
-            </a>
-            <button
-              ref={closeButtonRef}
-              type="button"
-              onClick={() => setIsViewerOpen(false)}
-              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 text-white hover:bg-error/90"
-              aria-label="Fechar visualizador (ESC)"
-            >
-              ✕
-            </button>
-          </div>
+          <div ref={modalRef} className="w-full max-w-6xl">
+            <div className="mb-3 flex w-full justify-end gap-2">
+              <a
+                href={report.pdf_url as string}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={markAsOpened}
+                className="inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
+              >
+                Abrir em nova aba
+              </a>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                onClick={() => setIsViewerOpen(false)}
+                className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 text-white hover:bg-error/90"
+                aria-label="Fechar visualizador de relatório (ESC)"
+              >
+                ✕
+              </button>
+            </div>
 
-          <iframe
-            src={report.pdf_url as string}
-            title={report.title}
-            className="h-[80vh] w-full max-w-6xl rounded-xl border border-white/20 bg-white"
-          />
+            <iframe
+              src={report.pdf_url as string}
+              title={report.title}
+              onLoad={markAsOpened}
+              className="h-[80vh] w-full rounded-xl border border-white/20 bg-white"
+            />
+          </div>
         </div>
       )}
     </section>

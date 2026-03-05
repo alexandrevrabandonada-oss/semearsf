@@ -706,6 +706,9 @@ export type SystemStatus = {
     current_month_total_cents: number;
     current_month_by_category: Record<string, number>;
     current_month_count: number;
+    last_7d_total_cents: number;
+    last_7d_by_category: Record<string, number>;
+    last_7d_count: number;
   };
   social: {
     total_7d: number;
@@ -766,6 +769,9 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         .select("category, amount_cents")
         .gte("occurred_on", monthStart.toISOString().slice(0, 10))
         .lt("occurred_on", monthEnd.toISOString().slice(0, 10)),
+      supabase.from("expenses")
+        .select("category, amount_cents")
+        .gte("occurred_on", sevenDaysAgo.slice(0, 10)),
       supabase.from("share_events")
         .select("*", { count: "exact", head: true })
         .gt("occurred_at", sevenDaysAgo),
@@ -795,16 +801,17 @@ export async function getSystemStatus(): Promise<SystemStatus> {
     const blog = results[2] as BlogPost[];
     const transparency = results[3] as TransparencySummary;
     const monthExpensesResult = results[4] as { data: Array<{ category: string; amount_cents: number }> };
-    const social7d = results[5] as { count: number };
-    const socialKinds = results[6] as { data: Array<{ kind: string | null }> };
-    const topShares = results[7] as { data: any[] };
-    const alerts7d = results[8] as { count: number };
-    const alertsStations = results[9] as { data: any[] };
-    const alertsPollutants = results[10] as { data: any[] };
-    const breaches24hResult = results[11] as { data: Array<{ station_id?: string; pm25?: number | null; pm10?: number | null; station?: { code?: string | null; name?: string | null } | Array<{ code?: string | null; name?: string | null }> | null }> };
-    const stationHealthData = results[12] as { data: StationHealth[] };
-    const opsKpiResult = results[13] as { data: OpsKPI[] };
-    const stationKpiResult = results[14] as { data: StationKPI[] };
+    const sevenDaysExpensesResult = results[5] as { data: Array<{ category: string; amount_cents: number }> };
+    const social7d = results[6] as { count: number };
+    const socialKinds = results[7] as { data: Array<{ kind: string | null }> };
+    const topShares = results[8] as { data: any[] };
+    const alerts7d = results[9] as { count: number };
+    const alertsStations = results[10] as { data: any[] };
+    const alertsPollutants = results[11] as { data: any[] };
+    const breaches24hResult = results[12] as { data: Array<{ station_id?: string; pm25?: number | null; pm10?: number | null; station?: { code?: string | null; name?: string | null } | Array<{ code?: string | null; name?: string | null }> | null }> };
+    const stationHealthData = results[13] as { data: StationHealth[] };
+    const opsKpiResult = results[14] as { data: OpsKPI[] };
+    const stationKpiResult = results[15] as { data: StationKPI[] };
 
     const stationCounts = new Map<string, number>();
     (alertsStations.data || []).forEach((item: any) => {
@@ -841,6 +848,15 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       monthSummary.count += 1;
     });
 
+    const sevenDaysSummary = { total_cents: 0, by_category: {} as Record<string, number>, count: 0 };
+    (sevenDaysExpensesResult.data || []).forEach((row) => {
+      const amount = Number(row.amount_cents ?? 0);
+      const cat = String(row.category ?? "outros");
+      sevenDaysSummary.total_cents += amount;
+      sevenDaysSummary.by_category[cat] = (sevenDaysSummary.by_category[cat] ?? 0) + amount;
+      sevenDaysSummary.count += 1;
+    });
+
     const breachCountsByStationCode = new Map<string, number>();
     (breaches24hResult.data || []).forEach((row) => {
       const stationPayload = Array.isArray(row.station) ? row.station[0] : row.station;
@@ -875,7 +891,10 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         ...transparency,
         current_month_total_cents: monthSummary.total_cents,
         current_month_by_category: monthSummary.by_category,
-        current_month_count: monthSummary.count
+        current_month_count: monthSummary.count,
+        last_7d_total_cents: sevenDaysSummary.total_cents,
+        last_7d_by_category: sevenDaysSummary.by_category,
+        last_7d_count: sevenDaysSummary.count
       },
       social: {
         total_7d: social7d.count || 0,
