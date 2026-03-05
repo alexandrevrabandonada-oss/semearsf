@@ -30,6 +30,16 @@ export function StatusPage() {
 
     const formatNumber = (value: number) => value.toLocaleString("pt-BR");
     const totalAboveThreshold24h = (status?.operations?.station_metrics ?? []).reduce((sum, station) => sum + (station.above_threshold_24h || 0), 0);
+    const socialLabels: Record<string, string> = {
+        dados: "Dados",
+        agenda: "Agenda",
+        blog: "Blog",
+        acervo: "Acervo",
+        dossies: "Dossies",
+        relatorios: "Relatorios"
+    };
+    const socialKindsOrder = ["dados", "agenda", "blog", "acervo", "dossies", "relatorios"];
+    const socialByKind = status?.social?.by_kind ?? {};
 
     if (loading) {
         return (
@@ -123,11 +133,11 @@ export function StatusPage() {
                     <h2 className="text-xs font-black uppercase tracking-widest text-cta">Transparência</h2>
                     <div className="mt-6 flex flex-col gap-4">
                         <div className="flex flex-col">
-                            <span className="text-2xl font-black text-primaria">{formatCurrency(status.transparency.total_cents)}</span>
-                            <span className="text-[10px] font-bold uppercase tracking-tighter text-texto/40 italic">Total de recursos aplicados</span>
+                            <span className="text-2xl font-black text-primaria">{formatCurrency(status.transparency.current_month_total_cents)}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-tighter text-texto/40 italic">Total no mês atual</span>
                         </div>
                         <div className="space-y-2 mt-2">
-                            {Object.entries(status.transparency.by_category).slice(0, 3).map(([cat, amount]) => (
+                            {Object.entries(status.transparency.current_month_by_category).sort((a, b) => Number(b[1]) - Number(a[1])).slice(0, 3).map(([cat, amount]) => (
                                 <div className="flex justify-between items-center text-xs" key={cat}>
                                     <span className="text-texto/60 capitalize">{cat}</span>
                                     <span className="font-bold text-texto">{formatCurrency(amount)}</span>
@@ -135,7 +145,26 @@ export function StatusPage() {
                             ))}
                         </div>
                     </div>
-                    <Link to="/transparencia" className="mt-auto pt-6 text-xs font-bold text-ciano hover:underline">Detalhes financeiros →</Link>
+                    <p className="mt-1 text-[10px] text-texto/40 uppercase tracking-tighter">{status.transparency.current_month_count} lançamentos no mês</p>
+                    <Link to="/transparencia" className="mt-auto pt-3 text-xs font-bold text-ciano hover:underline">Detalhes financeiros →</Link>
+                </div>
+
+                <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 flex flex-col">
+                    <h2 className="text-xs font-black uppercase tracking-widest text-cta">Alcance social (7 dias)</h2>
+                    <div className="mt-6 flex flex-col gap-4">
+                        <div className="flex items-end gap-2">
+                            <span className="text-4xl font-black text-ciano">{formatNumber(status.social.total_7d)}</span>
+                            <span className="mb-1 text-[10px] font-bold uppercase tracking-tighter text-texto/40">Compartilhamentos</span>
+                        </div>
+                        <div className="space-y-2">
+                            {socialKindsOrder.map((kind) => (
+                                <div key={kind} className="flex items-center justify-between text-xs">
+                                    <span className="text-texto/60">{socialLabels[kind] || kind}</span>
+                                    <span className="font-black text-texto">{formatNumber(Number(socialByKind[kind] || 0))}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
                 <div className="rounded-2xl border border-acento/40 bg-fundo/60 p-6 flex flex-col">

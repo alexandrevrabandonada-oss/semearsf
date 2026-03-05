@@ -1,60 +1,56 @@
 import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
+import { LoadingCard } from "./components/LoadingCard";
 import { PortalLayout } from "./layout/PortalLayout";
 
 // Eager-loaded (critical path)
 import { HomePage } from "./pages/HomePage";
-import { SobrePage } from "./pages/SobrePage";
 import { DadosPage } from "./pages/DadosPage";
 
 // Lazy-loaded (non-critical)
-const AgendaPage = lazy(() => import("./pages/AgendaPage").then(m => ({ default: m.AgendaPage })));
-const InscricoesPage = lazy(() => import("./pages/InscricoesPage").then(m => ({ default: m.InscricoesPage })));
-const TransparenciaPage = lazy(() => import("./pages/TransparenciaPage").then(m => ({ default: m.TransparenciaPage })));
-const AlertasPage = lazy(() => import("./pages/AlertasPage").then(m => ({ default: m.AlertasPage })));
-const SearchPage = lazy(() => import("./pages/SearchPage").then(m => ({ default: m.SearchPage })));
-const StatusPage = lazy(() => import("./pages/StatusPage").then(m => ({ default: m.StatusPage })));
+const SobrePage = lazy(() => import("./pages/SobrePage").then((m) => ({ default: m.SobrePage })));
+const AgendaPage = lazy(() => import("./pages/AgendaPage").then((m) => ({ default: m.AgendaPage })));
+const InscricoesPage = lazy(() => import("./pages/InscricoesPage").then((m) => ({ default: m.InscricoesPage })));
+const TransparenciaPage = lazy(() => import("./pages/TransparenciaPage").then((m) => ({ default: m.TransparenciaPage })));
+const AlertasPage = lazy(() => import("./pages/AlertasPage").then((m) => ({ default: m.AlertasPage })));
+const SearchPage = lazy(() => import("./pages/SearchPage").then((m) => ({ default: m.SearchPage })));
+const StatusPage = lazy(() => import("./pages/StatusPage").then((m) => ({ default: m.StatusPage })));
+const ComoLerDadosPage = lazy(() => import("./pages/ComoLerDadosPage").then((m) => ({ default: m.ComoLerDadosPage })));
+const ComoParticiparPage = lazy(() => import("./pages/ComoParticiparPage").then((m) => ({ default: m.ComoParticiparPage })));
+const PrivacidadeLgpdPage = lazy(() => import("./pages/PrivacidadeLgpdPage").then((m) => ({ default: m.PrivacidadeLgpdPage })));
 
 // Acervo lazy-loaded
-const AcervoPage = lazy(() => import("./pages/acervo/AcervoPage").then(m => ({ default: m.AcervoPage })));
-const AcervoTimelinePage = lazy(() => import("./pages/acervo/AcervoTimelinePage").then(m => ({ default: m.AcervoTimelinePage })));
-const AcervoListPage = lazy(() => import("./pages/acervo/AcervoListPage").then(m => ({ default: m.AcervoListPage })));
-const AcervoItemPage = lazy(() => import("./pages/acervo/AcervoItemPage").then(m => ({ default: m.AcervoItemPage })));
-const CollectionsListPage = lazy(() => import("./pages/acervo/CollectionsListPage").then(m => ({ default: m.CollectionsListPage })));
-const CollectionDetailPage = lazy(() => import("./pages/acervo/CollectionDetailPage").then(m => ({ default: m.CollectionDetailPage })));
+const AcervoPage = lazy(() => import("./pages/acervo/AcervoPage").then((m) => ({ default: m.AcervoPage })));
+const AcervoTimelinePage = lazy(() => import("./pages/acervo/AcervoTimelinePage").then((m) => ({ default: m.AcervoTimelinePage })));
+const AcervoListPage = lazy(() => import("./pages/acervo/AcervoListPage").then((m) => ({ default: m.AcervoListPage })));
+const AcervoItemPage = lazy(() => import("./pages/acervo/AcervoItemPage").then((m) => ({ default: m.AcervoItemPage })));
+const CollectionsListPage = lazy(() => import("./pages/acervo/CollectionsListPage").then((m) => ({ default: m.CollectionsListPage })));
+const CollectionDetailPage = lazy(() => import("./pages/acervo/CollectionDetailPage").then((m) => ({ default: m.CollectionDetailPage })));
 
 // Blog lazy-loaded
-const BlogListPage = lazy(() => import("./pages/BlogListPage").then(m => ({ default: m.BlogListPage })));
-const BlogPostPage = lazy(() => import("./pages/BlogPostPage").then(m => ({ default: m.BlogPostPage })));
+const BlogListPage = lazy(() => import("./pages/BlogListPage").then((m) => ({ default: m.BlogListPage })));
+const BlogPostPage = lazy(() => import("./pages/BlogPostPage").then((m) => ({ default: m.BlogPostPage })));
+
+// Relatorios lazy-loaded
+const ReportsListPage = lazy(() => import("./pages/reports/ReportsListPage").then((m) => ({ default: m.ReportsListPage })));
+const ReportDetailPage = lazy(() => import("./pages/reports/ReportDetailPage").then((m) => ({ default: m.ReportDetailPage })));
 
 // Conversar lazy-loaded
-const ConversarListPage = lazy(() => import("./pages/conversar/ConversarListPage").then(m => ({ default: m.ConversarListPage })));
-const ConversarDetailPage = lazy(() => import("./pages/conversar/ConversarDetailPage").then(m => ({ default: m.ConversarDetailPage })));
+const ConversarListPage = lazy(() => import("./pages/conversar/ConversarListPage").then((m) => ({ default: m.ConversarListPage })));
+const ConversarDetailPage = lazy(() => import("./pages/conversar/ConversarDetailPage").then((m) => ({ default: m.ConversarDetailPage })));
 
 // Corredores lazy-loaded
-const CorredoresListPage = lazy(() => import("./pages/corredores/CorredoresListPage").then(m => ({ default: m.CorredoresListPage })));
-const CorredoresDetailPage = lazy(() => import("./pages/corredores/CorredoresDetailPage").then(m => ({ default: m.CorredoresDetailPage })));
+const CorredoresListPage = lazy(() => import("./pages/corredores/CorredoresListPage").then((m) => ({ default: m.CorredoresListPage })));
+const CorredoresDetailPage = lazy(() => import("./pages/corredores/CorredoresDetailPage").then((m) => ({ default: m.CorredoresDetailPage })));
 
 // Mapa lazy-loaded
-const MapaPage = lazy(() => import("./pages/MapaPage").then(m => ({ default: m.MapaPage })));
-
-// Fallback loading component
-function LoadingFallback() {
-  return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
-        <p className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Carregando conteúdo...</p>
-      </div>
-    </div>
-  );
-}
+const MapaPage = lazy(() => import("./pages/MapaPage").then((m) => ({ default: m.MapaPage })));
 
 export default function App() {
   return (
     <PortalLayout>
-      <Suspense fallback={<LoadingFallback />}>
+      <Suspense fallback={<LoadingCard message="Carregando conteúdo da página..." />}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/alertas" element={<AlertasPage />} />
@@ -68,6 +64,9 @@ export default function App() {
           <Route path="/inscricoes" element={<InscricoesPage />} />
           <Route path="/sobre" element={<SobrePage />} />
           <Route path="/transparencia" element={<TransparenciaPage />} />
+          <Route path="/como-ler-dados" element={<ComoLerDadosPage />} />
+          <Route path="/como-participar" element={<ComoParticiparPage />} />
+          <Route path="/privacidade-lgpd" element={<PrivacidadeLgpdPage />} />
           <Route path="/acervo" element={<AcervoPage />} />
           <Route path="/acervo/linha" element={<AcervoTimelinePage />} />
           <Route path="/acervo/:area" element={<AcervoListPage />} />
@@ -76,6 +75,8 @@ export default function App() {
           <Route path="/dossies/:slug" element={<CollectionDetailPage />} />
           <Route path="/blog" element={<BlogListPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
+          <Route path="/relatorios" element={<ReportsListPage />} />
+          <Route path="/relatorios/:slug" element={<ReportDetailPage />} />
           <Route path="/status" element={<StatusPage />} />
           <Route path="/buscar" element={<SearchPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

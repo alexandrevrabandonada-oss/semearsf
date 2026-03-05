@@ -8,12 +8,46 @@ function formatBRL(cents: number) {
   }).format(cents / 100);
 }
 
+function toCsvCell(value: unknown) {
+  const text = String(value ?? "");
+  if (text.includes(",") || text.includes('"') || text.includes("\n")) {
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+  return text;
+}
+
 export function TransparenciaPage() {
   const [summary, setSummary] = useState<TransparencySummary | null>(null);
   const [links, setLinks] = useState<TransparencyLink[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleDownloadExpensesCsv = () => {
+    const header = ["occurred_on", "vendor", "category", "amount", "description", "document_url"];
+    const rows = expenses.map((exp) => [
+      exp.occurred_on,
+      exp.vendor,
+      exp.category,
+      (exp.amount_cents / 100).toFixed(2),
+      exp.description,
+      exp.document_url ?? ""
+    ]);
+
+    const csv = [header, ...rows]
+      .map((row) => row.map((cell) => toCsvCell(cell)).join(","))
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `gastos_transparencia_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -23,7 +57,7 @@ export function TransparenciaPage() {
         const [sumData, linkData, expData] = await Promise.all([
           getTransparencySummary(),
           listTransparencyLinks(),
-          listExpenses(10)
+          listExpenses(1000)
         ]);
         if (!cancelled) {
           setSummary(sumData);
@@ -66,7 +100,7 @@ export function TransparenciaPage() {
     <div className="space-y-8">
       {/* Header */}
       <section className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm md:p-12">
-        <div className="mb-6 flex items-center gap-3">
+        <div className="mb-6 flex items-center justify-between gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-success/10 text-success">
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -163,13 +197,22 @@ export function TransparenciaPage() {
 
       {/* Activity Table */}
       <section className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-green/10 text-accent-green">
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-green/10 text-accent-green">
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
             </svg>
           </div>
-          <h2 className="text-2xl font-black text-text-primary">Últimas Despesas Lançadas</h2>
+            <h2 className="text-2xl font-black text-text-primary">Últimas Despesas Lançadas</h2>
+          </div>
+          <button
+          type="button"
+          onClick={handleDownloadExpensesCsv}
+          className="inline-flex min-h-[44px] items-center rounded-lg border border-border-subtle bg-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-brand-primary transition-colors hover:bg-bg-surface"
+        >
+          Baixar CSV (gastos)
+        </button>
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-border-subtle">
@@ -181,7 +224,7 @@ export function TransparenciaPage() {
                 <th className="hidden px-4 py-3 text-sm font-bold uppercase tracking-wider text-text-secondary md:table-cell">Categoria</th>
                 <th className="px-4 py-3 text-sm font-bold uppercase tracking-wider text-text-secondary">Descrição</th>
                 <th className="px-4 py-3 text-right text-sm font-bold uppercase tracking-wider text-text-secondary">Valor</th>
-                <th className="px-4 py-3"></th>
+                <th className="px-4 py-3 text-right text-sm font-bold uppercase tracking-wider text-text-secondary">Documento</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-subtle">
@@ -201,7 +244,7 @@ export function TransparenciaPage() {
                     {formatBRL(exp.amount_cents)}
                   </td>
                   <td className="px-4 py-4 text-right">
-                    {exp.document_url && (
+                    {exp.document_url ? (
                       <a
                         href={exp.document_url}
                         target="_blank"
@@ -213,6 +256,8 @@ export function TransparenciaPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
                       </a>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full bg-bg-surface px-2 py-1 text-xs font-semibold text-text-secondary">Sem documento</span>
                     )}
                   </td>
                 </tr>

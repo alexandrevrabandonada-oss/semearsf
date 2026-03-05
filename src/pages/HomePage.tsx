@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { listAcervoItems, listBlogPosts, getStationOverview, listUpcomingEvents, getTransparencySummary, listFeaturedCollections, listFeaturedCorridors, type AcervoItem, type Event, type StationOverview, type BlogPost, type TransparencySummary, type AcervoCollection, type ClimateCorridor } from "../lib/api";
+import { listAcervoItems, listBlogPosts, getStationOverview, listUpcomingEvents, getTransparencySummary, listFeaturedCollections, listFeaturedCorridors, listLatestReports, type AcervoItem, type Event, type StationOverview, type BlogPost, type TransparencySummary, type AcervoCollection, type ClimateCorridor, type ReportDocument } from "../lib/api";
 import { useInstallPrompt } from "../hooks/useInstallPrompt";
 import { getOptimizedCover } from "../lib/imageOptimization";
 
@@ -14,6 +14,7 @@ export function HomePage() {
   const [transparency, setTransparency] = useState<TransparencySummary | null>(null);
   const [collections, setCollections] = useState<AcervoCollection[]>([]);
   const [corridors, setCorridors] = useState<ClimateCorridor[]>([]);
+  const [reports, setReports] = useState<ReportDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,14 +22,15 @@ export function HomePage() {
     async function load() {
       try {
         setLoading(true);
-        const [stationsData, eventsData, acervoData, blogData, transData, collectionsData, corridorsData] = await Promise.all([
+        const [stationsData, eventsData, acervoData, blogData, transData, collectionsData, corridorsData, reportsData] = await Promise.all([
           getStationOverview(),
           listUpcomingEvents(),
           listAcervoItems({ featured: true, limit: 6 }),
           listBlogPosts({ limit: 1 }),
           getTransparencySummary(),
           listFeaturedCollections(3),
-          listFeaturedCorridors(3)
+          listFeaturedCorridors(3),
+          listLatestReports(3)
         ]);
         setStations(stationsData);
         setEvents(eventsData.slice(0, 3));
@@ -37,6 +39,7 @@ export function HomePage() {
         setTransparency(transData);
         setCollections(collectionsData as AcervoCollection[]);
         setCorridors(corridorsData);
+        setReports(reportsData);
       } catch (err) {
         console.error("Erro ao carregar dados da home:", err);
         setError("Não foi possível carregar as informações em tempo real.");
@@ -491,6 +494,56 @@ export function HomePage() {
                     <span className="transition-transform group-hover:translate-x-1">→</span>
                   </div>
                 </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Relatórios e Notas Técnicas */}
+      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h6m-6 4h10M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H9l-3 3v11a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-text-primary">Relatórios e Notas Técnicas</h2>
+              <p className="text-sm text-text-secondary">Publicações oficiais em PDF</p>
+            </div>
+          </div>
+          <Link className="text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/relatorios">
+            Ver todos →
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="grid gap-4 md:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-28 animate-pulse rounded-lg bg-bg-surface" />
+            ))}
+          </div>
+        ) : reports.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
+            <p className="text-sm text-text-secondary">Nenhum relatório disponível no momento.</p>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-3">
+            {reports.map((report) => (
+              <Link
+                key={report.id}
+                to={`/relatorios/${report.slug}`}
+                className="rounded-lg border border-border-subtle bg-bg-surface p-4 transition-all hover:border-brand-primary hover:shadow-sm"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-primary">
+                  {report.published_at ? new Date(report.published_at).toLocaleDateString("pt-BR") : "Sem data"}
+                </p>
+                <h3 className="mt-1 text-sm font-black text-text-primary line-clamp-2">{report.title}</h3>
+                {report.summary && (
+                  <p className="mt-2 text-xs text-text-secondary line-clamp-2">{report.summary}</p>
+                )}
               </Link>
             ))}
           </div>

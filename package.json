@@ -14,12 +14,13 @@
     "db:types:local": "npx supabase gen types typescript --local > src/lib/supabase/database.types.ts",
     "db:types:remote": "source .env.local 2>/dev/null || true; npx supabase gen types typescript --project-id $SUPABASE_PROJECT_REF > src/lib/supabase/database.types.ts",
     "db:doctor": "node tools/migration-doctor.mjs",
+    "db:sync": "node tools/migration-sync.mjs",
     "env:doctor": "node tools/env-doctor.mjs",
     "env:clean": "node tools/env-clean.mjs",
     "fn:deploy": "npx supabase functions deploy --no-verify-jwt",
     "secrets:set": "node tools/secrets-set.mjs",
     "ship:infra": "npm run db:push && npm run fn:deploy && npm run done",
-    "ship:content": "npm run acervo:import && npm run collections:import && npm run blog:import && npm run transparency:import && npm run done",
+    "ship:content": "npm run acervo:import && npm run collections:import && npm run blog:import && npm run reports:import && npm run transparency:import && npm run done",
     "ship:all": "npm run ship:infra && npm run ship:content",
     "simulate:sensor": "node tools/simulate-sensor.mjs",
     "simulate:sensor:retry": "node tools/simulate-sensor.mjs --retry",
@@ -34,7 +35,9 @@
     "transparency:import": "node tools/transparency-import.mjs",
     "demo:dados": "node tools/demo-measurements.mjs",
     "demo:load": "node tools/demo-load.mjs",
-    "done": "npm run verify && npm run smoke && npm run db:doctor && npm run env:doctor && npm run snapshot"
+    "done": "npm run verify && npm run smoke && npm run db:doctor && npm run db:sync && npm run env:doctor && npm run snapshot",
+    "reports:import": "node tools/reports-import.mjs",
+    "reports:upload": "node tools/reports-upload.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",

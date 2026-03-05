@@ -490,7 +490,75 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
 }
 
 // ─────────────────────────────────────────
-// Transparência
+// Relatorios
+// ─────────────────────────────────────────
+
+export type ReportDocument = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string | null;
+  published_at: string | null;
+  year: number | null;
+  pdf_url: string | null;
+  cover_url: string | null;
+  tags: string[];
+  created_at: string;
+};
+
+function rowToReportDocument(row: Record<string, unknown>): ReportDocument {
+  return {
+    id: String(row.id ?? ""),
+    slug: String(row.slug ?? ""),
+    title: String(row.title ?? "Sem titulo"),
+    summary: typeof row.summary === "string" ? row.summary : null,
+    published_at: typeof row.published_at === "string" ? row.published_at : null,
+    year: typeof row.year === "number" ? row.year : null,
+    pdf_url: typeof row.pdf_url === "string" ? row.pdf_url : null,
+    cover_url: typeof row.cover_url === "string" ? row.cover_url : null,
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    created_at: typeof row.created_at === "string" ? row.created_at : ""
+  };
+}
+
+export async function listReports(limit = 100): Promise<ReportDocument[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("reports")
+      .select("*")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return ((data || []) as Record<string, unknown>[]).map(rowToReportDocument);
+  } catch (error) {
+    throw toAppError("Falha ao listar relatorios", error);
+  }
+}
+
+export async function listLatestReports(limit = 3): Promise<ReportDocument[]> {
+  return listReports(limit);
+}
+
+export async function getReportBySlug(slug: string): Promise<ReportDocument | null> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("reports")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return rowToReportDocument(data as Record<string, unknown>);
+  } catch (error) {
+    throw toAppError("Falha ao carregar relatorio", error);
+  }
+}
+
+// ─────────────────────────────────────────
+// Relatorios
 // ─────────────────────────────────────────
 
 export type TransparencyLink = {
@@ -631,12 +699,17 @@ export type SystemStatus = {
   };
   content: {
     upcoming_events: EventSummary[];
-    latest_acervo: any[]; // Use AcervoItem type if available, but for status list generic is fine
+    latest_acervo: any[];
     latest_blog: BlogPost[];
   };
-  transparency: TransparencySummary;
+  transparency: TransparencySummary & {
+    current_month_total_cents: number;
+    current_month_by_category: Record<string, number>;
+    current_month_count: number;
+  };
   social: {
     total_7d: number;
+    by_kind: Record<string, number>;
     top_slugs: { kind: string; slug: string; count: number }[];
   };
   alerts: {
@@ -660,7 +733,6 @@ export async function getSystemStatus(): Promise<SystemStatus> {
   try {
     const supabase = assertSupabase();
 
-    // 1. Monitoring stats
     const [{ count: stationsCount }, { count: measurements24h }] = await Promise.all([
       supabase.from("stations").select("*", { count: "exact", head: true }),
       supabase.from("measurements")
@@ -668,7 +740,6 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         .gt("ts", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
     ]);
 
-    // Latest measurement with station name
     const { data: latestM } = await supabase
       .from("measurements")
       .select("ts, station:stations(name)")
@@ -676,8 +747,12 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       .limit(1)
       .maybeSingle();
 
-    // 2. Content & Social
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+    const monthEnd = new Date(monthStart);
+    monthEnd.setMonth(monthEnd.getMonth() + 1);
 
     const results = await Promise.all([
       supabase.from("events").select("id, title, start_at, location, capacity")
@@ -687,11 +762,17 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       supabase.from("acervo_items").select("*").order("created_at", { ascending: false }).limit(3),
       listBlogPosts({ limit: 2 }),
       getTransparencySummary(),
+      supabase.from("expenses")
+        .select("category, amount_cents")
+        .gte("occurred_on", monthStart.toISOString().slice(0, 10))
+        .lt("occurred_on", monthEnd.toISOString().slice(0, 10)),
       supabase.from("share_events")
         .select("*", { count: "exact", head: true })
         .gt("occurred_at", sevenDaysAgo),
+      supabase.from("share_events")
+        .select("kind")
+        .gt("occurred_at", sevenDaysAgo),
       supabase.rpc("get_top_shared_items", { p_days: 7 }),
-      // Push alerts (7 days)
       supabase.from("push_events")
         .select("*", { count: "exact", head: true })
         .gt("ts", sevenDaysAgo),
@@ -701,13 +782,10 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       supabase.from("push_events")
         .select("pollutant")
         .gt("ts", sevenDaysAgo),
-      // Threshold breaches in the last 24h (per station)
       supabase.from("measurements")
         .select("station_id, pm25, pm10, station:stations(code, name)")
         .gt("ts", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
-      // Network health
       supabase.rpc("get_station_health"),
-      // Operations KPIs
       supabase.rpc("get_ops_kpis_7d"),
       supabase.rpc("get_station_kpis_7d")
     ]);
@@ -716,17 +794,18 @@ export async function getSystemStatus(): Promise<SystemStatus> {
     const acervo = results[1];
     const blog = results[2] as BlogPost[];
     const transparency = results[3] as TransparencySummary;
-    const social7d = results[4] as { count: number };
-    const topShares = results[5] as { data: any[] };
-    const alerts7d = results[6] as { count: number };
-    const alertsStations = results[7] as { data: any[] };
-    const alertsPollutants = results[8] as { data: any[] };
-    const breaches24hResult = results[9] as { data: Array<{ station_id?: string; pm25?: number | null; pm10?: number | null; station?: { code?: string | null; name?: string | null } | Array<{ code?: string | null; name?: string | null }> | null }> };
-    const stationHealthData = results[10] as { data: StationHealth[] };
-    const opsKpiResult = results[11] as { data: OpsKPI[] };
-    const stationKpiResult = results[12] as { data: StationKPI[] };
+    const monthExpensesResult = results[4] as { data: Array<{ category: string; amount_cents: number }> };
+    const social7d = results[5] as { count: number };
+    const socialKinds = results[6] as { data: Array<{ kind: string | null }> };
+    const topShares = results[7] as { data: any[] };
+    const alerts7d = results[8] as { count: number };
+    const alertsStations = results[9] as { data: any[] };
+    const alertsPollutants = results[10] as { data: any[] };
+    const breaches24hResult = results[11] as { data: Array<{ station_id?: string; pm25?: number | null; pm10?: number | null; station?: { code?: string | null; name?: string | null } | Array<{ code?: string | null; name?: string | null }> | null }> };
+    const stationHealthData = results[12] as { data: StationHealth[] };
+    const opsKpiResult = results[13] as { data: OpsKPI[] };
+    const stationKpiResult = results[14] as { data: StationKPI[] };
 
-    // Count top stations and pollutants
     const stationCounts = new Map<string, number>();
     (alertsStations.data || []).forEach((item: any) => {
       const code = item.station_code;
@@ -736,6 +815,12 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       .map(([station_code, count]) => ({ station_code, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
+
+    const socialByKind = (socialKinds.data || []).reduce((acc, item) => {
+      const key = String(item.kind ?? "outros");
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
     const pollutantCounts = new Map<string, number>();
     (alertsPollutants.data || []).forEach((item: any) => {
@@ -747,6 +832,15 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
 
+    const monthSummary = { total_cents: 0, by_category: {} as Record<string, number>, count: 0 };
+    (monthExpensesResult.data || []).forEach((row) => {
+      const amount = Number(row.amount_cents ?? 0);
+      const cat = String(row.category ?? "outros");
+      monthSummary.total_cents += amount;
+      monthSummary.by_category[cat] = (monthSummary.by_category[cat] ?? 0) + amount;
+      monthSummary.count += 1;
+    });
+
     const breachCountsByStationCode = new Map<string, number>();
     (breaches24hResult.data || []).forEach((row) => {
       const stationPayload = Array.isArray(row.station) ? row.station[0] : row.station;
@@ -755,12 +849,11 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       breachCountsByStationCode.set(stationCode, (breachCountsByStationCode.get(stationCode) || 0) + 1);
     });
 
-    // Network health breakdown
     const networkHealth = { ok: 0, degraded: 0, offline: 0, unknown: 0 };
     (stationHealthData.data || []).forEach((health: StationHealth) => {
       const status = health.health_status as keyof typeof networkHealth;
       if (status in networkHealth) {
-        networkHealth[status]++;
+        networkHealth[status] += 1;
       }
     });
 
@@ -778,9 +871,15 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         latest_acervo: ((acervo.data ?? []) as any[]).filter((item) => isPublishTimeReached(String(item.publish_at ?? "") || null)),
         latest_blog: blog
       },
-      transparency,
+      transparency: {
+        ...transparency,
+        current_month_total_cents: monthSummary.total_cents,
+        current_month_by_category: monthSummary.by_category,
+        current_month_count: monthSummary.count
+      },
       social: {
         total_7d: social7d.count || 0,
+        by_kind: socialByKind,
         top_slugs: (topShares.data || []) as { kind: string; slug: string; count: number }[]
       },
       alerts: {
@@ -804,9 +903,6 @@ export async function getSystemStatus(): Promise<SystemStatus> {
   }
 }
 
-/**
- * Busca itens no acervo pelo título ou excerto.
- */
 export async function searchAcervo(q: string, limit = 10): Promise<AcervoItem[]> {
   try {
     const supabase = assertSupabase();
@@ -1305,6 +1401,7 @@ export async function getCorridorBySlug(slug: string): Promise<ClimateCorridorWi
     throw toAppError("Falha ao carregar corredor climático", error);
   }
 }
+
 
 
 
