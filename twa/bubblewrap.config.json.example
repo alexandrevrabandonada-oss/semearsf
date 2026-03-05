@@ -1,0 +1,47 @@
+{
+  "host": "semear-pwa.vercel.app",
+  "name": "SEMEAR",
+  "launcherName": "SEMEAR",
+  "display": "standalone",
+  "themeColor": "#18A572",
+  "backgroundColor": "#0A1F1A",
+  "startUrl": "/",
+  "iconUrl": "https://semear-pwa.vercel.app/icons/icon-512x512.png",
+  "maskableIconUrl": "https://semear-pwa.vercel.app/icons/icon-maskable-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "semear-key"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Dados",
+      "short_name": "Dados",
+      "url": "/dados",
+      "icon": "https://semear-pwa.vercel.app/icons/icon-192x192.png"
+    },
+    {
+      "name": "Acervo",
+      "short_name": "Acervo",
+      "url": "/acervo",
+      "icon": "https://semear-pwa.vercel.app/icons/icon-192x192.png"
+    }
+  ],
+  "packageId": "br.org.semear.pwa",
+  "webManifestUrl": "https://semear-pwa.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableNotifications": true
+}

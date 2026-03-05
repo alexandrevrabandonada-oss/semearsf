@@ -1000,19 +1000,32 @@ export async function createConversationComment(payload: {
   conversation_id: string;
   name: string;
   body: string;
-}): Promise<ConversationComment> {
+  honeypot?: string;
+}): Promise<{ data: ConversationComment; status: string }> {
   try {
     const supabase = assertSupabase();
-    const { data, error } = await supabase
-      .from("conversation_comments")
-      .insert(payload)
-      .select()
-      .single();
+    const { data, error } = await supabase.functions.invoke("submit-comment", {
+      body: payload
+    });
 
     if (error) throw error;
-    return data as ConversationComment;
+    return data;
   } catch (error) {
     throw toAppError("Falha ao publicar comentário", error);
+  }
+}
+
+export async function reportConversationComment(commentId: string): Promise<{ success: boolean; hidden: boolean }> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase.functions.invoke("report-comment", {
+      body: { comment_id: commentId }
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    throw toAppError("Falha ao denunciar comentário", error);
   }
 }
 
@@ -1027,6 +1040,9 @@ export type ClimateCorridor = {
   excerpt: string | null;
   geometry_json: any | null; // e.g. GeoJSON literal
   featured: boolean;
+  cover_url: string | null;
+  note_md: string | null;
+  position: number;
   created_at: string;
   meta: any;
 };
@@ -1048,6 +1064,7 @@ export async function listCorridors(options?: { featuredOnly?: boolean }): Promi
     let query = supabase
       .from("climate_corridors")
       .select("*")
+      .order("position", { ascending: false })
       .order("created_at", { ascending: false });
 
     if (options?.featuredOnly) {
@@ -1060,6 +1077,24 @@ export async function listCorridors(options?: { featuredOnly?: boolean }): Promi
     return (data || []) as ClimateCorridor[];
   } catch (error) {
     throw toAppError("Falha ao listar corredores climáticos", error);
+  }
+}
+
+export async function listFeaturedCorridors(limit: number = 3): Promise<ClimateCorridor[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase
+      .from("climate_corridors")
+      .select("*")
+      .eq("featured", true)
+      .order("position", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return (data || []) as ClimateCorridor[];
+  } catch (error) {
+    throw toAppError("Falha ao listar corredores em destaque", error);
   }
 }
 
@@ -1079,6 +1114,7 @@ export async function getCorridorBySlug(slug: string): Promise<ClimateCorridorWi
       .from("climate_corridor_links")
       .select("*")
       .eq("corridor_id", corridor.id)
+      .order("item_kind", { ascending: true })
       .order("position", { ascending: true });
 
     if (linksError) throw linksError;

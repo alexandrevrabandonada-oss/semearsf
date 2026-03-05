@@ -32,37 +32,37 @@ export function BlogListPage() {
 
     return (
         <section className="space-y-6">
-            <div className="rounded-2xl border border-primaria/60 bg-fundo/80 p-6 md:p-8">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-ciano">Comunicação</p>
-                <h1 className="mt-2 text-2xl font-black uppercase tracking-wide text-cta md:text-4xl">
+            <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Comunicação</p>
+                <h1 className="mt-2 text-2xl font-black uppercase tracking-wide text-text-primary md:text-4xl">
                     Blog da Emenda
                 </h1>
-                <p className="mt-2 text-sm text-texto/80">
+                <p className="mt-2 text-base leading-relaxed text-text-secondary">
                     Acompanhe as últimas atualizações, notícias institucionais e artigos sobre o monitoramento do ar.
                 </p>
             </div>
 
             {loading ? (
-                <p aria-live="polite" className="text-sm text-texto/80" role="status">Carregando posts...</p>
+                <p aria-live="polite" className="text-base text-text-secondary" role="status">Carregando posts...</p>
             ) : error ? (
-                <p aria-live="assertive" className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto" role="alert">
+                <p aria-live="assertive" className="rounded-md border border-error bg-error/10 p-3 text-base text-error" role="alert">
                     {error}
                 </p>
             ) : posts.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-ciano/30 py-12 text-center text-texto/50">
+                <div className="rounded-2xl border border-dashed border-border-subtle bg-bg-surface py-12 text-center text-text-secondary">
                     <p className="text-4xl">✍️</p>
-                    <p className="mt-4 font-semibold">Nenhum post publicado no momento.</p>
+                    <p className="mt-4 text-base font-semibold">Nenhum post publicado no momento.</p>
                 </div>
             ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {posts.map((post) => (
                         <Link
-                            className="flex flex-col overflow-hidden rounded-2xl border border-ciano/20 bg-fundo/70 transition-all hover:border-ciano hover:bg-fundo/90"
+                            className="flex flex-col overflow-hidden rounded-2xl border border-border-subtle bg-white shadow-sm transition-all hover:border-brand-primary hover:shadow-md"
                             key={post.id}
                             to={`/blog/${post.slug}`}
                         >
                             {post.cover_url && (
-                                <div className="h-40 w-full overflow-hidden bg-ciano/5 relative">
+                                <div className="h-40 w-full overflow-hidden bg-bg-surface relative">
                                     <img
                                         alt={post.title}
                                         className="h-full w-full object-cover transition-all duration-700 ease-in-out"
@@ -78,21 +78,21 @@ export function BlogListPage() {
                                 </div>
                             )}
                             <div className="flex flex-1 flex-col p-5">
-                                <div className="mb-2 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-texto/50">
+                                <div className="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-text-secondary">
                                     <span>{post.published_at ? new Date(post.published_at).toLocaleDateString("pt-BR") : "Draft"}</span>
                                 </div>
-                                <h2 className="mb-2 text-lg font-black leading-tight text-cta line-clamp-2">
+                                <h2 className="mb-2 text-lg font-black leading-tight text-text-primary line-clamp-2">
                                     {post.title}
                                 </h2>
                                 {post.excerpt && (
-                                    <p className="mb-4 line-clamp-3 text-xs text-texto/70 leading-relaxed">
+                                    <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-text-secondary">
                                         {post.excerpt}
                                     </p>
                                 )}
                                 <div className="mt-auto flex flex-wrap gap-1">
                                     {post.tags.slice(0, 3).map((tag) => (
                                         <span
-                                            className="rounded-full bg-ciano/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-ciano"
+                                            className="rounded-full bg-brand-primary/10 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-brand-primary"
                                             key={tag}
                                         >
                                             {tag}

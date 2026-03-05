@@ -3,11 +3,59 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+  font-size: 16px; /* Accessibility: minimum readable font size */
 }
 
 body {
-  @apply bg-base text-texto antialiased;
+  @apply bg-bg-page text-text-primary antialiased;
+  font-size: 1rem; /* 16px base */
+  line-height: 1.5; /* Improved readability */
+}
+
+a {
+  @apply text-brand-primary transition-colors;
+}
+
+a:hover {
+  @apply text-brand-primary-dark;
+}
+
+button,
+input,
+textarea,
+select,
+[role="button"],
+[tabindex]:not([tabindex="-1"]) {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-page;
+}
+
+input,
+textarea,
+select {
+  @apply border border-border-subtle bg-bg-surface text-text-primary placeholder:text-text-secondary;
+}
+
+@layer components {
+  .ui-card {
+    @apply rounded-xl border border-border-subtle bg-bg-surface shadow-sm;
+  }
+
+  .ui-badge {
+    @apply inline-flex items-center rounded-md border border-border-subtle bg-brand-primary-soft px-2.5 py-1 text-xs font-semibold text-brand-primary-dark;
+  }
+
+  .ui-btn-primary {
+    @apply rounded-lg bg-brand-primary px-4 py-2 font-semibold text-white transition-colors hover:bg-brand-primary-dark;
+  }
+
+  .ui-btn-secondary {
+    @apply rounded-lg border border-border-subtle bg-bg-surface px-4 py-2 font-semibold text-text-primary transition-colors hover:bg-brand-primary-soft;
+  }
+
+  .ui-link {
+    @apply text-brand-primary underline-offset-2 hover:text-brand-primary-dark hover:underline;
+  }
 }
 
 #root {

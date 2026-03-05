@@ -109,94 +109,105 @@ export function SearchPage() {
         <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <header className="flex flex-col gap-4">
                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-ciano">Busca Global</p>
-                    <h1 className="text-4xl font-black text-texto">Explorar o Projeto</h1>
+                    <h1 className="text-4xl font-black text-text-primary">Busca no Portal</h1>
+                    <p className="mt-2 text-base text-text-secondary">Explore acervo, blog, transparência e agenda</p>
                 </div>
 
                 <div className="relative group">
+                    <label htmlFor="global-search" className="sr-only">
+                        Buscar no portal SEMEAR
+                    </label>
                     <input
-                        type="text"
-                        placeholder="O que você está procurando? (ex: estação, emenda, evento...)"
+                        id="global-search"
+                        type="search"
+                        placeholder="Digite palavras-chave (ex: estação, emenda, evento...)"
                         value={query}
                         onChange={(e) => setSearchParams({ q: e.target.value, tipo })}
-                        className="w-full rounded-2xl border border-ciano/30 bg-base/40 p-5 pr-14 text-lg font-bold text-texto placeholder:text-texto/40 focus:border-ciano focus:outline-none transition-all group-hover:border-ciano/50 shadow-lg"
+                        className="w-full rounded-xl border-2 border-border-subtle bg-white p-5 pr-14 text-base font-semibold text-text-primary placeholder:text-text-secondary/60 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all shadow-sm"
+                        aria-describedby="search-help"
                     />
-                    <div className="absolute right-5 top-1/2 -translate-y-1/2 text-ciano/60">
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none" aria-hidden="true">
                         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
                 </div>
+                <p id="search-help" className="sr-only">
+                    Digite pelo menos 2 caracteres para obter resultados da busca
+                </p>
 
-                <div className="flex flex-wrap gap-2">
-                    {(["todos", "acervo", "blog", "transparencia", "agenda"] as SearchType[]).map((t) => (
-                        <button
-                            key={t}
-                            onClick={() => handleTipoChange(t)}
-                            className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all ${tipo === t
-                                ? "bg-ciano text-base shadow-lg shadow-ciano/20"
-                                : "bg-base/40 text-texto/60 hover:bg-base/60 hover:text-texto"
-                                }`}
-                        >
-                            <span>{t === "transparencia" ? "Transparência" : t}</span>
-                            {query.trim().length >= 2 && !loading && (
-                                <span className={`flex h-4 items-center justify-center rounded-full px-1.5 text-[9px] ${tipo === t ? 'bg-base/20 text-base' : 'bg-texto/10 text-texto/60'}`}>
-                                    {t === "todos" ? totalResults : results[t === "agenda" ? "events" : t === "transparencia" ? "transparency" : t].length}
-                                </span>
-                            )}
-                        </button>
-                    ))}
+                <div role="group" aria-label="Filtros de busca">
+                    <div className="flex flex-wrap gap-2">
+                        {(["todos", "acervo", "blog", "transparencia", "agenda"] as SearchType[]).map((t) => (
+                            <button
+                                key={t}
+                                onClick={() => handleTipoChange(t)}
+                                className={`inline-flex min-h-[44px] items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition-all ${tipo === t
+                                    ? "bg-brand-primary text-white shadow-md"
+                                    : "border border-border-subtle bg-white text-text-secondary hover:bg-brand-primary-soft hover:text-brand-primary"
+                                    }`}
+                                aria-pressed={tipo === t}
+                            >
+                                <span className="capitalize">{t === "transparencia" ? "Transparência" : t}</span>
+                                {query.trim().length >= 2 && !loading && (
+                                    <span className={`flex h-5 items-center justify-center rounded-full px-2 text-xs font-bold ${tipo === t ? 'bg-white/20 text-white' : 'bg-brand-primary/10 text-brand-primary'}`} aria-label={`${t === "todos" ? totalResults : results[t === "agenda" ? "events" : t === "transparencia" ? "transparency" : t].length} resultados`}>
+                                        {t === "todos" ? totalResults : results[t === "agenda" ? "events" : t === "transparencia" ? "transparency" : t].length}
+                                    </span>
+                                )}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </header>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-20 animate-pulse">
-                    <div className="h-12 w-12 rounded-full border-4 border-ciano border-t-transparent animate-spin mb-4" />
-                    <p className="text-sm font-bold uppercase tracking-widest text-ciano italic">Vasculhando o projeto...</p>
+                <div className="flex flex-col items-center justify-center py-20" role="status" aria-live="polite">
+                    <div className="h-12 w-12 rounded-full border-4 border-brand-primary border-t-transparent animate-spin mb-4" aria-hidden="true" />
+                    <p className="text-base font-semibold text-brand-primary">Buscando resultados...</p>
                 </div>
             ) : error ? (
-                <div className="rounded-2xl border border-dashed border-acento/40 p-10 text-center bg-acento/5">
-                    <p className="text-acento font-bold">{error}</p>
+                <div className="rounded-2xl border-2 border-danger bg-danger/10 p-10 text-center" role="alert">
+                    <p className="text-base font-bold text-danger">{error}</p>
                 </div>
             ) : query && totalResults === 0 ? (
-                <div className="rounded-2xl border border-dashed border-ciano/30 p-20 text-center bg-base/20">
-                    <div className="text-4xl mb-4">🔦</div>
-                    <h2 className="text-xl font-bold text-texto uppercase">Nenhum resultado</h2>
-                    <p className="mt-2 text-sm text-texto/50">Tente usar termos mais genéricos ou verifique a ortografia.</p>
+                <div className="rounded-2xl border border-dashed border-border-subtle bg-bg-surface p-20 text-center">
+                    <div className="text-4xl mb-4" aria-hidden="true">🔦</div>
+                    <h2 className="text-xl font-bold text-text-primary">Nenhum resultado encontrado</h2>
+                    <p className="mt-2 text-base text-text-secondary">Tente usar termos mais genéricos ou verifique a ortografia.</p>
                 </div>
             ) : !query ? (
-                <div className="rounded-2xl border border-dashed border-ciano/30 p-20 text-center bg-base/20">
-                    <div className="text-4xl mb-4">🔎</div>
-                    <h2 className="text-xl font-bold text-texto uppercase">Comece a digitar</h2>
-                    <p className="mt-2 text-sm text-texto/50">Digite algo acima para buscar no acervo, blog, transparência e agenda.</p>
+                <div className="rounded-2xl border border-dashed border-border-subtle bg-bg-surface p-20 text-center">
+                    <div className="text-4xl mb-4" aria-hidden="true">🔎</div>
+                    <h2 className="text-xl font-bold text-text-primary">Comece a digitar</h2>
+                    <p className="mt-2 text-base text-text-secondary">Digite algo acima para buscar no acervo, blog, transparência e agenda.</p>
                 </div>
             ) : (
                 <div className="space-y-12 pb-20">
                     {/* Mixed Results (FTS) */}
                     {results.mixed.length > 0 && (
-                        <div className="space-y-4">
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-cta flex items-center gap-2">
-                                Principais Resultados <span className="rounded-full bg-cta/10 px-2 py-0.5 text-[10px] text-cta">{results.mixed.length}</span>
+                        <section aria-labelledby="main-results-heading">
+                            <h2 id="main-results-heading" className="mb-4 text-base font-black uppercase tracking-wider text-brand-primary flex items-center gap-2">
+                                Principais Resultados <span className="rounded-full bg-brand-primary/10 px-2 py-1 text-xs text-brand-primary">{results.mixed.length}</span>
                             </h2>
                             <div className="grid gap-4 md:grid-cols-2">
                                 {results.mixed.map((item) => (
                                     <Link
                                         key={item.url}
                                         to={item.url}
-                                        className="group flex flex-col rounded-xl border border-ciano/20 bg-fundo/60 p-5 transition-all hover:border-ciano hover:bg-fundo/80"
+                                        className="group flex flex-col rounded-xl border border-border-subtle bg-white p-5 shadow-sm transition-all hover:border-brand-primary hover:shadow-md"
                                     >
                                         <div className="flex items-center justify-between">
-                                            <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest ${item.kind === 'blog' ? 'bg-primaria/10 text-primaria' : 'bg-ciano/10 text-ciano'}`}>
-                                                {item.kind === 'blog' ? 'Blog da Emenda' : 'Acervo'}
+                                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${item.kind === 'blog' ? 'bg-accent-yellow/10 text-accent-brown' : 'bg-brand-primary/10 text-brand-primary'}`}>
+                                                {item.kind === 'blog' ? 'Blog' : 'Acervo'}
                                             </span>
-                                            <span className="text-[10px] text-texto/40">Score: {item.score.toFixed(2)}</span>
+                                            <span className="text-xs text-text-secondary" aria-label={`Relevância: ${item.score.toFixed(2)}`}>Score: {item.score.toFixed(2)}</span>
                                         </div>
-                                        <h3 className="mt-2 font-bold text-texto group-hover:text-ciano">{item.title}</h3>
-                                        {item.excerpt && <p className="mt-2 text-xs text-texto/60 line-clamp-2">{item.excerpt}</p>}
+                                        <h3 className="mt-2 text-base font-bold text-text-primary group-hover:text-brand-primary">{item.title}</h3>
+                                        {item.excerpt && <p className="mt-2 text-sm text-text-secondary line-clamp-2">{item.excerpt}</p>}
                                     </Link>
                                 ))}
                             </div>
-                        </div>
+                        </section>
                     )}
                     {/* Acervo Results */}
                     {results.acervo.length > 0 && (

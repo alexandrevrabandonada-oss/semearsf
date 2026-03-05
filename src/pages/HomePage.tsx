@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { listAcervoItems, listBlogPosts, getStationOverview, listUpcomingEvents, getTransparencySummary, listFeaturedCollections, listCorridors, type AcervoItem, type Event, type StationOverview, type BlogPost, type TransparencySummary, type AcervoCollection, type ClimateCorridor } from "../lib/api";
+import { listAcervoItems, listBlogPosts, getStationOverview, listUpcomingEvents, getTransparencySummary, listFeaturedCollections, listFeaturedCorridors, type AcervoItem, type Event, type StationOverview, type BlogPost, type TransparencySummary, type AcervoCollection, type ClimateCorridor } from "../lib/api";
 import { useInstallPrompt } from "../hooks/useInstallPrompt";
 import { getOptimizedCover } from "../lib/imageOptimization";
 
@@ -28,7 +28,7 @@ export function HomePage() {
           listBlogPosts({ limit: 1 }),
           getTransparencySummary(),
           listFeaturedCollections(3),
-          listCorridors({ featuredOnly: true })
+          listFeaturedCorridors(3)
         ]);
         setStations(stationsData);
         setEvents(eventsData.slice(0, 3));
@@ -36,7 +36,7 @@ export function HomePage() {
         setLatestBlog(blogData[0] || null);
         setTransparency(transData);
         setCollections(collectionsData as AcervoCollection[]);
-        setCorridors(corridorsData.slice(0, 3));
+        setCorridors(corridorsData);
       } catch (err) {
         console.error("Erro ao carregar dados da home:", err);
         setError("Não foi possível carregar as informações em tempo real.");
@@ -56,35 +56,59 @@ export function HomePage() {
 
   return (
     <section className="space-y-8">
-      {/* Hero Section */}
-      <div className="rounded-2xl border border-primaria/60 bg-fundo/90 p-8 shadow-[0_0_0_1px_rgba(24,165,114,0.25)] md:p-10">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-ciano">Portal SEMEAR</p>
-        <h1 className="mt-3 text-3xl font-black leading-tight text-texto md:text-5xl">
-          Ciência aberta e memória pública em um único lugar.
-        </h1>
-        <p className="mt-4 max-w-3xl text-sm text-texto/90 md:text-base">
-          Acompanhe os dados de qualidade do ar em tempo real, participe das nossas atividades e explore o acervo curado pela equipe SEMEAR.
-        </p>
-        <div className="mt-8 relative max-w-xl group">
-          <input
-            type="text"
-            placeholder="Buscar no acervo e no projeto..."
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const q = (e.target as HTMLInputElement).value;
-                if (q.trim()) window.location.href = `/buscar?q=${encodeURIComponent(q)}`;
-              }
-            }}
-            className="w-full rounded-xl border border-ciano/30 bg-base/20 p-4 pr-12 text-sm font-bold text-texto placeholder:text-texto/40 focus:border-ciano focus:outline-none transition-all group-hover:border-ciano/50"
-          />
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-ciano/40 pointer-events-none">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+      {/* Hero Section - Institutional Portal */}
+      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm md:p-12">
+        {/* Institutional Lockup */}
+        <div className="mb-6 flex flex-wrap items-center gap-4 border-b border-border-subtle pb-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-primary text-white font-black text-xl">
+              UFF
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Universidade Federal Fluminense</span>
+              <span className="text-base font-black uppercase tracking-wide text-brand-primary">SEMEAR</span>
+            </div>
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        {/* Main Heading with clear hierarchy */}
+        <div className="space-y-4">
+          <h1 className="text-4xl font-black leading-tight text-text-primary md:text-5xl lg:text-6xl">
+            Monitoramento da Qualidade do Ar e Memória Socioambiental
+          </h1>
+          <p className="max-w-3xl text-base text-text-secondary md:text-lg leading-relaxed">
+            Portal público-universitário que reúne dados científicos em tempo real, acervo histórico curado e agenda de atividades participativas.
+          </p>
+        </div>
+
+        {/* Institutional Search */}
+        <div className="mt-8 max-w-2xl">
+          <label htmlFor="home-search" className="mb-2 block text-sm font-semibold text-text-primary">
+            Buscar no portal
+          </label>
+          <div className="relative group">
+            <input
+              id="home-search"
+              type="search"
+              placeholder="Digite palavras-chave (ex: qualidade do ar, eventos, documentos...)"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const q = (e.target as HTMLInputElement).value;
+                  if (q.trim()) window.location.href = `/buscar?q=${encodeURIComponent(q)}`;
+                }
+              }}
+              className="w-full rounded-lg border-2 border-border-subtle bg-white px-6 py-4 pr-12 text-base text-text-primary placeholder:text-text-secondary/60 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+            />
+            <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary">
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Primary CTAs */}
+        <div className="mt-8 flex flex-wrap gap-4">
           {prompt && (
             <button
               onClick={async () => {
@@ -92,200 +116,198 @@ export function HomePage() {
                 const { outcome } = await prompt.userChoice;
                 if (outcome === 'accepted') clearPrompt();
               }}
-              className="group relative overflow-hidden rounded-lg bg-primaria px-5 py-3 text-sm font-black uppercase tracking-wide text-base transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primaria/20"
+              className="rounded-lg bg-brand-primary px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition-all hover:bg-brand-primary-dark hover:shadow-md"
             >
-              <div className="absolute inset-0 bg-white/20 translate-y-full transition-transform duration-300 group-hover:translate-y-0" />
-              <span className="relative flex items-center gap-2">📱 Baixar App</span>
+              📱 Instalar Aplicativo
             </button>
           )}
-          <Link className="rounded-lg bg-cta px-5 py-3 text-sm font-black uppercase tracking-wide text-base transition-transform hover:-translate-y-0.5 hover:bg-cta/90" to="/dados">
-            Ver dados agora
+          <Link 
+            to="/dados" 
+            className="rounded-lg bg-accent-green px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition-all hover:bg-success hover:shadow-md"
+          >
+            Dados em Tempo Real
           </Link>
-          <Link className="rounded-lg bg-ciano px-5 py-3 text-sm font-black uppercase tracking-wide text-base transition-transform hover:-translate-y-0.5 hover:bg-ciano/90" to="/agenda">
-            Ver agenda
+          <Link 
+            to="/agenda" 
+            className="rounded-lg border-2 border-brand-primary bg-white px-6 py-3 text-sm font-bold uppercase tracking-wide text-brand-primary transition-all hover:bg-brand-primary hover:text-white"
+          >
+            Agenda de Atividades
           </Link>
-        </div>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Dado Agora */}
-        <div className="flex flex-col rounded-2xl border border-ciano/40 bg-fundo/60 p-6 transition-all hover:border-ciano/60">
-          <h2 className="text-lg font-black uppercase tracking-wide text-cta">Dado agora</h2>
-          <div className="mt-4 flex flex-1 flex-col justify-center gap-4">
-            {loading ? (
-              <div className="h-12 w-full animate-pulse rounded-lg bg-ciano/10" />
-            ) : error ? (
-              <p className="text-sm text-acento/80">{error}</p>
-            ) : (
-              <div className="flex flex-col mt-4 gap-2">
-                <div className="flex items-center gap-4">
-                  <div className="flex flex-col">
-                    <span className="text-3xl font-black text-primaria">{onlineCount}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-texto/50">Online</span>
-                  </div>
-                  <div className="h-8 w-px bg-ciano/20" />
-                  <div className="flex flex-col">
-                    <span className="text-3xl font-black text-acento">{offlineCount}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-texto/50">Offline</span>
-                  </div>
-                </div>
-                {stations.filter(s => s.pm25 !== null).slice(0, 2).map(s => (
-                  <div key={s.station_id} className="flex justify-between items-center text-xs border-t border-ciano/10 pt-2">
-                    <span className="text-texto/70 truncate mr-2">{s.name}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-texto">{Math.round(s.pm25!)} µg/m³</span>
-                      <span className="text-[9px] text-texto/40">{new Date(s.last_ts!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
-                  </div>
-                ))}
-                <div className="mt-2 text-xs text-texto/50 italic">
-                  Monitoramento local em tempo real.
-                </div>
-              </div>
-            )}
-          </div>
-          <Link className="mt-6 text-sm font-bold text-ciano hover:underline" to="/dados">
-            Acessar painel de dados →
-          </Link>
-        </div>
-
-        {/* O Que Há de Novo (Blog + Transparência) */}
-        <div className="flex flex-col rounded-2xl border border-primaria/40 bg-fundo/60 p-6 transition-all hover:border-primaria/60">
-          <h2 className="text-lg font-black uppercase tracking-wide text-cta">O que há de novo</h2>
-          <div className="mt-4 flex flex-1 flex-col gap-4">
-            {loading ? (
-              <div className="space-y-3">
-                <div className="h-20 w-full animate-pulse rounded-lg bg-primaria/10" />
-                <div className="h-12 w-full animate-pulse rounded-lg bg-primaria/10" />
-              </div>
-            ) : (
-              <>
-                {/* Blog Signal */}
-                <div className="space-y-2">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-primaria">Última do Blog</p>
-                  {latestBlog ? (
-                    <Link to={`/blog/${latestBlog.slug}`} className="group block">
-                      <h3 className="text-sm font-bold leading-snug text-texto group-hover:text-ciano">{latestBlog.title}</h3>
-                      <p className="text-[10px] text-texto/50 uppercase mt-1">{new Date(latestBlog.published_at!).toLocaleDateString()}</p>
-                    </Link>
-                  ) : (
-                    <p className="text-xs text-texto/40 italic">Nenhum post recente.</p>
-                  )}
-                </div>
-
-                {/* Transparency Signal */}
-                <div className="mt-auto pt-4 border-t border-primaria/10 space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-primaria">Transparência</p>
-                  {transparency ? (
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-black text-texto">{formatCurrency(transparency.total_cents)}</span>
-                      <Link to="/transparencia" className="text-[10px] font-bold text-ciano hover:underline uppercase">Auditável →</Link>
-                    </div>
-                  ) : (
-                    <p className="text-xs text-texto/40 italic">Sem dados financeiros.</p>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-          <Link className="mt-6 text-sm font-bold text-primaria hover:underline" to="/status">
-            Ver status do sistema →
+          <Link 
+            to="/acervo" 
+            className="rounded-lg border-2 border-text-secondary/30 bg-white px-6 py-3 text-sm font-bold uppercase tracking-wide text-text-primary transition-all hover:border-brand-primary hover:text-brand-primary"
+          >
+            Explorar Acervo
           </Link>
         </div>
       </div>
 
-      {/* Featured Climate Corridors */}
-      <div className="rounded-2xl border border-cta/30 bg-cta/5 p-6 md:p-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-black uppercase tracking-wide text-cta md:text-2xl">Corredores Climáticos</h2>
-          <Link className="text-sm font-bold text-ciano hover:underline" to="/corredores">Ver mapa →</Link>
+      {/* Dados Agora - Real-time monitoring */}
+      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-green/10 text-accent-green">
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-text-primary">Dados Agora</h2>
+            <p className="text-sm text-text-secondary">Monitoramento em tempo real</p>
+          </div>
         </div>
-        <p className="mt-2 text-sm text-texto/70">Navegue pelas rotas e recortes territoriais monitorados.</p>
 
         {loading ? (
-          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite" aria-busy="true">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-40 animate-pulse rounded-xl bg-cta/10" />
-            ))}
-          </div>
-        ) : corridors.length === 0 ? (
-          <p className="mt-6 text-sm text-texto/50 italic" aria-live="polite">Nenhum corredor em destaque no momento.</p>
+          <div className="h-32 w-full animate-pulse rounded-lg bg-bg-surface" />
+        ) : error ? (
+          <p className="text-sm text-danger">{error}</p>
         ) : (
-          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite">
-            {corridors.map((c) => (
-              <Link
-                key={c.id}
-                to={`/corredores/${c.slug}`}
-                className="group flex flex-col justify-between overflow-hidden rounded-xl border border-ciano/20 bg-fundo-card p-5 transition-all hover:-translate-y-1 hover:border-cta/50 hover:bg-ciano/10 hover:shadow-xl hover:shadow-cta/5"
-              >
-                <div>
-                  <h3 className="mb-2 text-lg font-black leading-tight text-texto transition-colors group-hover:text-cta">
-                    {c.title}
-                  </h3>
-                  {c.excerpt && (
-                    <p className="text-xs text-texto-secundario line-clamp-3">
-                      {c.excerpt}
-                    </p>
-                  )}
+          <div className="space-y-4">
+            <div className="flex items-center gap-6">
+              <div className="flex flex-col">
+                <span className="text-4xl font-black text-success">{onlineCount}</span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Estações Online</span>
+              </div>
+              <div className="h-12 w-px bg-border-subtle" />
+              <div className="flex flex-col">
+                <span className="text-4xl font-black text-text-secondary">{offlineCount}</span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Offline</span>
+              </div>
+            </div>
+
+            <div className="space-y-3 rounded-lg bg-bg-surface p-4">
+              {stations.filter(s => s.pm25 !== null).slice(0, 2).map(s => (
+                <div key={s.station_id} className="flex items-center justify-between border-b border-border-subtle pb-3 last:border-0 last:pb-0">
+                  <span className="text-sm font-semibold text-text-primary truncate mr-4">{s.name}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-black text-text-primary">{Math.round(s.pm25!)} µg/m³</span>
+                    <span className="text-xs text-text-secondary">{new Date(s.last_ts!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
                 </div>
-                <div className="mt-4 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-ciano">
-                  <span>Explorar</span>
-                  <span className="transition-transform group-hover:translate-x-1">→</span>
+              ))}
+              <p className="pt-2 text-xs text-text-secondary italic">
+                Medições de MP2.5 (material particulado fino)
+              </p>
+            </div>
+          </div>
+        )}
+
+        <Link className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/dados">
+          Acessar painel completo de dados
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
+      </div>
+
+      {/* Próximas Atividades */}
+      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-yellow/10 text-accent-brown">
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-text-primary">Próximas Atividades</h2>
+            <p className="text-sm text-text-secondary">Agenda pública de eventos e encontros</p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="space-y-3">
+            <div className="h-20 w-full animate-pulse rounded-lg bg-bg-surface" />
+            <div className="h-20 w-full animate-pulse rounded-lg bg-bg-surface" />
+          </div>
+        ) : error ? (
+          <p className="text-sm text-danger">{error}</p>
+        ) : events.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
+            <p className="text-sm text-text-secondary">Nenhum evento publicado para os próximos dias.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {events.map((event) => (
+              <Link
+                key={event.id}
+                to="/agenda"
+                className="group flex items-center gap-4 rounded-lg border border-border-subtle bg-white p-4 transition-all hover:border-brand-primary hover:shadow-md"
+              >
+                <div className="flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-accent-yellow/10 text-accent-brown">
+                  <span className="text-xl font-black">{new Date(event.start_at).getDate()}</span>
+                  <span className="text-xs font-semibold uppercase">{new Date(event.start_at).toLocaleDateString("pt-BR", { month: "short" })}</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-bold text-text-primary group-hover:text-brand-primary">{event.title}</h3>
+                  <p className="text-xs text-text-secondary">{new Date(event.start_at).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
               </Link>
             ))}
           </div>
         )}
+
+        <Link className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/agenda">
+          Ver agenda completa
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
       </div>
 
-      {/* Featured Collections (Dossiês) */}
-      <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 md:p-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-black uppercase tracking-wide text-cta md:text-2xl">Dossiês em Destaque</h2>
-          <Link className="text-sm font-bold text-ciano hover:underline" to="/dossies">Ver todos →</Link>
+      {/* Dossiês em Destaque */}
+      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-text-primary">Dossiês em Destaque</h2>
+              <p className="text-sm text-text-secondary">Coleções temáticas curadas</p>
+            </div>
+          </div>
+          <Link className="text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/dossies">
+            Ver todos →
+          </Link>
         </div>
-        <p className="mt-2 text-sm text-texto/70">Explore coleções temáticas curadas pelo nosso time.</p>
 
         {loading ? (
-          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite" aria-busy="true">
+          <div className="grid gap-6 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 animate-pulse rounded-xl bg-ciano/5" />
+              <div key={i} className="h-64 animate-pulse rounded-lg bg-bg-surface" />
             ))}
           </div>
         ) : collections.length === 0 ? (
-          <p className="mt-6 text-sm text-texto/50 italic" aria-live="polite">Nenhuma coleção em destaque no momento.</p>
+          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
+            <p className="text-sm text-text-secondary">Nenhuma coleção em destaque no momento.</p>
+          </div>
         ) : (
-          <div className="mt-6 grid gap-4 md:grid-cols-3" aria-live="polite">
+          <div className="grid gap-6 md:grid-cols-3">
             {collections.map((col) => (
               <div
                 key={col.id}
-                className="group flex flex-col overflow-hidden rounded-xl border border-ciano/20 bg-base/20 transition-all hover:border-ciano/50 hover:bg-base/40"
+                className="group flex flex-col overflow-hidden rounded-xl border border-border-subtle bg-white shadow-sm transition-all hover:border-brand-primary hover:shadow-md"
               >
                 {col.cover_url && (
-                  <Link to={`/dossies/${col.slug}`} className="aspect-video w-full overflow-hidden bg-ciano/5 relative block">
+                  <Link to={`/dossies/${col.slug}`} className="aspect-video w-full overflow-hidden bg-bg-surface">
                     <img
                       src={getOptimizedCover(col, 'thumb') || ''}
                       alt={col.title}
                       loading="lazy"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="h-full w-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105"
-                      style={
-                        (!col.cover_small_url && !col.cover_thumb_url) ? {} : {
-                          filter: 'blur(0)'
-                        }
-                      }
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   </Link>
                 )}
-                <div className="p-5 flex flex-col flex-1">
+                <div className="flex flex-1 flex-col p-6">
                   <Link to={`/dossies/${col.slug}`}>
-                    <h3 className="text-lg font-bold text-texto transition-colors hover:text-ciano">{col.title}</h3>
+                    <h3 className="text-lg font-bold text-text-primary transition-colors group-hover:text-brand-primary">{col.title}</h3>
                   </Link>
-                  {col.excerpt && <p className="mt-2 text-xs text-texto/80 line-clamp-2">{col.excerpt}</p>}
+                  {col.excerpt && <p className="mt-2 text-sm text-text-secondary line-clamp-2">{col.excerpt}</p>}
 
-                  <div className="mt-4 flex flex-1 flex-wrap gap-2 content-start">
+                  <div className="mt-4 flex flex-wrap gap-2">
                     {col.tags.slice(0, 2).map((tag) => (
-                      <span key={tag} className="rounded-full bg-ciano/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-ciano">
+                      <span key={tag} className="rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary">
                         {tag}
                       </span>
                     ))}
@@ -294,9 +316,9 @@ export function HomePage() {
                   <div className="mt-6 flex gap-2">
                     <Link
                       to={`/dossies/${col.slug}`}
-                      className="flex-1 rounded-md bg-ciano px-3 py-2 text-center text-[10px] font-black uppercase tracking-widest text-base transition-colors hover:bg-ciano/90"
+                      className="flex-1 rounded-lg bg-brand-primary px-4 py-2 text-center text-sm font-bold text-white transition-all hover:bg-brand-primary-dark"
                     >
-                      Abrir
+                      Abrir Dossiê
                     </Link>
                     <button
                       type="button"
@@ -310,11 +332,10 @@ export function HomePage() {
                           alert("Link copiado para a área de transferência!");
                         }
                       }}
-                      className="flex items-center justify-center rounded-md border border-ciano/40 bg-transparent px-3 py-2 text-ciano hover:bg-ciano hover:text-base transition-colors"
+                      className="flex items-center justify-center rounded-lg border border-border-subtle bg-white px-3 py-2 text-text-secondary transition-all hover:border-brand-primary hover:text-brand-primary"
                       aria-label="Compartilhar dossiê"
                     >
-                      <span className="sr-only">Compartilhar</span>
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                       </svg>
                     </button>
@@ -325,75 +346,183 @@ export function HomePage() {
           </div>
         )}
       </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Próximas Atividades */}
-        <div className="flex flex-col rounded-2xl border border-acento/40 bg-fundo/60 p-6 transition-all hover:border-acento/60">
-          <h2 className="text-lg font-black uppercase tracking-wide text-cta">Próximas atividades</h2>
-          <div className="mt-4 flex flex-1 flex-col gap-3">
-            {loading ? (
-              <div className="space-y-2">
-                <div className="h-10 w-full animate-pulse rounded-lg bg-acento/10" />
-                <div className="h-10 w-full animate-pulse rounded-lg bg-acento/10" />
-              </div>
-            ) : error ? (
-              <p className="text-sm text-acento/80">{error}</p>
-            ) : events.length === 0 ? (
-              <p className="text-sm text-texto/50 italic">Nenhum evento publicado para os próximos dias.</p>
-            ) : (
-              events.map((event) => (
-                <Link
-                  className="group flex flex-col rounded-lg border border-acento/20 bg-base/40 p-3 transition-colors hover:bg-base/60"
-                  key={event.id}
-                  to="/agenda"
-                >
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-acento">
-                    {new Date(event.start_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
-                  </span>
-                  <span className="text-sm font-bold text-texto group-hover:text-cta">{event.title}</span>
-                </Link>
-              ))
-            )}
+      {/* Destaques do Acervo */}
+      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-brown/10 text-accent-brown">
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-text-primary">Destaques do Acervo</h2>
+              <p className="text-sm text-text-secondary">Documentos, imagens e memória histórica</p>
+            </div>
           </div>
-          <Link className="mt-6 text-sm font-bold text-acento hover:underline" to="/agenda">
-            Ver agenda completa →
+          <Link className="text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/acervo">
+            Ver acervo completo →
           </Link>
         </div>
 
-        {/* Destaques do Acervo */}
-        <div className="space-y-4 flex flex-col">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black uppercase tracking-wide text-cta">Destaques do Acervo</h2>
-            <Link className="text-sm font-bold text-ciano hover:underline" to="/acervo">Ver tudo →</Link>
+        {loading ? (
+          <div className="grid gap-4 md:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-32 animate-pulse rounded-lg bg-bg-surface" />
+            ))}
+          </div>
+        ) : acervo.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
+            <p className="text-sm text-text-secondary">Nenhum destaque disponível.</p>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-4">
+            {acervo.slice(0, 4).map((item) => (
+              <Link
+                key={item.id}
+                to={`/acervo/item/${item.slug}`}
+                className="group flex flex-col gap-2 rounded-lg border border-border-subtle bg-white p-4 transition-all hover:border-brand-primary hover:shadow-md"
+              >
+                <span className="inline-block rounded-full bg-accent-brown/10 px-2 py-1 text-xs font-semibold text-accent-brown">
+                  {item.kind}
+                </span>
+                <h3 className="line-clamp-2 text-sm font-bold text-text-primary group-hover:text-brand-primary">{item.title}</h3>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Corredores Climáticos */}
+      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 text-success">
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-text-primary">Corredores Climáticos</h2>
+              <p className="text-sm text-text-secondary">Rotas e recortes territoriais monitorados</p>
+            </div>
+          </div>
+          <Link className="text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/corredores">
+            Ver mapa →
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="grid gap-6 md:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-64 animate-pulse rounded-lg bg-bg-surface" />
+            ))}
+          </div>
+        ) : corridors.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
+            <p className="text-sm text-text-secondary">Nenhum corredor em destaque no momento.</p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-3">
+            {corridors.map((c) => (
+              <Link
+                key={c.id}
+                to={`/corredores/${c.slug}`}
+                className="group flex flex-col overflow-hidden rounded-xl border border-border-subtle bg-white shadow-sm transition-all hover:border-success hover:shadow-md"
+              >
+                {c.cover_url && (
+                  <div className="h-48 w-full overflow-hidden bg-bg-surface">
+                    <img
+                      src={getOptimizedCover(c, "thumb") || c.cover_url}
+                      alt={c.title}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+                )}
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="mb-2 text-lg font-bold text-text-primary transition-colors group-hover:text-success">
+                    {c.title}
+                  </h3>
+                  {c.excerpt && (
+                    <p className="mb-4 flex-grow text-sm text-text-secondary line-clamp-2">
+                      {c.excerpt}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between text-sm font-bold text-success">
+                    <span>Explorar corredor</span>
+                    <span className="transition-transform group-hover:translate-x-1">→</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* O Que Há de Novo - Blog + Transparência */}
+      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-text-primary">O Que Há de Novo</h2>
+            <p className="text-sm text-text-secondary">Últimas atualizações e transparência</p>
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Blog Latest */}
+          <div className="rounded-lg border border-border-subtle bg-bg-surface p-6">
+            <p className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-primary">Última Publicação do Blog</p>
+            {loading ? (
+              <div className="h-20 animate-pulse rounded-lg bg-white" />
+            ) : latestBlog ? (
+              <Link to={`/blog/${latestBlog.slug}`} className="group block">
+                <h3 className="text-base font-bold text-text-primary group-hover:text-brand-primary">{latestBlog.title}</h3>
+                <p className="mt-2 text-xs text-text-secondary">{new Date(latestBlog.published_at!).toLocaleDateString("pt-BR", { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+              </Link>
+            ) : (
+              <p className="text-sm text-text-secondary italic">Nenhum post recente.</p>
+            )}
+            <Link className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/blog">
+              Ver todos os posts
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
 
-          {loading ? (
-            <div className="grid gap-3 md:grid-cols-2 flex-1">
-              {[1, 2].map((i) => (
-                <div className="h-24 animate-pulse rounded-xl bg-ciano/5" key={i} />
-              ))}
-            </div>
-          ) : acervo.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-ciano/30 py-4 text-center flex-1 flex items-center justify-center">
-              <p className="text-xs text-texto/50 italic">Nenhum destaque.</p>
-            </div>
-          ) : (
-            <div className="grid gap-3 md:grid-cols-2 flex-1">
-              {acervo.slice(0, 4).map((item) => (
-                <Link
-                  className="flex flex-col gap-1 rounded-xl border border-ciano/20 bg-fundo/70 p-4 transition-all hover:border-ciano hover:bg-fundo/90"
-                  key={item.id}
-                  to={`/acervo/item/${item.slug}`}
-                >
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-ciano">
-                    {item.kind}
-                  </span>
-                  <h3 className="line-clamp-1 text-sm font-bold text-texto">{item.title}</h3>
-                </Link>
-              ))}
-            </div>
-          )}
+          {/* Transparency */}
+          <div className="rounded-lg border border-border-subtle bg-bg-surface p-6">
+            <p className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-primary">Transparência Financeira</p>
+            {loading ? (
+              <div className="h-20 animate-pulse rounded-lg bg-white" />
+            ) : transparency ? (
+              <div>
+                <p className="text-3xl font-black text-text-primary">{formatCurrency(transparency.total_cents)}</p>
+                <p className="mt-2 text-xs text-text-secondary">Recursos investidos no projeto</p>
+              </div>
+            ) : (
+              <p className="text-sm text-text-secondary italic">Sem dados financeiros disponíveis.</p>
+            )}
+            <Link className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/transparencia">
+              Acessar prestação de contas
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
+
+        <Link className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/status">
+          Ver status completo do sistema
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
       </div>
 
     </section>

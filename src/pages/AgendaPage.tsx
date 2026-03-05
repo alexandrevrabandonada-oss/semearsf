@@ -36,37 +36,38 @@ export function AgendaPage() {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-2xl border border-ciano/60 bg-fundo/80 p-6 md:p-8">
-        <h1 className="text-2xl font-black uppercase tracking-wide text-cta md:text-4xl">Agenda</h1>
-        <p className="mt-3 text-sm text-texto/90">
-          [Placeholder] A lista abaixo mostra apenas eventos publicados no banco, sem conteudo ficticio.
+      <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Atividades</p>
+        <h1 className="mt-2 text-2xl font-black uppercase tracking-wide text-text-primary md:text-4xl">Agenda</h1>
+        <p className="mt-3 text-base leading-relaxed text-text-secondary">
+          Confira os próximos eventos, oficinas e atividades públicas do SEMEAR.
         </p>
       </div>
 
-      <section className="rounded-2xl border border-primaria/50 bg-base/70 p-6">
-        {loading ? <p className="text-sm text-texto/80">Carregando eventos...</p> : null}
+      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+        {loading ? <p className="text-base text-text-secondary">Carregando eventos...</p> : null}
         {!loading && !events.length ? (
-          <p aria-live="polite" className="text-sm text-texto/80" role="status">
-            Nenhum evento publicado.
+          <p aria-live="polite" className="text-base text-text-secondary" role="status">
+            Nenhum evento publicado no momento.
           </p>
         ) : null}
         {events.length ? (
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             {events.map((event) => (
               <li
-                className="flex flex-col gap-3 rounded-lg border border-ciano/40 bg-fundo/80 p-4 md:flex-row md:items-center md:justify-between"
+                className="flex flex-col gap-3 rounded-lg border border-border-subtle bg-bg-surface p-5 md:flex-row md:items-center md:justify-between"
                 key={event.id}
               >
-                <div>
-                  <p className="text-base font-bold text-texto">{String(event.title ?? "Sem titulo")}</p>
-                  <p className="text-xs text-texto/80">Inicio: {formatDate(String(event.start_at ?? ""))}</p>
-                  <p className="text-xs text-texto/80">
+                <div className="flex-1">
+                  <p className="text-lg font-black text-text-primary">{String(event.title ?? "Sem titulo")}</p>
+                  <p className="mt-1 text-sm text-text-secondary">Inicio: {formatDate(String(event.start_at ?? ""))}</p>
+                  <p className="text-sm text-text-secondary">
                     Local: {typeof event.location === "string" && event.location.trim() ? event.location : "Local nao informado."}
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <button
-                    className="inline-flex w-fit rounded-md border border-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-cta transition-colors hover:bg-cta hover:text-base"
+                    className="inline-flex w-fit min-h-[44px] items-center rounded-md border border-brand-primary px-4 py-2 text-sm font-bold uppercase tracking-wide text-brand-primary transition-colors hover:bg-brand-primary hover:text-white"
                     onClick={() => {
                       const shareUrl = `${window.location.origin}/s/agenda/${event.id}`;
                       if (navigator.share) {
@@ -83,7 +84,7 @@ export function AgendaPage() {
                     Compartilhar
                   </button>
                   <Link
-                    className="inline-flex w-fit rounded-md bg-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90"
+                    className="inline-flex w-fit min-h-[44px] items-center rounded-md bg-brand-primary px-4 py-2 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-brand-primary/90"
                     to={`/inscricoes?eventId=${encodeURIComponent(event.id)}`}
                   >
                     Inscrever-se
@@ -96,7 +97,7 @@ export function AgendaPage() {
       </section>
 
       {error ? (
-        <p aria-live="assertive" className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto" role="alert">
+        <p aria-live="assertive" className="rounded-md border border-error bg-error/10 p-3 text-base text-error" role="alert">
           {error}
         </p>
       ) : null}

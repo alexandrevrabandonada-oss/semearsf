@@ -1,6 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
+import conversasDemo from "../data/demo/conversas.demo.json" with { type: "json" };
+import corredoresDemo from "../data/demo/corredores.demo.json" with { type: "json" };
 
 if (fs.existsSync(".env.local")) {
     const env = fs.readFileSync(".env.local", "utf8");
@@ -35,6 +37,19 @@ async function safelyLoadJson(filename) {
 
 async function run() {
     console.log(`\n🌱 Loading DEMO seeds into ${SUPABASE_URL}...\n`);
+    console.log("🔐 Auth mode: Service Role\n");
+
+    const summary = {
+        acervo: 0,
+        blog: 0,
+        transparenciaLinks: 0,
+        transparenciaFinances: 0,
+        colecoes: 0,
+        colecaoBindings: 0,
+        conversar: 0,
+        corredores: 0,
+        corredorLinks: 0
+    };
 
     // 1. Acervo
     const acervoData = await safelyLoadJson("acervo.demo.json");
@@ -42,6 +57,7 @@ async function run() {
         console.log(`📦 Inserting ${acervoData.length} Acervo artifacts...`);
         const { error } = await supabase.from("acervo_items").upsert(acervoData, { onConflict: "slug" });
         if (error) console.error("❌ Error Acervo:", error.message);
+        else summary.acervo = acervoData.length;
     }
 
     // 2. Blog
@@ -50,6 +66,7 @@ async function run() {
         console.log(`📝 Inserting ${blogData.length} Blog posts...`);
         const { error } = await supabase.from("blog_posts").upsert(blogData, { onConflict: "slug" });
         if (error) console.error("❌ Error Blog:", error.message);
+        else summary.blog = blogData.length;
     }
 
     // 3. Transparência
@@ -59,11 +76,13 @@ async function run() {
             console.log(`🔗 Inserting ${transData.portal_links.length} portal links...`);
             const { error: e1 } = await supabase.from("transparency_links").upsert(transData.portal_links);
             if (e1) console.error("❌ Error Transparency Links:", e1.message);
+            else summary.transparenciaLinks = transData.portal_links.length;
         }
         if (transData.finances) {
             console.log(`💸 Inserting ${transData.finances.length} finance records...`);
             const { error: e2 } = await supabase.from("transparency_expenses").upsert(transData.finances);
             if (e2) console.error("❌ Error Transparency Finances:", e2.message);
+            else summary.transparenciaFinances = transData.finances.length;
         }
     }
 
@@ -81,6 +100,7 @@ async function run() {
         if (e1) {
             console.error("❌ Error Dossiês:", e1.message);
         } else {
+            summary.colecoes = withoutItems.length;
             console.log("🔗 Binding Dossiê <-> Acervo relatonships...");
             let rels = [];
             for (const col of collData) {
@@ -102,25 +122,28 @@ async function run() {
             if (rels.length > 0) {
                 const { error: e2 } = await supabase.from("acervo_collection_items").upsert(rels, { onConflict: "collection_id,item_id" });
                 if (e2) console.error("❌ Error Dossiê bindings:", e2.message);
+                else summary.colecaoBindings = rels.length;
             }
         }
     }
 
     // 5. Conversas
-    const convsData = await safelyLoadJson("conversas.demo.json");
+    const convsData = Array.isArray(conversasDemo) ? conversasDemo : [];
     if (convsData) {
-        console.log(`💬 Inserting ${convsData.length} Roda de Conversa topics...`);
-        const { error } = await supabase.from("conversations").insert(convsData);
+        console.log(`💬 Upserting ${convsData.length} Roda de Conversa topics...`);
+        const { error } = await supabase.from("conversations").upsert(convsData, { onConflict: "slug" });
         if (error) {
             console.error("❌ Error Conversations:", error.message);
             console.error("Full Error:", JSON.stringify(error, null, 2));
+        } else {
+            summary.conversar = convsData.length;
         }
     }
 
     // 6. Corredores Climáticos
-    const corridorsData = await safelyLoadJson("corredores.demo.json");
+    const corridorsData = Array.isArray(corredoresDemo) ? corredoresDemo : [];
     if (corridorsData) {
-        console.log(`🗺️ Inserting ${corridorsData.length} Corredores...`);
+        console.log(`🗺️ Upserting ${corridorsData.length} Corredores...`);
         const withoutLinks = corridorsData.map(c => {
             const { links, ...rest } = c;
             return rest;
@@ -129,6 +152,7 @@ async function run() {
         if (e1) {
             console.error("❌ Error Climate Corridors:", e1.message);
         } else {
+            summary.corredores = withoutLinks.length;
             console.log("🔗 Binding Climate Corridor links...");
             let rels = [];
             for (const col of corridorsData) {
@@ -151,9 +175,21 @@ async function run() {
             if (rels.length > 0) {
                 const { error: e2 } = await supabase.from("climate_corridor_links").upsert(rels, { onConflict: "corridor_id,item_kind,item_ref" });
                 if (e2) console.error("❌ Error Climate Corridor Links:", e2.message);
+                else summary.corredorLinks = rels.length;
             }
         }
     }
+
+    console.log("\n📊 DEMO SUMMARY:");
+    console.log(`- Acervo: ${summary.acervo}`);
+    console.log(`- Blog: ${summary.blog}`);
+    console.log(`- Transparência (links): ${summary.transparenciaLinks}`);
+    console.log(`- Transparência (finanças): ${summary.transparenciaFinances}`);
+    console.log(`- Dossiês: ${summary.colecoes}`);
+    console.log(`- Dossiês vínculos: ${summary.colecaoBindings}`);
+    console.log(`- Conversar: ${summary.conversar}`);
+    console.log(`- Corredores: ${summary.corredores}`);
+    console.log(`- Corredores vínculos: ${summary.corredorLinks}`);
 
     console.log(`\n✅ DEMO OK`);
     process.exit(0);

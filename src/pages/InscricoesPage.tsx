@@ -96,103 +96,154 @@ export function InscricoesPage() {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-2xl border border-ciano/60 bg-fundo/80 p-6 md:p-8">
-        <h1 className="text-2xl font-black uppercase tracking-wide text-cta md:text-4xl">Inscricoes</h1>
-        <p className="mt-3 text-sm text-texto/90">
-          [Placeholder] Este formulario envia dados reais para o banco. Preencha apenas informacoes oficiais.
+      <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
+        <h1 className="text-2xl font-black text-text-primary md:text-4xl">Inscrições em Eventos</h1>
+        <p className="mt-3 text-base text-text-secondary">
+          Preencha o formulário abaixo para se inscrever em atividades públicas do projeto SEMEAR.
         </p>
       </div>
 
-      <section className="rounded-2xl border border-primaria/50 bg-base/70 p-6">
-        {loadingEvent ? <p className="text-sm text-texto/80">Carregando dados do evento...</p> : null}
+      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+        {loadingEvent ? <p className="text-base text-text-secondary">Carregando dados do evento...</p> : null}
         {event ? (
-          <div className="mb-6 rounded-lg border border-ciano/50 bg-fundo/80 p-4">
-            <p className="text-xs uppercase tracking-wide text-ciano">Evento selecionado</p>
-            <p className="mt-1 text-base font-bold text-texto">{event.title}</p>
-            <p className="text-xs text-texto/80">Inicio: {formatDate(event.start_at)}</p>
-            <p className="text-xs text-texto/80">Local: {event.location?.trim() ? event.location : "Local nao informado."}</p>
+          <div className="mb-6 rounded-lg border border-brand-primary/30 bg-brand-primary-soft p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-brand-primary">Evento selecionado</p>
+            <p className="mt-2 text-lg font-bold text-text-primary">{event.title}</p>
+            <p className="mt-1 text-sm text-text-secondary">Início: {formatDate(event.start_at)}</p>
+            <p className="text-sm text-text-secondary">Local: {event.location?.trim() ? event.location : "Local não informado."}</p>
           </div>
         ) : eventId && !loadingEvent && !error ? (
-          <p className="mb-6 text-sm text-texto/80">Evento nao encontrado para o ID informado.</p>
+          <p className="mb-6 text-base text-text-secondary">Evento não encontrado para o ID informado.</p>
         ) : (
-          <p className="mb-6 text-sm text-texto/80">Nenhum evento especificado no link. Acesse a agenda para iniciar uma inscricao.</p>
+          <p className="mb-6 text-base text-text-secondary">Nenhum evento especificado. Acesse a <a href="/agenda" className="ui-link">agenda</a> para iniciar uma inscrição.</p>
         )}
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="mb-1 block text-sm font-semibold text-texto">Nome</span>
+        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          <div>
+            <label htmlFor="registration-name" className="mb-2 block text-base font-semibold text-text-primary">
+              Nome completo <span className="text-danger" aria-label="obrigatório">*</span>
+            </label>
             <input
-              className="w-full rounded-md border border-ciano/40 bg-fundo px-3 py-2 text-texto outline-none ring-0 placeholder:text-texto/40 focus:border-ciano"
+              id="registration-name"
+              className="w-full rounded-lg border-2 border-border-subtle bg-white px-4 py-3 text-base text-text-primary transition-colors placeholder:text-text-secondary/60 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
               onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
               required
               type="text"
               value={form.name}
+              aria-required="true"
+              placeholder="Digite seu nome completo"
             />
-          </label>
+            <p className="mt-1 text-sm text-text-secondary">Informe seu nome como consta em documento oficial.</p>
+          </div>
 
-          <label className="block">
-            <span className="mb-1 block text-sm font-semibold text-texto">Email</span>
+          <div>
+            <label htmlFor="registration-email" className="mb-2 block text-base font-semibold text-text-primary">
+              E-mail <span className="text-danger" aria-label="obrigatório">*</span>
+            </label>
             <input
-              className="w-full rounded-md border border-ciano/40 bg-fundo px-3 py-2 text-texto outline-none ring-0 placeholder:text-texto/40 focus:border-ciano"
+              id="registration-email"
+              className="w-full rounded-lg border-2 border-border-subtle bg-white px-4 py-3 text-base text-text-primary transition-colors placeholder:text-text-secondary/60 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
               onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
               required
               type="email"
               value={form.email}
+              aria-required="true"
+              placeholder="exemplo@email.com"
             />
-          </label>
+            <p className="mt-1 text-sm text-text-secondary">Usaremos este e-mail para confirmações e comunicados.</p>
+          </div>
 
-          <label className="block">
-            <span className="mb-1 block text-sm font-semibold text-texto">WhatsApp</span>
+          <div>
+            <label htmlFor="registration-whatsapp" className="mb-2 block text-base font-semibold text-text-primary">
+              WhatsApp <span className="text-danger" aria-label="obrigatório">*</span>
+            </label>
             <input
-              className="w-full rounded-md border border-ciano/40 bg-fundo px-3 py-2 text-texto outline-none ring-0 placeholder:text-texto/40 focus:border-ciano"
+              id="registration-whatsapp"
+              className="w-full rounded-lg border-2 border-border-subtle bg-white px-4 py-3 text-base text-text-primary transition-colors placeholder:text-text-secondary/60 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
               onChange={(e) => setForm((prev) => ({ ...prev, whatsapp: e.target.value }))}
               required
-              type="text"
+              type="tel"
               value={form.whatsapp}
+              aria-required="true"
+              placeholder="(21) 99999-9999"
             />
-          </label>
+            <p className="mt-1 text-sm text-text-secondary">Número com DDD para contato direto.</p>
+          </div>
 
-          <label className="block">
-            <span className="mb-1 block text-sm font-semibold text-texto">Bairro</span>
+          <div>
+            <label htmlFor="registration-bairro" className="mb-2 block text-base font-semibold text-text-primary">
+              Bairro <span className="text-danger" aria-label="obrigatório">*</span>
+            </label>
             <input
-              className="w-full rounded-md border border-ciano/40 bg-fundo px-3 py-2 text-texto outline-none ring-0 placeholder:text-texto/40 focus:border-ciano"
+              id="registration-bairro"
+              className="w-full rounded-lg border-2 border-border-subtle bg-white px-4 py-3 text-base text-text-primary transition-colors placeholder:text-text-secondary/60 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
               onChange={(e) => setForm((prev) => ({ ...prev, bairro: e.target.value }))}
               required
               type="text"
               value={form.bairro}
+              aria-required="true"
+              placeholder="Nome do bairro onde reside"
             />
-          </label>
+            <p className="mt-1 text-sm text-text-secondary">Ajuda-nos a entender o alcance territorial do projeto.</p>
+          </div>
 
-          <label className="flex items-start gap-2 text-sm text-texto">
-            <input
-              checked={form.consent_lgpd}
-              className="mt-0.5 size-4 accent-primaria"
-              onChange={(e) => setForm((prev) => ({ ...prev, consent_lgpd: e.target.checked }))}
-              required
-              type="checkbox"
-            />
-            <span>Aceito o tratamento dos meus dados para inscricao (LGPD).</span>
-          </label>
+          <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
+            <label htmlFor="registration-consent" className="flex items-start gap-3 text-base text-text-primary">
+              <input
+                id="registration-consent"
+                checked={form.consent_lgpd}
+                className="mt-1 h-5 w-5 flex-shrink-0 rounded border-2 border-border-subtle accent-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2"
+                onChange={(e) => setForm((prev) => ({ ...prev, consent_lgpd: e.target.checked }))}
+                required
+                type="checkbox"
+                aria-required="true"
+              />
+              <span>
+                Aceito o tratamento dos meus dados pessoais para fins de inscrição e comunicação sobre o evento, conforme a Lei Geral de Proteção de Dados (LGPD). <span className="text-danger" aria-label="obrigatório">*</span>
+              </span>
+            </label>
+          </div>
 
           <button
-            className="rounded-md bg-cta px-4 py-2 text-sm font-black uppercase tracking-wide text-base transition-colors hover:bg-cta/90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-lg bg-brand-primary px-6 py-3 text-base font-bold text-white transition-all hover:bg-brand-primary-dark disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-brand-primary"
             disabled={submitting || !event?.id}
             type="submit"
+            aria-busy={submitting}
           >
-            {submitting ? "Enviando..." : "Enviar inscricao"}
+            {submitting ? (
+              <>
+                <svg className="mr-2 h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Enviando inscrição...
+              </>
+            ) : (
+              "Enviar inscrição"
+            )}
           </button>
         </form>
       </section>
 
       {success ? (
-        <p aria-live="polite" className="rounded-md border border-primaria/70 bg-primaria/15 p-3 text-sm text-texto" role="status">
-          {success}
-        </p>
+        <div aria-live="polite" className="rounded-lg border-2 border-success bg-success/10 p-4" role="status">
+          <p className="flex items-start gap-2 text-base font-semibold text-success">
+            <svg className="mt-0.5 h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            {success}
+          </p>
+        </div>
       ) : null}
       {error ? (
-        <p aria-live="assertive" className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto" role="alert">
-          {error}
-        </p>
+        <div aria-live="assertive" className="rounded-lg border-2 border-danger bg-danger/10 p-4" role="alert">
+          <p className="flex items-start gap-2 text-base font-semibold text-danger">
+            <svg className="mt-0.5 h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            {error}
+          </p>
+        </div>
       ) : null}
     </section>
   );

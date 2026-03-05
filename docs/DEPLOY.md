@@ -27,12 +27,20 @@ npm run ship:content
 4. Verificação final e snapshot (`done`)
 
 ### 🧪 Modo Demo Local (Conteúdo e Sensores)
-Para testes de UI ou demonstrações para stakeholders, você pode carregar uma massa de dados fictícia completa preenchendo todos os principais módulos da plataforma (Acervo, Blog, Transparência, Dossiês):
+Para testes de UI ou demonstrações para stakeholders, você pode carregar uma massa de dados fictícia completa preenchendo os principais módulos da plataforma (Acervo, Blog, Transparência, Dossiês, Conversar e Corredores Climáticos):
 
 ```bash
 npm run demo:load
 ```
-*Isto irá injetar conteúdo estático contendo a tag `meta: { demo: true }` no banco através da Service Role.*
+*Isto irá injetar conteúdo estático contendo a tag `meta: { demo: true }` no banco através da Service Role, com `upsert` por `slug` nos módulos suportados e resumo final de contagens por módulo no terminal.*
+
+*Resumo esperado ao final do `demo:load`:*
+- Acervo
+- Blog
+- Transparência (links e finanças)
+- Dossiês (coleções e vínculos)
+- Conversar
+- Corredores (itens e vínculos)
 
 Para testes focados especificamente nos painéis de sensores (gerando um histórico imediato de Material Particulado falso na estação `piloto`), execute:
 ```bash
@@ -87,3 +95,38 @@ Se você importou um arquivo `.env.local` legado que contém chaves `NEXT_PUBLIC
 npm run env:clean
 ```
 Este comando criará um backup automático e removerá as chaves legadas.
+
+## Testes de UI (Smoke Tests)
+
+O projeto inclui testes de UI automatizados com Playwright para verificar os fluxos críticos da aplicação.
+
+### Executar Smoke Tests
+```bash
+npm run test:smoke:ui
+```
+
+*Ações realizadas:*
+- Inicia o servidor de desenvolvimento automaticamente (se não estiver rodando)
+- Executa testes de fumaça nas páginas principais:
+  - Página inicial (navegação, blocos de dados)
+  - Dados (seletor de estação, visualizações)
+  - Acervo (listagem, linha do tempo)
+  - Blog (listagem de posts)
+  - Conversar (interface de conversas)
+  - Status (informações do sistema)
+
+### Quando Executar
+- **Opcional**: Antes de fazer deploy de mudanças significativas na UI
+- **Recomendado**: Após modificações em componentes de navegação ou layout
+- **CI/CD**: Pode ser integrado no pipeline de deployment para validação automática
+
+### Configuração
+Os testes são resilientes e não dependem de dados exatos no banco. Eles verificam:
+- Presença de elementos principais da interface
+- Navegação entre páginas
+- Carregamento correto de componentes
+
+**Nota**: Os testes rodam em modo headless por padrão. Para debug visual, use:
+```bash
+npx playwright test --headed --grep @smoke
+```

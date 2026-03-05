@@ -48,7 +48,7 @@ export function ConversarListPage() {
             <header className="mb-12">
                 <h1 className="mb-4 text-3xl font-black md:text-5xl">Conversar</h1>
                 <p className="max-w-2xl text-lg text-texto-secundario">
-                    Espaço de participação direta. Rodas de conversa, fóruns e feedback sobre o clima e a cidade no Rio de Janeiro.
+                    Espaço de participação direta. Rodas de conversa, fóruns e feedback sobre o clima e a cidade em Volta Redonda e no Sul Fluminense.
                 </p>
             </header>
 

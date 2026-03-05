@@ -1,0 +1,13 @@
+# TWA Build Artifacts
+*.keystore
+*.jks
+app-release-signed.apk
+app-release-bundle.aab
+app/
+.gradle/
+
+# Bubblewrap config with sensitive data
+bubblewrap.config.json
+
+# Keep only the example
+!bubblewrap.config.json.example

@@ -4,6 +4,7 @@ import {
     getConversationBySlug,
     listConversationComments,
     createConversationComment,
+    reportConversationComment,
     Conversation,
     ConversationComment
 } from "../../lib/api";
@@ -27,10 +28,12 @@ export function ConversarDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Form state
     const [name, setName] = useState("");
     const [body, setBody] = useState("");
+    const [honeypot, setHoneypot] = useState("");
     const [submitting, setSubmitting] = useState(false);
+    const [submitSuccess, setSubmitSuccess] = useState<{ msg: string; type: 'success' | 'warn' } | null>(null);
+    const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         if (!slug) return;
@@ -61,18 +64,48 @@ export function ConversarDetailPage() {
 
         try {
             setSubmitting(true);
-            const newComment = await createConversationComment({
+            setSubmitSuccess(null);
+
+            const result = await createConversationComment({
                 conversation_id: conversation.id,
                 name: name.trim(),
-                body: body.trim()
+                body: body.trim(),
+                honeypot: honeypot
             });
-            setComments([...comments, newComment]);
+
+            if (result.status === 'published') {
+                setComments([...comments, result.data]);
+                setSubmitSuccess({ msg: "Comentário publicado com sucesso!", type: 'success' });
+            } else {
+                setSubmitSuccess({ msg: "Seu comentário foi enviado e está aguardando moderação.", type: 'warn' });
+            }
+
             setName("");
             setBody("");
+            setHoneypot("");
         } catch (err) {
+            console.error(err);
             alert("Falha ao publicar comentário. Tente novamente.");
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleReport = async (commentId: string) => {
+        if (reportedIds.has(commentId)) return;
+
+        try {
+            const { hidden } = await reportConversationComment(commentId);
+            setReportedIds(new Set([...reportedIds, commentId]));
+
+            if (hidden) {
+                setComments(comments.filter(c => c.id !== commentId));
+                alert("Obrigado. O comentário foi removido por excesso de denúncias.");
+            } else {
+                alert("Obrigado pela denúncia. Nossa equipe irá revisar.");
+            }
+        } catch (err) {
+            alert("Falha ao processar denúncia.");
         }
     };
 
@@ -126,9 +159,18 @@ export function ConversarDetailPage() {
                             <div key={comment.id} className="rounded-2xl border border-ciano/10 bg-fundo-card p-6">
                                 <div className="mb-2 flex items-center justify-between">
                                     <span className="font-bold text-base">{comment.name}</span>
-                                    <span className="text-xs text-texto-secundario">
-                                        {new Date(comment.created_at).toLocaleDateString('pt-BR')}
-                                    </span>
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-xs text-texto-secundario">
+                                            {new Date(comment.created_at).toLocaleDateString('pt-BR')}
+                                        </span>
+                                        <button
+                                            onClick={() => handleReport(comment.id)}
+                                            disabled={reportedIds.has(comment.id)}
+                                            className="text-[10px] font-bold uppercase tracking-wider text-red-500/50 hover:text-red-500 disabled:opacity-30"
+                                        >
+                                            {reportedIds.has(comment.id) ? "Denunciado" : "Denunciar"}
+                                        </button>
+                                    </div>
                                 </div>
                                 <p className="whitespace-pre-wrap text-texto/90">{comment.body}</p>
                             </div>
@@ -138,7 +180,24 @@ export function ConversarDetailPage() {
 
                 <form onSubmit={handleSubmit} className="rounded-2xl border border-cta/30 bg-cta/5 p-6 md:p-8">
                     <h3 className="mb-6 text-xl font-bold">Deixe sua contribuição</h3>
+
+                    {submitSuccess && (
+                        <div className={`mb-6 rounded-lg border p-4 text-sm font-bold ${submitSuccess.type === 'success' ? 'border-green-500/30 bg-green-500/10 text-green-500' : 'border-yellow-500/30 bg-yellow-500/10 text-yellow-500'}`}>
+                            {submitSuccess.msg}
+                        </div>
+                    )}
+
                     <div className="grid gap-4">
+                        {/* Honeypot field - hidden from users */}
+                        <div className="hidden" aria-hidden="true">
+                            <input
+                                type="text"
+                                value={honeypot}
+                                onChange={(e) => setHoneypot(e.target.value)}
+                                autoComplete="off"
+                                tabIndex={-1}
+                            />
+                        </div>
                         <div>
                             <label htmlFor="name" className="mb-2 block text-xs font-bold uppercase tracking-wider text-texto-secundario">
                                 Seu nome ou organização

@@ -23,6 +23,7 @@
     "ship:all": "npm run ship:infra && npm run ship:content",
     "simulate:sensor": "node tools/simulate-sensor.mjs",
     "smoke": "node tools/db-smoke.mjs",
+    "test:smoke:ui": "playwright test --grep @smoke",
     "snapshot": "node tools/snapshot.mjs",
     "acervo:import": "node tools/acervo-import.mjs",
     "acervo:upload": "node tools/acervo-upload.mjs",
@@ -42,6 +43,7 @@
     "web-push": "^3.6.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/node": "^25.3.0",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",

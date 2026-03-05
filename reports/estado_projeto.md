@@ -16,7 +16,7 @@ Este relatório compila o estágio de desenvolvimento tecnológico, as infraestr
 ## 🌍 2. Módulos e Funcionalidades Consolidadas
 
 ### 2.1 Monitoramento Ambiental em Tempo Real (`/dados`)
-- **Estação Piloto Caju**: Leitura estabilizada via Edge Functions de sensores `PM2.5` e `PM10`.
+- **Estação Piloto Volta Redonda**: Leitura estabilizada via Edge Functions de sensores `PM2.5` e `PM10`.
 - **UI de Impacto Visual**: Cards responsivos exibindo as classificações de qualidade baseadas na OMS. Inclui ferramenta de exportação Client-Side de CSV histórico `(24h e 7 dias)` para uso de stakeholders externos e academia.
 - **Panorama Geral**: Página global unificando o status de conectividade (Online/Offline) e leituras de todas as estações parceiras instantaneamente.
 

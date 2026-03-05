@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { getAcervoBySlug, listCollectionsForItem, getRelatedItemsByCollections, type AcervoItem, type AcervoCollection } from "../../lib/api";
@@ -42,6 +42,8 @@ export function AcervoItemPage() {
     // Modal State
     const [activeMedia, setActiveMedia] = useState<{ url: string; type: string; title?: string } | null>(null);
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
+    const modalCloseButtonRef = useRef<HTMLButtonElement>(null);
+    const previousActiveElementRef = useRef<HTMLElement | null>(null);
 
     useEffect(() => {
         const handleOnline = () => setIsOffline(false);
@@ -54,8 +56,18 @@ export function AcervoItemPage() {
         };
     }, []);
 
-    // Close Modal on ESC
+    // Close Modal on ESC and manage focus
     useEffect(() => {
+        if (activeMedia) {
+            // Save previously focused element
+            previousActiveElementRef.current = document.activeElement as HTMLElement;
+            // Focus close button when modal opens
+            setTimeout(() => modalCloseButtonRef.current?.focus(), 100);
+        } else if (previousActiveElementRef.current) {
+            // Restore focus when modal closes
+            previousActiveElementRef.current.focus();
+        }
+
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape" && activeMedia) {
                 setActiveMedia(null);
@@ -325,58 +337,71 @@ export function AcervoItemPage() {
             {/* Media Viewer Modal */}
             {activeMedia && (
                 <div
-                    className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-fundo/95 p-4 backdrop-blur-sm"
+                    className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="media-modal-title"
+                    aria-describedby="media-modal-description"
+                    onClick={(e) => {
+                        // Close when clicking backdrop
+                        if (e.target === e.currentTarget) setActiveMedia(null);
+                    }}
                 >
-                    <div className="absolute top-4 right-4 flex items-center gap-4">
+                    <div className="absolute top-4 right-4 flex items-center gap-4 z-10">
                         <a
                             href={activeMedia.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs font-bold uppercase tracking-widest text-ciano hover:text-ciano/80"
+                            className="inline-flex min-h-[44px] items-center rounded-lg border-2 border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition-all hover:bg-white/20"
                         >
-                            Abrir em nova aba ↗
+                            Abrir em nova aba
+                            <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
                         </a>
                         <button
-                            className="rounded-full bg-acento/20 p-2 text-acento hover:bg-acento/30 transition-colors"
+                            ref={modalCloseButtonRef}
+                            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-danger px-3 py-2 text-white transition-all hover:bg-danger/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
                             onClick={() => setActiveMedia(null)}
-                            aria-label="Fechar visualizador"
+                            aria-label="Fechar visualizador de mídia (pressione ESC)"
                         >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
 
-                    <div className="flex h-full w-full max-w-5xl flex-col items-center justify-center pt-12 pb-4">
-                        <p id="media-modal-title" className="sr-only">Visualizador de Mídia do Acervo</p>
+                    <div className="flex h-full w-full max-w-5xl flex-col items-center justify-center pt-16 pb-4">
+                        <h2 id="media-modal-title" className="sr-only">Visualizador de Mídia do Acervo</h2>
+                        <p id="media-modal-description" className="sr-only">
+                            Use ESC para fechar, clique no botão fechar ou clique fora da imagem. {activeMedia.title ? `Visualizando: ${activeMedia.title}` : ''}
+                        </p>
 
                         {isOffline && (
-                            <div className="mb-4 w-full rounded-lg border border-acento/40 bg-acento/10 p-3 text-center">
-                                <p className="text-sm font-bold text-acento">Você está offline</p>
-                                <p className="text-xs text-texto/80 mt-1">Se você já carregou este arquivo antes, ele pode reabrir usando o cache do dispositivo.</p>
+                            <div className="mb-4 w-full rounded-lg border-2 border-warning bg-warning/20 p-4 text-center" role="alert">
+                                <p className="text-base font-bold text-white">Você está offline</p>
+                                <p className="text-sm text-white/90 mt-1">Se você já carregou este arquivo antes, ele pode reabrir usando o cache do dispositivo.</p>
                             </div>
                         )}
 
                         {activeMedia.type.toLowerCase().includes("pdf") || activeMedia.url.toLowerCase().endsWith(".pdf") ? (
                             <iframe
                                 src={activeMedia.url}
-                                className="h-full w-full rounded-xl border border-ciano/30 bg-base"
-                                title={activeMedia.title || "Documento PDF"}
+                                className="h-full w-full rounded-xl border-2 border-white/20 bg-white shadow-2xl"
+                                title={activeMedia.title || "Documento PDF do acervo"}
+                                aria-label={activeMedia.title ? `PDF: ${activeMedia.title}` : "Visualizador de PDF"}
                             />
                         ) : (
-                            <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl border border-ciano/10 bg-base/50">
+                            <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl border-2 border-white/20 bg-black/50 shadow-2xl">
                                 <img
                                     src={activeMedia.url}
-                                    alt={activeMedia.title || "Mídia do acervo"}
-                                    className="max-h-full max-w-full object-contain cursor-zoom-in hover:scale-105 transition-transform duration-300"
+                                    alt={activeMedia.title || "Imagem do acervo"}
+                                    className="max-h-full max-w-full object-contain"
                                 />
                             </div>
                         )}
                         {activeMedia.title && (
-                            <p className="mt-4 text-center text-sm font-semibold italic text-texto/70">{activeMedia.title}</p>
+                            <p className="mt-4 max-w-3xl text-center text-base font-semibold text-white">{activeMedia.title}</p>
                         )}
                     </div>
                 </div>

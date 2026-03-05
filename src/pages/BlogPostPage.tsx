@@ -12,7 +12,7 @@ function SimpleMarkdown({ text }: { text: string }) {
         .replace(/\*(.+?)\*/g, "<em>$1</em>")
         .replace(/\n/g, "<br />");
     // eslint-disable-next-line react/no-danger
-    return <div className="text-base leading-relaxed text-texto/90 space-y-4" dangerouslySetInnerHTML={{ __html: html }} />;
+    return <div className="text-base leading-relaxed text-text-primary space-y-4" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export function BlogPostPage() {
@@ -44,12 +44,12 @@ export function BlogPostPage() {
     }, [slug]);
 
     if (loading) {
-        return <p aria-live="polite" className="text-sm text-texto/80" role="status">Carregando post...</p>;
+        return <p aria-live="polite" className="text-base text-text-secondary" role="status">Carregando post...</p>;
     }
 
     if (error) {
         return (
-            <p aria-live="assertive" className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto" role="alert">
+            <p aria-live="assertive" className="rounded-md border border-error bg-error/10 p-3 text-base text-error" role="alert">
                 {error}
             </p>
         );
@@ -57,12 +57,12 @@ export function BlogPostPage() {
 
     if (!post) {
         return (
-            <div className="rounded-2xl border border-ciano/30 bg-fundo/80 p-10 text-center">
+            <div className="rounded-2xl border border-border-subtle bg-white p-10 text-center shadow-sm">
                 <p className="text-4xl">🔍</p>
-                <p aria-live="polite" className="mt-3 text-sm font-semibold text-texto/70" role="status">
+                <p aria-live="polite" className="mt-3 text-base font-semibold text-text-secondary" role="status">
                     Post não encontrado.
                 </p>
-                <Link className="mt-4 inline-block text-sm font-bold text-ciano hover:underline" to="/blog">
+                <Link className="mt-4 inline-block text-sm font-bold text-brand-primary hover:underline" to="/blog">
                     Voltar ao Blog
                 </Link>
             </div>
@@ -72,13 +72,13 @@ export function BlogPostPage() {
     return (
         <article className="mx-auto max-w-4xl space-y-6">
             <Link
-                className="inline-flex items-center gap-1 text-xs font-semibold text-ciano/70 hover:text-ciano"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-brand-primary hover:underline"
                 to="/blog"
             >
                 ← Voltar ao Blog
             </Link>
 
-            <div className="overflow-hidden rounded-2xl border border-ciano/40 bg-fundo/80 shadow-xl">
+            <div className="overflow-hidden rounded-2xl border border-border-subtle bg-white shadow-sm">
                 {post.cover_url && (
                     <img
                         alt={post.title}
@@ -87,20 +87,20 @@ export function BlogPostPage() {
                     />
                 )}
                 <div className="p-6 md:p-10">
-                    <div className="mb-4 flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-widest text-texto/50">
+                    <div className="mb-4 flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-wider text-text-secondary">
                         <span>{post.published_at ? new Date(post.published_at).toLocaleDateString("pt-BR") : "Draft"}</span>
                         {post.tags.length > 0 && (
                             <>
-                                <span className="h-1 w-1 rounded-full bg-texto/20" />
+                                <span className="h-1 w-1 rounded-full bg-border-subtle" />
                                 <div className="flex flex-wrap gap-2">
                                     {post.tags.map((tag) => (
-                                        <span className="text-ciano" key={tag}>#{tag}</span>
+                                        <span className="text-brand-primary" key={tag}>#{tag}</span>
                                     ))}
                                 </div>
                             </>
                         )}
                         <button
-                            className="ml-auto inline-flex items-center gap-1 rounded-full bg-ciano/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-ciano hover:bg-ciano/20"
+                            className="ml-auto inline-flex items-center gap-1 rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-primary hover:bg-brand-primary/20"
                             onClick={() => {
                                 const url = `${window.location.origin}/s/blog/${post.slug}`;
                                 if (navigator.share) {
@@ -120,22 +120,22 @@ export function BlogPostPage() {
                         </button>
                     </div>
 
-                    <h1 className="mb-6 text-3xl font-black leading-tight text-cta md:text-5xl">
+                    <h1 className="mb-6 text-3xl font-black leading-tight text-text-primary md:text-5xl">
                         {post.title}
                     </h1>
 
                     {post.excerpt && (
-                        <p className="mb-8 text-lg font-semibold leading-relaxed text-texto/90 border-l-4 border-ciano/30 pl-4 italic">
+                        <p className="mb-8 text-lg font-semibold leading-relaxed text-text-secondary border-l-4 border-brand-primary/30 pl-4 italic">
                             {post.excerpt}
                         </p>
                     )}
 
-                    <hr className="my-8 border-ciano/10" />
+                    <hr className="my-8 border-border-subtle" />
 
                     {post.content_md ? (
                         <SimpleMarkdown text={post.content_md} />
                     ) : (
-                        <p className="text-center italic text-texto/40">Este post ainda não possui conteúdo.</p>
+                        <p className="text-center italic text-text-secondary/50">Este post ainda não possui conteúdo.</p>
                     )}
                 </div>
             </div>

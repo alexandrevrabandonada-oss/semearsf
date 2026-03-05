@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getCorridorBySlug, type ClimateCorridorWithLinks } from "../../lib/api";
+import { getOptimizedCover } from "../../lib/imageOptimization";
 
 function ItemLink({ kind, refId }: { kind: string; refId: string }) {
     // Map kind to appropriate URL and label prefix
@@ -95,7 +96,9 @@ export function CorredoresDetailPage() {
     }
 
     const stations = corridor.links.filter((l) => l.item_kind === "station");
-    const otherLinks = corridor.links.filter((l) => l.item_kind !== "station");
+    const acervoItems = corridor.links.filter((l) => l.item_kind === "acervo");
+    const blogPosts = corridor.links.filter((l) => l.item_kind === "blog");
+    const events = corridor.links.filter((l) => l.item_kind === "event");
 
     return (
         <main className="mx-auto max-w-5xl px-4 py-8 md:py-12">
@@ -122,46 +125,127 @@ export function CorredoresDetailPage() {
                 )}
             </header>
 
-            {/* Geometry / Map Placeholder for MVP */}
-            <section className="mb-20 overflow-hidden rounded-3xl border border-ciano/20 bg-fundo-card shadow-2xl">
-                <div className="flex h-64 w-full flex-col items-center justify-center bg-gradient-to-br from-fundo to-primaria/10 md:h-96">
-                    <svg className="mb-4 h-16 w-16 text-ciano/30" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                    </svg>
-                    <span className="text-sm font-bold uppercase tracking-widest text-texto-secundario">Visualização do Mapa em Breve</span>
-                </div>
-            </section>
+            {/* Cover Image */}
+            {corridor.cover_url && (
+                <section className="mb-12 overflow-hidden rounded-3xl border border-ciano/20 shadow-2xl">
+                    <img
+                        src={getOptimizedCover(corridor, "cover") || corridor.cover_url}
+                        alt={corridor.title}
+                        className="h-auto w-full object-cover"
+                    />
+                </section>
+            )}
 
-            {/* Connected Nodes */}
-            <section className="space-y-16">
-                <div>
-                    <h2 className="mb-8 text-2xl font-black uppercase tracking-tight text-texto">
-                        Estações no Corredor
+            {/* Editorial Note - "O que observar aqui" */}
+            {corridor.note_md && (
+                <section className="mb-16 rounded-3xl border border-primaria/30 bg-primaria/5 p-8">
+                    <h2 className="mb-4 flex items-center gap-3 text-2xl font-black uppercase tracking-tight text-primaria">
+                        <span className="text-3xl">👁️</span>
+                        O que observar aqui
                     </h2>
-                    {stations.length === 0 ? (
-                        <p className="italic text-texto-secundario">Nenhuma estação de monitoramento vinculada a este corredor.</p>
-                    ) : (
+                    <div className="prose prose-lg max-w-none text-texto/90">
+                        <p className="whitespace-pre-wrap leading-relaxed">{corridor.note_md}</p>
+                    </div>
+                </section>
+            )}
+
+            {/* Geometry / Map Placeholder */}
+            {corridor.geometry_json ? (
+                <section className="mb-20 overflow-hidden rounded-3xl border border-ciano/20 bg-fundo-card shadow-2xl">
+                    <div className="p-8">
+                        <h3 className="mb-4 text-xl font-black uppercase tracking-tight text-texto">
+                            Geometria do Corredor
+                        </h3>
+                        <details className="cursor-pointer">
+                            <summary className="mb-2 text-sm font-bold text-ciano hover:underline">
+                                Ver dados GeoJSON
+                            </summary>
+                            <pre className="max-h-96 overflow-auto rounded-xl bg-fundo p-4 text-xs text-texto-secundario">
+                                {JSON.stringify(corridor.geometry_json, null, 2)}
+                            </pre>
+                        </details>
+                        <p className="mt-4 text-sm italic text-texto-secundario">
+                            Visualização interativa em desenvolvimento.
+                        </p>
+                    </div>
+                </section>
+            ) : (
+                <section className="mb-20 overflow-hidden rounded-3xl border border-ciano/20 bg-fundo-card shadow-2xl">
+                    <div className="flex h-64 w-full flex-col items-center justify-center bg-gradient-to-br from-fundo to-primaria/10 md:h-96">
+                        <svg className="mb-4 h-16 w-16 text-ciano/30" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                        </svg>
+                        <span className="text-sm font-bold uppercase tracking-widest text-texto-secundario">Mapa em breve</span>
+                    </div>
+                </section>
+            )}
+
+            {/* Connected Content - Organized by Type */}
+            <div className="space-y-16">
+                {/* Stations */}
+                {stations.length > 0 && (
+                    <section>
+                        <h2 className="mb-8 text-2xl font-black uppercase tracking-tight text-texto">
+                            📡 Estações Relacionadas
+                        </h2>
                         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
                             {stations.map((link) => (
                                 <ItemLink key={`${link.item_kind}-${link.item_ref}`} kind={link.item_kind} refId={link.item_ref} />
                             ))}
                         </div>
-                    )}
-                </div>
+                    </section>
+                )}
 
-                {otherLinks.length > 0 && (
-                    <div>
+                {/* Acervo Items */}
+                {acervoItems.length > 0 && (
+                    <section>
                         <h2 className="mb-8 text-2xl font-black uppercase tracking-tight text-texto">
-                            Conteúdo Relacionado
+                            📚 Itens do Acervo Relacionados
                         </h2>
                         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                            {otherLinks.map((link) => (
+                            {acervoItems.map((link) => (
                                 <ItemLink key={`${link.item_kind}-${link.item_ref}`} kind={link.item_kind} refId={link.item_ref} />
                             ))}
                         </div>
-                    </div>
+                    </section>
                 )}
-            </section>
+
+                {/* Blog Posts */}
+                {blogPosts.length > 0 && (
+                    <section>
+                        <h2 className="mb-8 text-2xl font-black uppercase tracking-tight text-texto">
+                            📝 Posts do Blog Relacionados
+                        </h2>
+                        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                            {blogPosts.map((link) => (
+                                <ItemLink key={`${link.item_kind}-${link.item_ref}`} kind={link.item_kind} refId={link.item_ref} />
+                            ))}
+                        </div>
+                    </section>
+                )}
+
+                {/* Events */}
+                {events.length > 0 && (
+                    <section>
+                        <h2 className="mb-8 text-2xl font-black uppercase tracking-tight text-texto">
+                            📅 Eventos Relacionados
+                        </h2>
+                        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                            {events.map((link) => (
+                                <ItemLink key={`${link.item_kind}-${link.item_ref}`} kind={link.item_kind} refId={link.item_ref} />
+                            ))}
+                        </div>
+                    </section>
+                )}
+
+                {stations.length === 0 && acervoItems.length === 0 && blogPosts.length === 0 && events.length === 0 && (
+                    <section className="text-center">
+                        <p className="italic text-texto-secundario">
+                            Nenhum conteúdo relacionado vinculado a este corredor climático.
+                        </p>
+                    </section>
+                )}
+            </div>
         </main>
     );
 }

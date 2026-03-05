@@ -1,7 +1,7 @@
 [
     {
         "slug": "demo-acervo-artigo-1",
-        "title": "Análise da dispersão de O3 na Baía da Guanabara",
+        "title": "Análise da dispersão de O3 no Médio Paraíba",
         "excerpt": "Estudo de simulação das concentrações de Ozônio modelado com dados coletados da rede de monitoramento participativo e radar Doppler.",
         "kind": "paper",
         "source_type": "academic_journal",
@@ -13,7 +13,7 @@
             "qualidade do ar",
             "inversão térmica"
         ],
-        "curator_note": "Artigo fundamental que cruza as medições da estação SEMEAR-Caju com dados de satélite.",
+        "curator_note": "Artigo fundamental que cruza as medições da rede SEMEAR em Volta Redonda com dados de satélite.",
         "meta": {
             "demo": true,
             "year": 2024,
@@ -27,8 +27,8 @@
     },
     {
         "slug": "demo-acervo-artigo-2",
-        "title": "Monitoramento de PM2.5 no Porto do Rio",
-        "excerpt": "Resultados de 2 anos de medições de Material Particulado de 2.5 micrômetros na zona portuária.",
+        "title": "Monitoramento de PM2.5 em corredor urbano-industrial",
+        "excerpt": "Resultados de 2 anos de medições de Material Particulado de 2.5 micrômetros em áreas de tráfego e entorno industrial.",
         "kind": "paper",
         "source_type": "academic_journal",
         "source_name": "Revista Engenharia Sanitária",
@@ -81,7 +81,7 @@
     {
         "slug": "demo-acervo-news-1",
         "title": "Estação do SEMEAR registra recorde de poluição após queimadas",
-        "excerpt": "Concentrações de PM10 chegaram a 150µg/m³ no Caju durante a tarde de terça-feira.",
+        "excerpt": "Concentrações de PM10 chegaram a 150µg/m³ em bairros centrais de Volta Redonda durante a tarde de terça-feira.",
         "kind": "news",
         "source_type": "press",
         "source_name": "Jornal Local RJ",
@@ -116,7 +116,7 @@
     {
         "slug": "demo-acervo-news-3",
         "title": "Vazamento de gás na refinaria atinge bairros vizinhos",
-        "excerpt": "Moradores acionaram a Defesa Civil após cheiro forte inundar Manguinhos.",
+        "excerpt": "Moradores acionaram a Defesa Civil após cheiro forte em bairros residenciais próximos a áreas industriais.",
         "kind": "news",
         "source_type": "press",
         "source_name": "Portal G1",
@@ -150,7 +150,7 @@
     {
         "slug": "demo-acervo-video-1",
         "title": "Documentário: O Ar que Respiramos",
-        "excerpt": "Curta-metragem reunindo depoimentos da comunidade sobre o cotidiano da poluição sob o Viaduto do Gasômetro.",
+        "excerpt": "Curta-metragem reunindo depoimentos da comunidade sobre o cotidiano da poluição em áreas de forte circulação urbana.",
         "kind": "video",
         "source_type": "documentary",
         "source_name": "Coletivo Mídia Cidadã",
@@ -158,7 +158,7 @@
         "tags": [
             "documentário",
             "testemunho",
-            "gasômetro"
+            "memória industrial"
         ],
         "meta": {
             "demo": true,
@@ -173,7 +173,7 @@
     },
     {
         "slug": "demo-acervo-video-2",
-        "title": "Palestra Magna: Qualidade do Ar no Rio de Janeiro",
+        "title": "Palestra Magna: Qualidade do Ar em Volta Redonda",
         "excerpt": "Apresentação de resultados na COP-28 em painel de Ciência Aberta Brasileira.",
         "kind": "video",
         "source_type": "lecture",
