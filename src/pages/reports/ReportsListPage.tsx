@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { getOptimizedCover } from "../../lib/imageOptimization";
 import { listReports, type ReportDocument, type ReportKind } from "../../lib/api";
 
 const KIND_LABEL: Record<ReportKind, string> = {
@@ -160,41 +161,61 @@ export function ReportsListPage() {
           </div>
         ) : (
           <ul className="space-y-3">
-            {reports.map((item) => (
-              <li key={item.id}>
-                <Link
-                  to={`/relatorios/${item.slug}`}
-                  className="flex flex-col gap-2 rounded-xl border border-border-subtle bg-bg-surface p-4 transition-all hover:border-brand-primary hover:shadow-md"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      {item.featured && (
-                        <span className="rounded-full bg-brand-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary">
-                          Destaque
+            {reports.map((item) => {
+              const thumbUrl = getOptimizedCover(item, "thumb");
+              return (
+                <li key={item.id}>
+                  <Link
+                    to={`/relatorios/${item.slug}`}
+                    className="grid gap-4 rounded-xl border border-border-subtle bg-bg-surface p-4 transition-all hover:border-brand-primary hover:shadow-md md:grid-cols-[132px_minmax(0,1fr)] md:items-start"
+                  >
+                    {thumbUrl ? (
+                      <div className="overflow-hidden rounded-lg border border-border-subtle bg-white">
+                        <img
+                          src={thumbUrl}
+                          alt={`Capa de ${item.title}`}
+                          loading="lazy"
+                          className="h-24 w-full object-cover md:h-28"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-24 w-full flex-col justify-between rounded-lg border border-dashed border-brand-primary/25 bg-gradient-to-br from-brand-primary/10 via-white to-bg-surface p-3 md:h-28">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-primary">SEMEAR</span>
+                        <span className="text-xs font-black uppercase leading-tight text-text-primary">Documento oficial</span>
+                      </div>
+                    )}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          {item.featured && (
+                            <span className="rounded-full bg-brand-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary">
+                              Destaque
+                            </span>
+                          )}
+                          <span className="rounded-full bg-bg-surface px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary border border-border-subtle">
+                            {KIND_LABEL[item.kind]}
+                          </span>
+                        </div>
+                        <span className="text-xs font-semibold text-text-secondary">
+                          {item.published_at ? new Date(item.published_at).toLocaleDateString("pt-BR") : "Sem data"}
                         </span>
+                      </div>
+                      <h2 className="text-base font-black text-text-primary">{item.title}</h2>
+                      {item.summary && <p className="text-sm leading-relaxed text-text-secondary line-clamp-2">{item.summary}</p>}
+                      {item.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {item.tags.slice(0, 5).map((itemTag) => (
+                            <span key={itemTag} className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary">
+                              {itemTag}
+                            </span>
+                          ))}
+                        </div>
                       )}
-                      <span className="rounded-full bg-bg-surface px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary border border-border-subtle">
-                        {KIND_LABEL[item.kind]}
-                      </span>
                     </div>
-                    <span className="text-xs font-semibold text-text-secondary">
-                      {item.published_at ? new Date(item.published_at).toLocaleDateString("pt-BR") : "Sem data"}
-                    </span>
-                  </div>
-                  <h2 className="text-base font-black text-text-primary">{item.title}</h2>
-                  {item.summary && <p className="text-sm leading-relaxed text-text-secondary line-clamp-2">{item.summary}</p>}
-                  {item.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {item.tags.slice(0, 5).map((itemTag) => (
-                        <span key={itemTag} className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary">
-                          {itemTag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </Link>
-              </li>
-            ))}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>

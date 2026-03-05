@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
+import { LoadingCard } from "../components/LoadingCard";
 import { getMeasurementsDownsampled, getStationOverview, getStationHealth, type DownsampledMeasurement, type StationOverview, type StationHealth } from "../lib/api";
 import { classifyOmsPollutant } from "../lib/airQuality";
 
@@ -9,6 +9,10 @@ const ENV_HINT = " Verifique .env.local (VITE_SUPABASE_URL e VITE_SUPABASE_ANON_
 const POLLING_INTERVAL_MS = 60_000;
 
 type TabId = "now" | "24h" | "7d";
+
+const MeasurementsChart = lazy(() =>
+  import("../components/MeasurementsChart").then((m) => ({ default: m.MeasurementsChart }))
+);
 
 function formatDate(value: unknown) {
   if (typeof value !== "string") return "-";
@@ -549,55 +553,9 @@ export function DadosPage() {
                   {/* Gráfico */}
                   <div className="rounded-lg border border-border-subtle bg-white p-4 mb-6">
                     <h3 className="text-sm font-bold text-brand-primary mb-4">Evolução Temporal</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                        <XAxis 
-                          dataKey="ts" 
-                          tick={{ fontSize: 12 }}
-                          stroke="#6b7280"
-                        />
-                        <YAxis 
-                          tick={{ fontSize: 12 }}
-                          stroke="#6b7280"
-                          label={{ value: 'µg/m³', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
-                        />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'white', 
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '0.5rem',
-                            fontSize: '12px'
-                          }}
-                        />
-                        <Legend 
-                          wrapperStyle={{ fontSize: '12px' }}
-                          iconType="line"
-                        />
-                        {showPM25 && (
-                          <Line 
-                            type="monotone" 
-                            dataKey="pm25" 
-                            stroke="#10b981" 
-                            strokeWidth={2}
-                            name="PM2.5 (µg/m³)"
-                            dot={{ r: 3 }}
-                            activeDot={{ r: 5 }}
-                          />
-                        )}
-                        {showPM10 && (
-                          <Line 
-                            type="monotone" 
-                            dataKey="pm10" 
-                            stroke="#f59e0b" 
-                            strokeWidth={2}
-                            name="PM10 (µg/m³)"
-                            dot={{ r: 3 }}
-                            activeDot={{ r: 5 }}
-                          />
-                        )}
-                      </LineChart>
-                    </ResponsiveContainer>
+                    <Suspense fallback={<LoadingCard message="Carregando gráfico histórico..." />}>
+                      <MeasurementsChart data={chartData} showPM25={showPM25} showPM10={showPM10} />
+                    </Suspense>
                   </div>
 
                   {/* Tabela fallback para acessibilidade */}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   getTransparencySummary,
   listExpenses,
@@ -36,11 +36,16 @@ export function TransparenciaPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewerExpense, setViewerExpense] = useState<Expense | null>(null);
 
   const [selectedMonth, setSelectedMonth] = useState("all");
   const [selectedYear, setSelectedYear] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [vendorQuery, setVendorQuery] = useState("");
+
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -68,6 +73,42 @@ export function TransparenciaPage() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (viewerExpense) {
+      previousActiveElementRef.current = document.activeElement as HTMLElement;
+      window.setTimeout(() => closeButtonRef.current?.focus(), 50);
+    } else if (previousActiveElementRef.current) {
+      previousActiveElementRef.current.focus();
+    }
+
+    const onKeyDown = (ev: KeyboardEvent) => {
+      if (!viewerExpense) return;
+      if (ev.key === "Escape") {
+        setViewerExpense(null);
+        return;
+      }
+      if (ev.key === "Tab" && modalRef.current) {
+        const focusable = Array.from(
+          modalRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])')
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+        if (ev.shiftKey && active === first) {
+          ev.preventDefault();
+          last.focus();
+        } else if (!ev.shiftKey && active === last) {
+          ev.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [viewerExpense]);
 
   const monthOptions = useMemo(() => {
     const values = new Set<string>();
@@ -112,18 +153,10 @@ export function TransparenciaPage() {
       return acc;
     }, {} as Record<string, number>);
 
-    const topCategories = Object.entries(byCategory)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-
-    const topVendors = Object.entries(byVendor)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-
     return {
       total,
-      topCategories,
-      topVendors,
+      topCategories: Object.entries(byCategory).sort((a, b) => b[1] - a[1]).slice(0, 5),
+      topVendors: Object.entries(byVendor).sort((a, b) => b[1] - a[1]).slice(0, 5),
       count: filteredExpenses.length
     };
   }, [filteredExpenses]);
@@ -229,59 +262,28 @@ export function TransparenciaPage() {
         <div className="mt-4 grid gap-4 md:grid-cols-4">
           <div>
             <label htmlFor="filtro-mes" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Mês</label>
-            <select
-              id="filtro-mes"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm"
-            >
+            <select id="filtro-mes" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
               <option value="all">Todos</option>
-              {monthOptions.map((month) => (
-                <option key={month} value={month}>{month}</option>
-              ))}
+              {monthOptions.map((month) => <option key={month} value={month}>{month}</option>)}
             </select>
           </div>
-
           <div>
             <label htmlFor="filtro-ano" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Ano</label>
-            <select
-              id="filtro-ano"
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm"
-            >
+            <select id="filtro-ano" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
               <option value="all">Todos</option>
-              {yearOptions.map((year) => (
-                <option key={year} value={year}>{year}</option>
-              ))}
+              {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
             </select>
           </div>
-
           <div>
             <label htmlFor="filtro-categoria" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Categoria</label>
-            <select
-              id="filtro-categoria"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm"
-            >
+            <select id="filtro-categoria" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
               <option value="all">Todas</option>
-              {categoryOptions.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
+              {categoryOptions.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
             </select>
           </div>
-
           <div>
             <label htmlFor="filtro-fornecedor" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Fornecedor (busca)</label>
-            <input
-              id="filtro-fornecedor"
-              type="search"
-              value={vendorQuery}
-              onChange={(e) => setVendorQuery(e.target.value)}
-              placeholder="Digite o nome"
-              className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm"
-            />
+            <input id="filtro-fornecedor" type="search" value={vendorQuery} onChange={(e) => setVendorQuery(e.target.value)} placeholder="Digite o nome" className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm" />
           </div>
         </div>
       </section>
@@ -320,20 +322,14 @@ export function TransparenciaPage() {
             <h2 className="text-2xl font-black text-text-primary">Despesas lançadas</h2>
             <p className="mt-1 text-xs text-text-secondary">Documentos são publicados quando disponíveis.</p>
           </div>
-          <button
-            type="button"
-            onClick={handleDownloadExpensesCsv}
-            className="inline-flex min-h-[44px] items-center rounded-lg border border-border-subtle bg-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-brand-primary transition-colors hover:bg-bg-surface"
-          >
+          <button type="button" onClick={handleDownloadExpensesCsv} className="inline-flex min-h-[44px] items-center rounded-lg border border-border-subtle bg-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-brand-primary transition-colors hover:bg-bg-surface">
             Baixar CSV
           </button>
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-border-subtle" aria-label="Tabela de despesas filtradas">
           <table className="w-full border-collapse text-left text-base" aria-describedby="caption-despesas">
-            <caption id="caption-despesas" className="sr-only">
-              Tabela de despesas com filtros por mês, ano, categoria e fornecedor. Ordenada por data decrescente.
-            </caption>
+            <caption id="caption-despesas" className="sr-only">Tabela de despesas com filtros por mês, ano, categoria e fornecedor. Ordenada por data decrescente.</caption>
             <thead>
               <tr className="border-b border-border-subtle bg-bg-surface">
                 <th className="px-4 py-3 text-sm font-bold uppercase tracking-wider text-text-secondary">Data</th>
@@ -347,30 +343,23 @@ export function TransparenciaPage() {
             <tbody className="divide-y divide-border-subtle">
               {filteredExpenses.map((exp) => (
                 <tr key={exp.id} className="transition-colors hover:bg-bg-surface">
-                  <td className="whitespace-nowrap px-4 py-4 font-mono text-sm text-text-secondary">
-                    {new Date(exp.occurred_on).toLocaleDateString("pt-BR")}
-                  </td>
+                  <td className="whitespace-nowrap px-4 py-4 font-mono text-sm text-text-secondary">{new Date(exp.occurred_on).toLocaleDateString("pt-BR")}</td>
                   <td className="px-4 py-4 font-semibold text-text-primary">{exp.vendor}</td>
-                  <td className="hidden px-4 py-4 md:table-cell">
-                    <span className="inline-block rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary">
-                      {exp.category}
-                    </span>
-                  </td>
+                  <td className="hidden px-4 py-4 md:table-cell"><span className="inline-block rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary">{exp.category}</span></td>
                   <td className="max-w-[220px] px-4 py-4 text-sm text-text-secondary line-clamp-1">{exp.description}</td>
                   <td className="whitespace-nowrap px-4 py-4 text-right text-base font-bold text-success">{formatBRL(exp.amount_cents)}</td>
                   <td className="px-4 py-4 text-right">
                     {exp.document_url ? (
-                      <a
-                        href={exp.document_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        type="button"
+                        onClick={() => setViewerExpense(exp)}
                         className="inline-flex items-center gap-1 text-sm font-bold text-brand-primary hover:underline"
                       >
                         Ver documento
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
-                      </a>
+                      </button>
                     ) : (
                       <span className="inline-flex items-center rounded-full bg-bg-surface px-2 py-1 text-xs font-semibold text-text-secondary">Sem documento</span>
                     )}
@@ -391,25 +380,57 @@ export function TransparenciaPage() {
         <h2 className="text-2xl font-black text-text-primary">Links oficiais de controle</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {links.map((link) => (
-            <a
-              key={link.id}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex flex-col gap-2 rounded-xl border border-border-subtle bg-bg-surface p-4 transition-all hover:border-brand-primary hover:shadow-md"
-            >
+            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="group flex flex-col gap-2 rounded-xl border border-border-subtle bg-bg-surface p-4 transition-all hover:border-brand-primary hover:shadow-md">
               <span className="inline-block rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary">{link.kind}</span>
               <span className="text-base font-bold text-text-primary group-hover:text-brand-primary">{link.title}</span>
               <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-text-secondary">Acessar link externo</span>
             </a>
           ))}
           {links.length === 0 && (
-            <p className="col-span-full rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center text-base text-text-secondary">
-              Nenhum link oficial cadastrado no momento.
-            </p>
+            <p className="col-span-full rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center text-base text-text-secondary">Nenhum link oficial cadastrado no momento.</p>
           )}
         </div>
       </section>
+
+      {viewerExpense?.document_url && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/75 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="transparencia-viewer-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setViewerExpense(null);
+          }}
+        >
+          <h2 id="transparencia-viewer-title" className="sr-only">Visualizador de documento</h2>
+          <div ref={modalRef} className="w-full max-w-5xl">
+            <div className="mb-3 flex w-full justify-end gap-2">
+              <a
+                href={viewerExpense.document_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
+              >
+                Abrir em nova aba
+              </a>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                onClick={() => setViewerExpense(null)}
+                className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 text-white hover:bg-error/90"
+                aria-label="Fechar visualizador de documento (ESC)"
+              >
+                ✕
+              </button>
+            </div>
+            <iframe
+              src={viewerExpense.document_url}
+              title={`Documento de ${viewerExpense.vendor}`}
+              className="h-[80vh] w-full rounded-xl border border-white/20 bg-white"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

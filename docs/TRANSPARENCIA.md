@@ -21,17 +21,22 @@ npm run transparency:upload -- --expense-id 11111111-2222-3333-4444-555555555555
 ### Opção 2: por lookup (data + fornecedor + valor)
 
 ```bash
-npm run transparency:upload -- --lookup --date <YYYY-MM-DD> --vendor <nome> --amount <valor_em_reais> --file <caminho-do-arquivo>
+npm run transparency:upload -- --date <YYYY-MM-DD> --vendor <nome> --amount <valor_em_reais> --file <caminho-do-arquivo>
 ```
 
-Exemplo:
+Exemplos:
 
 ```bash
-npm run transparency:upload -- --lookup --date 2026-03-05 --vendor "Fornecedor X" --amount 1250,50 --file ./docs/comprovante.pdf
+npm run transparency:upload -- --date 2026-03-05 --vendor "Fornecedor X" --amount 123.45 --file ./docs/comprovante.pdf
+```
+
+```bash
+npm run transparency:upload -- --date 2026-03-05 --vendor "Fornecedor X" --amount 1250,50 --file ./docs/nota-fiscal.pdf
 ```
 
 Comportamento:
 - faz upload no bucket público `transparency`
+- organiza o arquivo em `transparency/<year>/<month>/<vendor>-<amount>-<timestamp>.pdf`
 - salva a URL pública em `expenses.document_url`
 - se o lookup encontrar mais de um resultado, o script interrompe e pede refinamento
 

@@ -1,22 +1,76 @@
+import fs from "node:fs";
+import path from "node:path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+
+function buildChunksManifest() {
+  return {
+    name: "build-chunks-manifest",
+    closeBundle() {
+      const distDir = path.join(process.cwd(), "dist");
+      if (!fs.existsSync(distDir)) return;
+
+      const manifest = {};
+      const walk = (dir) => {
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+          const fullPath = path.join(dir, entry.name);
+          if (entry.isDirectory()) {
+            walk(fullPath);
+            continue;
+          }
+
+          const relPath = path.relative(distDir, fullPath).replace(/\\/g, "/");
+          if (relPath === "manifest.json") continue;
+          manifest[relPath] = {
+            file: relPath,
+            type: relPath.endsWith(".js") ? "chunk" : "asset",
+            isEntry: relPath === "index.html"
+          };
+        }
+      };
+
+      walk(distDir);
+      fs.writeFileSync(path.join(distDir, "manifest.json"), JSON.stringify(manifest, null, 2));
+    }
+  };
+}
 
 export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          "vendor-react": ["react", "react-dom"],
-          "vendor-router": ["react-router-dom"],
-          "vendor-supabase": ["@supabase/supabase-js"],
-          "vendor-viz-map": ["recharts", "leaflet", "react-leaflet"]
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+
+          if (id.includes("/react-dom/") || id.includes("/react/")) {
+            return "vendor-react";
+          }
+
+          if (id.includes("/react-router-dom/") || id.includes("/@remix-run/router/")) {
+            return "vendor-router";
+          }
+
+          if (id.includes("/@supabase/")) {
+            return "vendor-supabase";
+          }
+
+          if (id.includes("/leaflet/") || id.includes("/react-leaflet/")) {
+            return "vendor-maps";
+          }
+
+          if (id.includes("/recharts/") || id.includes("/victory-vendor/")) {
+            return "vendor-charts";
+          }
+
+          return undefined;
         }
       }
     }
   },
   plugins: [
     react(),
+    buildChunksManifest(),
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
@@ -53,7 +107,7 @@ export default defineConfig({
               cacheName: "acervo-images",
               expiration: {
                 maxEntries: 200,
-                maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
+                maxAgeSeconds: 30 * 24 * 60 * 60
               },
               cacheableResponse: {
                 statuses: [0, 200]
@@ -67,7 +121,7 @@ export default defineConfig({
               cacheName: "acervo-pdfs",
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 14 * 24 * 60 * 60 // 14 days
+                maxAgeSeconds: 14 * 24 * 60 * 60
               },
               cacheableResponse: {
                 statuses: [0, 200]
