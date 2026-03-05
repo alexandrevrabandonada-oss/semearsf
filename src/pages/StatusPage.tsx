@@ -84,6 +84,39 @@ export function StatusPage() {
                     </div>
                 </div>
 
+                {/* Push Alerts Card */}
+                <div className="rounded-2xl border border-acento/40 bg-fundo/60 p-6 flex flex-col">
+                    <h2 className="text-xs font-black uppercase tracking-widest text-cta">Alertas (7 dias)</h2>
+                    <div className="mt-6 flex flex-col gap-4">
+                        <div className="flex items-end gap-2">
+                            <span className="text-4xl font-black text-acento">{status.alerts.total_7d}</span>
+                            <span className="mb-1 text-[10px] font-bold uppercase tracking-tighter text-texto/40">Triggers</span>
+                        </div>
+                        {status.alerts.top_stations.length > 0 && (
+                            <div className="space-y-2">
+                                <p className="text-[10px] font-bold uppercase text-ciano/70">Top Estações</p>
+                                {status.alerts.top_stations.map((station, idx) => (
+                                    <div key={idx} className="flex justify-between items-center text-xs">
+                                        <span className="text-texto/60 font-mono">{station.station_code}</span>
+                                        <span className="font-black text-acento">{station.count}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {status.alerts.top_pollutants.length > 0 && (
+                            <div className="space-y-2 mt-3">
+                                <p className="text-[10px] font-bold uppercase text-ciano/70">Top Poluentes</p>
+                                {status.alerts.top_pollutants.map((pol, idx) => (
+                                    <div key={idx} className="flex justify-between items-center text-xs">
+                                        <span className="text-texto/60">{pol.pollutant}</span>
+                                        <span className="font-black text-acento">{pol.count}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
                 {/* Transparency Card */}
                 <div className="rounded-2xl border border-primaria/40 bg-fundo/60 p-6 flex flex-col">
                     <h2 className="text-xs font-black uppercase tracking-widest text-cta">Transparência</h2>

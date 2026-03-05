@@ -237,6 +237,9 @@ Deno.serve(async (req) => {
 
         const pollutant = pm25 !== null && pm25 >= 35 ? "PM2.5" : "PM10";
         const value = pollutant === "PM2.5" ? pm25 : pm10;
+        const threshold = pollutant === "PM2.5" 
+          ? (eligibleSubs[0]?.pm25_threshold || 35)
+          : (eligibleSubs[0]?.pm10_threshold || 0);
 
         const pushPayload = JSON.stringify({
           title: `Alerta: Qualidade do Ar - ${station.name}`,
@@ -250,6 +253,7 @@ Deno.serve(async (req) => {
           }
         });
 
+        let triggeredCount = 0;
         await Promise.allSettled(
           eligibleSubs.map(async (sub) => {
             try {
@@ -258,6 +262,7 @@ Deno.serve(async (req) => {
                 keys: { p256dh: sub.p256dh, auth: sub.auth }
               };
               await webpush.sendNotification(pushSubscription, pushPayload);
+              triggeredCount++;
 
               await supabase
                 .from("push_subscriptions")
@@ -274,11 +279,14 @@ Deno.serve(async (req) => {
           })
         );
 
-        await supabase.from("push_alert_events").insert({
-          station_id: station.id,
-          pm25,
-          pm10,
-          reason: `Disparo avançado para ${eligibleSubs.length} assinantes (Filtro: ${stationCode}).`
+        // Log to push_events (no personal data, only measurement context)
+        await supabase.from("push_events").insert({
+          ts,
+          station_code: stationCode,
+          pollutant,
+          value,
+          triggered: triggeredCount > 0,
+          reason: `${pollutant} ${value} µg/m³ > ${threshold} | ${triggeredCount}/${eligibleSubs.length} notificações enviadas`
         });
       }
     }

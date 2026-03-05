@@ -557,6 +557,11 @@ export type SystemStatus = {
     total_7d: number;
     top_slugs: { kind: string; slug: string; count: number }[];
   };
+  alerts: {
+    total_7d: number;
+    top_stations: { station_code: string; count: number }[];
+    top_pollutants: { pollutant: string; count: number }[];
+  };
 };
 
 export async function getSystemStatus(): Promise<SystemStatus> {
@@ -580,6 +585,8 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       .maybeSingle();
 
     // 2. Content & Social
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
     const results = await Promise.all([
       supabase.from("events").select("id, title, start_at, location, capacity")
         .order("start_at", { ascending: true })
@@ -590,8 +597,18 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       getTransparencySummary(),
       supabase.from("share_events")
         .select("*", { count: "exact", head: true })
-        .gt("occurred_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
-      supabase.rpc("get_top_shared_items", { p_days: 7 })
+        .gt("occurred_at", sevenDaysAgo),
+      supabase.rpc("get_top_shared_items", { p_days: 7 }),
+      // Push alerts (7 days)
+      supabase.from("push_events")
+        .select("*", { count: "exact", head: true })
+        .gt("ts", sevenDaysAgo),
+      supabase.from("push_events")
+        .select("station_code")
+        .gt("ts", sevenDaysAgo),
+      supabase.from("push_events")
+        .select("pollutant")
+        .gt("ts", sevenDaysAgo)
     ]);
 
     const events = results[0];
@@ -600,6 +617,30 @@ export async function getSystemStatus(): Promise<SystemStatus> {
     const transparency = results[3] as TransparencySummary;
     const social7d = results[4] as { count: number };
     const topShares = results[5] as { data: any[] };
+    const alerts7d = results[6] as { count: number };
+    const alertsStations = results[7] as { data: any[] };
+    const alertsPollutants = results[8] as { data: any[] };
+
+    // Count top stations and pollutants
+    const stationCounts = new Map<string, number>();
+    (alertsStations.data || []).forEach((item: any) => {
+      const code = item.station_code;
+      stationCounts.set(code, (stationCounts.get(code) || 0) + 1);
+    });
+    const topStations = Array.from(stationCounts.entries())
+      .map(([station_code, count]) => ({ station_code, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+
+    const pollutantCounts = new Map<string, number>();
+    (alertsPollutants.data || []).forEach((item: any) => {
+      const pol = item.pollutant;
+      pollutantCounts.set(pol, (pollutantCounts.get(pol) || 0) + 1);
+    });
+    const topPollutants = Array.from(pollutantCounts.entries())
+      .map(([pollutant, count]) => ({ pollutant, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
 
     return {
       monitoring: {
@@ -619,6 +660,11 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       social: {
         total_7d: social7d.count || 0,
         top_slugs: (topShares.data || []) as { kind: string; slug: string; count: number }[]
+      },
+      alerts: {
+        total_7d: alerts7d.count || 0,
+        top_stations: topStations,
+        top_pollutants: topPollutants
       }
     };
   } catch (error) {
