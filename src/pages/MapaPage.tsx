@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import { getStationOverview, listCorridors, type StationOverview, type ClimateCorridor } from "../lib/api";
+import { getStationOverview, getStationHealth, listCorridors, type StationOverview, type StationHealth, type ClimateCorridor } from "../lib/api";
 
 // Fix default marker icons in react-leaflet
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -34,8 +34,42 @@ function getStationCoordinates(code: string | null): [number, number] {
   return MOCK_COORDINATES[code] || MOCK_COORDINATES.default;
 }
 
+function getHealthMarkerIcon(health: string | undefined) {
+  const colors: Record<string, { bg: string; text: string }> = {
+    ok: { bg: '#22c55e', text: '#fff' },        // green
+    degraded: { bg: '#eab308', text: '#000' },  // yellow
+    offline: { bg: '#ef4444', text: '#fff' },   // red
+    unknown: { bg: '#a1a1a1', text: '#fff' }    // gray
+  };
+  
+  const color = colors[health || 'unknown'];
+  
+  return new L.DivIcon({
+    html: `<div style="
+      background-color: ${color.bg};
+      color: ${color.text};
+      border: 2px solid white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    ">
+      ${health === 'ok' ? '✓' : health === 'degraded' ? '⚠' : health === 'offline' ? '✕' : '?'}
+    </div>`,
+    className: 'leaflet-health-icon',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+}
+
 export function MapaPage() {
   const [stations, setStations] = useState<StationOverview[]>([]);
+  const [stationHealth, setStationHealth] = useState<Map<string, StationHealth>>(new Map());
   const [corridors, setCorridors] = useState<ClimateCorridor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,11 +79,20 @@ export function MapaPage() {
       try {
         setLoading(true);
         setError(null);
-        const [stationsData, corridorsData] = await Promise.all([
+        const [stationsData, healthData, corridorsData] = await Promise.all([
           getStationOverview(),
+          getStationHealth(),
           listCorridors(),
         ]);
         setStations(stationsData);
+        
+        // Create health map by station_id
+        const healthMap = new Map<string, StationHealth>();
+        healthData.forEach(h => {
+          healthMap.set(h.station_id, h);
+        });
+        setStationHealth(healthMap);
+        
         setCorridors(corridorsData);
       } catch (err) {
         const message = err instanceof Error ? err.message : "Falha ao carregar dados do mapa.";
@@ -120,8 +163,11 @@ export function MapaPage() {
               {/* Station Markers */}
               {stations.map((station) => {
                 const coords = getStationCoordinates(station.code);
+                const health = stationHealth.get(station.station_id);
+                const icon = getHealthMarkerIcon(health?.health_status);
+                
                 return (
-                  <Marker key={station.station_id} position={coords}>
+                  <Marker key={station.station_id} position={coords} icon={icon}>
                     <Popup>
                       <div className="p-2">
                         <h3 className="font-bold text-sm mb-1">{station.name}</h3>
@@ -130,6 +176,11 @@ export function MapaPage() {
                             {station.is_online ? "● Online" : "● Offline"}
                           </span>
                         </p>
+                        {health && (
+                          <p className="text-xs text-text-secondary mb-2">
+                            Qualidade: <span className="font-bold">{health.health_status === 'ok' ? 'Excelente' : health.health_status === 'degraded' ? 'Degradado' : health.health_status === 'offline' ? 'Offline' : 'Desconhecido'}</span>
+                          </p>
+                        )}
                         {station.bairro && (
                           <p className="text-xs text-text-secondary mb-2">{station.bairro}</p>
                         )}
@@ -182,6 +233,35 @@ export function MapaPage() {
                 }
               })}
             </MapContainer>
+          </div>
+        )}
+
+        {/* Legend */}
+        {!loading && (
+          <div className="mt-4 rounded-lg border border-border-subtle bg-bg-surface p-4">
+            <p className="text-xs font-bold uppercase tracking-wide text-brand-primary mb-3">Legenda</p>
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="flex items-center gap-2">
+                <div style={{ backgroundColor: '#22c55e', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>✓</div>
+                <span className="text-xs text-text-secondary"><strong>Excelente:</strong> Qualidade confiável</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div style={{ backgroundColor: '#eab308', color: '#000', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>⚠</div>
+                <span className="text-xs text-text-secondary"><strong>Degradado:</strong> Qualidade comprometida</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div style={{ backgroundColor: '#ef4444', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>✕</div>
+                <span className="text-xs text-text-secondary"><strong>Offline:</strong> Sem comunicação</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div style={{ backgroundColor: '#a1a1a1', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>?</div>
+                <span className="text-xs text-text-secondary"><strong>Desconhecido:</strong> Sem dados</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div style={{ backgroundColor: '#10b981', height: '4px', width: '30px' }}></div>
+                <span className="text-xs text-text-secondary"><strong>Corredor climático</strong></span>
+              </div>
+            </div>
           </div>
         )}
       </section>

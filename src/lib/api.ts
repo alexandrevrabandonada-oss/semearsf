@@ -47,6 +47,27 @@ export async function getStationOverview(): Promise<StationOverview[]> {
   }
 }
 
+export type StationHealth = {
+  station_id: string;
+  code: string;
+  name: string;
+  is_online: boolean;
+  health_status: 'ok' | 'degraded' | 'offline' | 'unknown';
+  last_measurement_ts: string | null;
+  last_seen_at: string;
+};
+
+export async function getStationHealth(): Promise<StationHealth[]> {
+  try {
+    const supabase = assertSupabase();
+    const { data, error } = await supabase.rpc("get_station_health");
+    if (error) throw error;
+    return (data ?? []) as StationHealth[];
+  } catch (error) {
+    throw toAppError("Falha ao buscar saúde das estações", error);
+  }
+}
+
 
 export type Event = {
   id: string;
@@ -562,6 +583,12 @@ export type SystemStatus = {
     top_stations: { station_code: string; count: number }[];
     top_pollutants: { pollutant: string; count: number }[];
   };
+  network_health: {
+    ok: number;
+    degraded: number;
+    offline: number;
+    unknown: number;
+  };
 };
 
 export async function getSystemStatus(): Promise<SystemStatus> {
@@ -608,7 +635,9 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         .gt("ts", sevenDaysAgo),
       supabase.from("push_events")
         .select("pollutant")
-        .gt("ts", sevenDaysAgo)
+        .gt("ts", sevenDaysAgo),
+      // Network health
+      supabase.rpc("get_station_health")
     ]);
 
     const events = results[0];
@@ -620,6 +649,7 @@ export async function getSystemStatus(): Promise<SystemStatus> {
     const alerts7d = results[6] as { count: number };
     const alertsStations = results[7] as { data: any[] };
     const alertsPollutants = results[8] as { data: any[] };
+    const stationHealthData = results[9] as { data: StationHealth[] };
 
     // Count top stations and pollutants
     const stationCounts = new Map<string, number>();
@@ -641,6 +671,15 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       .map(([pollutant, count]) => ({ pollutant, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
+
+    // Network health breakdown
+    const networkHealth = { ok: 0, degraded: 0, offline: 0, unknown: 0 };
+    (stationHealthData.data || []).forEach((health: StationHealth) => {
+      const status = health.health_status as keyof typeof networkHealth;
+      if (status in networkHealth) {
+        networkHealth[status]++;
+      }
+    });
 
     return {
       monitoring: {
@@ -665,7 +704,8 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         total_7d: alerts7d.count || 0,
         top_stations: topStations,
         top_pollutants: topPollutants
-      }
+      },
+      network_health: networkHealth
     };
   } catch (error) {
     throw toAppError("Falha ao obter status do sistema", error);

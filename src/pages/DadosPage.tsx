@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-import { getMeasurementsDownsampled, getStationOverview, type DownsampledMeasurement, type StationOverview } from "../lib/api";
+import { getMeasurementsDownsampled, getStationOverview, getStationHealth, type DownsampledMeasurement, type StationOverview, type StationHealth } from "../lib/api";
 
 const ENV_HINT = " Verifique .env.local (VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY).";
 const POLLING_INTERVAL_MS = 60_000;
@@ -28,11 +28,27 @@ function formatCellValue(value: unknown) {
   return String(value);
 }
 
+function getHealthBadgeInfo(health: string | undefined) {
+  switch (health) {
+    case 'ok':
+      return { label: 'Excelente', color: 'bg-green-100 text-green-900', icon: '✓' };
+    case 'degraded':
+      return { label: 'Degradado', color: 'bg-yellow-100 text-yellow-900', icon: '⚠' };
+    case 'offline':
+      return { label: 'Offline', color: 'bg-red-100 text-red-900', icon: '✕' };
+    case 'unknown':
+    default:
+      return { label: 'Desconhecido', color: 'bg-gray-100 text-gray-900', icon: '?' };
+  }
+}
+
+
 export function DadosPage() {
   const [searchParams] = useSearchParams();
   const stationCodeFromQuery = searchParams.get("station");
 
   const [stations, setStations] = useState<StationOverview[]>([]);
+  const [stationHealth, setStationHealth] = useState<Map<string, StationHealth>>(new Map());
   const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("24h");
   const [measurements24h, setMeasurements24h] = useState<DownsampledMeasurement[]>([]);
@@ -54,7 +70,16 @@ export function DadosPage() {
         setLoadingStations(true);
         setError(null);
         const data = await getStationOverview();
+        const health = await getStationHealth();
+        
         setStations(data);
+        
+        // Criar mapa de health por station_id
+        const healthMap = new Map<string, StationHealth>();
+        health.forEach(h => {
+          healthMap.set(h.station_id, h);
+        });
+        setStationHealth(healthMap);
 
         let defaultStationId = data[0]?.station_id ?? null;
         if (stationCodeFromQuery) {
@@ -279,7 +304,7 @@ export function DadosPage() {
           </button>
         </div>
 
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
           <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
             <p className="text-xs uppercase tracking-wide text-brand-primary">Status da Estação</p>
             <p className={`mt-1 text-sm font-bold ${isOnline ? "text-accent-green" : "text-error"}`}>
@@ -289,6 +314,22 @@ export function DadosPage() {
           <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
             <p className="text-xs uppercase tracking-wide text-brand-primary">Última Atualização</p>
             <p className="mt-1 text-sm font-bold text-text-primary">{stats.lastTime ? formatDate(stats.lastTime) : "-"}</p>
+          </div>
+          <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
+            <p className="text-xs uppercase tracking-wide text-brand-primary">Qualidade do Dado</p>
+            {selectedStationId && stationHealth.has(selectedStationId) ? (
+              (() => {
+                const health = stationHealth.get(selectedStationId)!;
+                const info = getHealthBadgeInfo(health.health_status);
+                return (
+                  <div className={`mt-1 inline-block rounded-md px-3 py-1 text-sm font-bold ${info.color}`} aria-label={`Qualidade do dado: ${info.label}`} title={`Status: ${info.label} - ${health.health_status === 'ok' ? 'Medições confiáveis' : health.health_status === 'degraded' ? 'Qualidade comprometida' : health.health_status === 'offline' ? 'Sem comunicação' : 'Dados não disponíveis'}`}>
+                    {info.icon} {info.label}
+                  </div>
+                );
+              })()
+            ) : (
+              <p className="mt-1 text-sm text-text-secondary">-</p>
+            )}
           </div>
         </div>
       </section>

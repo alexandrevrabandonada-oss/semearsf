@@ -157,6 +157,34 @@ export function StatusPage() {
                     <p className="mt-auto text-[10px] text-texto/40 uppercase tracking-tighter">Sincronizado</p>
                 </div>
 
+                {/* Network Health Card */}
+                <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 flex flex-col">
+                    <h2 className="text-xs font-black uppercase tracking-widest text-cta">Saúde da Rede</h2>
+                    <div className="mt-6 flex flex-col gap-3">
+                        <div className="flex items-center gap-2">
+                            <div style={{ backgroundColor: '#22c55e', borderRadius: '4px', width: '20px', height: '20px' }}></div>
+                            <div className="flex-1">
+                                <span className="text-[10px] font-bold uppercase text-texto/70">Excelente</span>
+                                <span className="text-sm font-black text-texto ml-auto">{status.network_health?.ok || 0}</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div style={{ backgroundColor: '#eab308', borderRadius: '4px', width: '20px', height: '20px' }}></div>
+                            <div className="flex-1">
+                                <span className="text-[10px] font-bold uppercase text-texto/70">Degradado</span>
+                                <span className="text-sm font-black text-texto ml-auto">{status.network_health?.degraded || 0}</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div style={{ backgroundColor: '#ef4444', borderRadius: '4px', width: '20px', height: '20px' }}></div>
+                            <div className="flex-1">
+                                <span className="text-[10px] font-bold uppercase text-texto/70">Offline</span>
+                                <span className="text-sm font-black text-texto ml-auto">{status.network_health?.offline || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Social Reach Card */}
                 <div className="rounded-2xl border border-base/40 bg-fundo/60 p-6 flex flex-col md:col-span-3">
                     <div className="flex justify-between items-start">
