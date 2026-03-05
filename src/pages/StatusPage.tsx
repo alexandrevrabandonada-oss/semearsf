@@ -29,6 +29,7 @@ export function StatusPage() {
     };
 
     const formatNumber = (value: number) => value.toLocaleString("pt-BR");
+    const totalAboveThreshold24h = (status?.operations?.station_metrics ?? []).reduce((sum, station) => sum + (station.above_threshold_24h || 0), 0);
 
     if (loading) {
         return (
@@ -233,6 +234,12 @@ export function StatusPage() {
                         </div>
                     </div>
 
+                    <div className="mt-3 rounded-xl border border-red-500/30 bg-base/20 p-4">
+                        <p className="text-2xl font-black text-red-500">{formatNumber(totalAboveThreshold24h)}</p>
+                        <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Leituras acima do limiar (24h)</p>
+                        <p className="mt-1 text-xs text-texto/50">Contagem de leituras acima da referencia OMS (PM2.5 &gt; 15 ou PM10 &gt; 45).</p>
+                    </div>
+
                     <div className="mt-4 rounded-xl border border-ciano/15 bg-base/10 p-4">
                         <p className="text-[11px] font-bold uppercase tracking-wide text-ciano">Medições por estação (7 dias)</p>
                         <div className="mt-2 grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -242,7 +249,10 @@ export function StatusPage() {
                                 status.operations.station_metrics.map((station, idx) => (
                                     <div key={`${station.station_code}-${idx}`} className="flex items-center justify-between rounded-md bg-fundo/40 px-3 py-2 text-xs">
                                         <span className="font-mono text-texto/70">{station.station_code || station.station_name}</span>
-                                        <span className="font-black text-ciano">{formatNumber(station.measurements_count)}</span>
+                                        <div className="text-right">
+                                            <span className="block font-black text-ciano">{formatNumber(station.measurements_count)}</span>
+                                            <span className="block text-[10px] font-bold uppercase tracking-wide text-red-500">{formatNumber(station.above_threshold_24h || 0)} acima (24h)</span>
+                                        </div>
                                     </div>
                                 ))
                             )}
@@ -269,6 +279,7 @@ export function StatusPage() {
                             <li><span className="font-bold">Eventos publicados:</span> registros de agenda com `status = published` no período.</li>
                             <li><span className="font-bold">Acervo + blog publicados:</span> soma de novos itens de acervo e posts publicados.</li>
                             <li><span className="font-bold">Agendados:</span> total de conteúdos com `publish_at` no futuro.</li>
+                            <li><span className="font-bold">Acima do limiar (24h):</span> leituras por estação acima de PM2.5 &gt; 15 ou PM10 &gt; 45.</li>
                         </ul>
                         <button
                             type="button"
@@ -333,5 +344,8 @@ export function StatusPage() {
         </section>
     );
 }
+
+
+
 
 

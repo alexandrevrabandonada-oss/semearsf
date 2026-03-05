@@ -1,76 +1,102 @@
-import { createClient } from "@supabase/supabase-js";
 import fs from "node:fs";
+import path from "node:path";
+import { createClient } from "@supabase/supabase-js";
 
-// Manual env parsing since dotenv is missing
-if (fs.existsSync(".env.local")) {
-    const env = fs.readFileSync(".env.local", "utf8");
-    env.split("\n").forEach(line => {
-        const [key, ...vals] = line.split("=");
-        if (key && vals.length > 0) {
-            process.env[key.trim()] = vals.join("=").trim().replace(/^["']|["']$/g, "");
+function parseEnvFile(filePath) {
+    if (!fs.existsSync(filePath)) return {};
+    const raw = fs.readFileSync(filePath, "utf8");
+    const env = {};
+
+    for (const line of raw.split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) continue;
+
+        const idx = trimmed.indexOf("=");
+        if (idx <= 0) continue;
+
+        const key = trimmed.slice(0, idx).trim();
+        let value = trimmed.slice(idx + 1).trim();
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+            value = value.slice(1, -1);
         }
-    });
+
+        env[key] = value;
+    }
+
+    return env;
 }
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+function ensureFileExists(filePath, label) {
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Arquivo de seed ausente (${label}): ${filePath}`);
+    }
+}
+
+const repoRoot = process.cwd();
+const envLocalPath = path.resolve(repoRoot, ".env.local");
+const envPath = path.resolve(repoRoot, ".env");
+const env = fs.existsSync(envLocalPath) ? parseEnvFile(envLocalPath) : parseEnvFile(envPath);
+
+const supabaseUrl = env.SUPABASE_URL || env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-    console.error("ERRO: SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não configurados.");
+    console.error("ERRO: SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY são obrigatórios no ambiente.");
     process.exit(1);
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function importCollections() {
-    const collectionsFile = path.resolve("data/collections.seed.json");
-    if (!fs.existsSync(collectionsFile)) {
-        console.log("SKIP: Arquivo collections.seed.json não encontrado.");
-        return;
-    }
+async function importCollections(collectionsFile) {
+    ensureFileExists(collectionsFile, "collections");
 
     const collections = JSON.parse(fs.readFileSync(collectionsFile, "utf8"));
     console.log(`Importando ${collections.length} coleções...`);
 
     let insertedCount = 0;
+    let errors = 0;
+
     for (const collection of collections) {
         const { error } = await supabase
             .from("acervo_collections")
             .upsert(collection, { onConflict: "slug" });
 
         if (error) {
-            console.error(`ERRO ao importar coleção ${collection.slug} - Verifique permissões ou schema.`);
+            console.error(`[ERRO] coleção ${collection.slug}: ${error.message}`);
+            errors++;
         } else {
             insertedCount++;
         }
     }
-    console.log(`[OK] ${insertedCount} coleções processadas (inserted/updated).`);
+
+    console.log(`[OK] ${insertedCount} coleções processadas (insert/update).`);
+    return errors;
 }
 
-async function importCollectionItems() {
-    const itemsFile = path.resolve("data/collection_items.seed.json");
-    if (!fs.existsSync(itemsFile)) {
-        console.log("SKIP: Arquivo collection_items.seed.json não encontrado.");
-        return;
-    }
+async function importCollectionItems(itemsFile) {
+    ensureFileExists(itemsFile, "collection_items");
 
     const items = JSON.parse(fs.readFileSync(itemsFile, "utf8"));
     console.log(`Vinculando ${items.length} itens a coleções...`);
 
-    // We need to resolve slugs to IDs
-    const { data: collections } = await supabase.from("acervo_collections").select("id, slug");
-    const { data: acervoItems } = await supabase.from("acervo_items").select("id, slug");
+    const [{ data: collections, error: collectionsError }, { data: acervoItems, error: acervoError }] = await Promise.all([
+        supabase.from("acervo_collections").select("id, slug"),
+        supabase.from("acervo_items").select("id, slug")
+    ]);
 
-    if (!collections || !acervoItems) {
-        console.error("ERRO: Falha ao carregar metadados para vínculo.");
-        return;
+    if (collectionsError) {
+        throw new Error(`Falha ao carregar coleções: ${collectionsError.message}`);
+    }
+    if (acervoError) {
+        throw new Error(`Falha ao carregar itens do acervo: ${acervoError.message}`);
     }
 
-    const collectionMap = Object.fromEntries(collections.map(c => [c.slug, c.id]));
-    const itemMap = Object.fromEntries(acervoItems.map(i => [i.slug, i.id]));
+    const collectionMap = Object.fromEntries((collections || []).map((c) => [c.slug, c.id]));
+    const itemMap = Object.fromEntries((acervoItems || []).map((i) => [i.slug, i.id]));
 
     let linkedCount = 0;
     let skippedCount = 0;
+    let errors = 0;
 
     for (const link of items) {
         const cid = collectionMap[link.collection_slug];
@@ -90,20 +116,39 @@ async function importCollectionItems() {
             });
 
         if (error) {
-            console.error(`ERRO ao vincular ${link.item_slug} -> ${link.collection_slug} - Falha no BD.`);
+            console.error(`[ERRO] vínculo ${link.item_slug} -> ${link.collection_slug}: ${error.message}`);
+            errors++;
         } else {
             linkedCount++;
         }
     }
 
-    console.log(`[OK] ${linkedCount} itens vinculados. (${skippedCount} ignorados por ausência do Acervo).`);
+    console.log(`[OK] ${linkedCount} itens vinculados. (${skippedCount} ignorados por ausência de referência).`);
+    return errors;
 }
 
 async function main() {
+    const collectionsFile = path.resolve(repoRoot, "data", "collections.seed.json");
+    const itemsFile = path.resolve(repoRoot, "data", "collection_items.seed.json");
+
+    ensureFileExists(collectionsFile, "collections");
+    ensureFileExists(itemsFile, "collection_items");
+
     console.log("=== ACERVO COLLECTIONS IMPORTER ===");
-    await importCollections();
-    await importCollectionItems();
+    console.log(`repoRoot: ${repoRoot}`);
+
+    const collectionsErrors = await importCollections(collectionsFile);
+    const linksErrors = await importCollectionItems(itemsFile);
+
+    const totalErrors = collectionsErrors + linksErrors;
+    if (totalErrors > 0) {
+        throw new Error(`Importação concluída com ${totalErrors} erro(s).`);
+    }
+
     console.log("Done.");
 }
 
-main().catch(console.error);
+main().catch((error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+});

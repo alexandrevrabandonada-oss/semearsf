@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 import { getMeasurementsDownsampled, getStationOverview, getStationHealth, type DownsampledMeasurement, type StationOverview, type StationHealth } from "../lib/api";
+import { classifyOmsPollutant } from "../lib/airQuality";
 
 const ENV_HINT = " Verifique .env.local (VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY).";
 const POLLING_INTERVAL_MS = 60_000;
@@ -42,6 +43,21 @@ function getHealthBadgeInfo(health: string | undefined) {
   }
 }
 
+
+function getOmsLevelStyle(level: string) {
+  switch (level) {
+    case "bom":
+      return "bg-green-100 text-green-900";
+    case "moderado":
+      return "bg-yellow-100 text-yellow-900";
+    case "alto":
+      return "bg-orange-100 text-orange-900";
+    case "muito alto":
+      return "bg-red-100 text-red-900";
+    default:
+      return "bg-gray-100 text-gray-900";
+  }
+}
 
 export function DadosPage() {
   const [searchParams] = useSearchParams();
@@ -182,6 +198,9 @@ export function DadosPage() {
     };
   }, [currentMeasurements]);
 
+  const pm25NowClassification = useMemo(() => classifyOmsPollutant("pm25", stats.lastValue?.pm25 ?? null), [stats.lastValue]);
+  const pm10NowClassification = useMemo(() => classifyOmsPollutant("pm10", stats.lastValue?.pm10 ?? null), [stats.lastValue]);
+
   // Resumo textual para acessibilidade
   const textualSummary = useMemo(() => {
     if (!selectedStation || currentMeasurements.length === 0) {
@@ -263,6 +282,16 @@ export function DadosPage() {
           Acompanhe as leituras de qualidade do ar de nossas estações públicas em Volta Redonda e no Sul Fluminense. Dados científicos atualizados, acessíveis e exportáveis.
         </p>
       </div>
+
+      <section className="rounded-2xl border border-border-subtle bg-white p-6">
+        <h2 className="text-lg font-bold text-brand-primary">Como ler os dados</h2>
+        <ul className="mt-3 space-y-2 text-sm text-text-secondary">
+          <li><span className="font-semibold text-text-primary">1.</span> PM2.5 e PM10 medem material particulado no ar em µg/m³.</li>
+          <li><span className="font-semibold text-text-primary">2.</span> A classificacao OMS mostra o nivel atual: bom, moderado, alto ou muito alto.</li>
+          <li><span className="font-semibold text-text-primary">3.</span> Os cuidados sao preventivos e neutros, sem alarmismo.</li>
+          <li><span className="font-semibold text-text-primary">4.</span> Consulte tendencia em 24h/7d para contexto, nao apenas uma leitura isolada.</li>
+        </ul>
+      </section>
 
       {/* Seleção de estação */}
       <section className="rounded-2xl border border-border-subtle bg-white p-6">
@@ -382,43 +411,50 @@ export function DadosPage() {
             </button>
           </div>
 
-          {/* Painel Agora */}
+                    {/* Painel Agora */}
           {activeTab === "now" && (
             <div role="tabpanel" id="panel-now" aria-labelledby="tab-now">
-              <h2 className="text-lg font-bold text-brand-primary mb-4">Última Leitura</h2>
+              <h2 className="text-lg font-bold text-brand-primary mb-4">Ultima leitura</h2>
               {stats.lastValue ? (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                    <p className="text-xs uppercase tracking-wide text-brand-primary">PM2.5</p>
-                    <p className="mt-2 text-3xl font-black text-text-primary">
-                      {stats.lastValue.pm25?.toFixed(1) ?? "-"}
-                    </p>
-                    <p className="text-xs text-text-secondary mt-1">µg/m³</p>
+                <>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
+                      <p className="text-xs uppercase tracking-wide text-brand-primary">PM2.5</p>
+                      <p className="mt-2 text-3xl font-black text-text-primary">{stats.lastValue.pm25?.toFixed(1) ?? "-"}</p>
+                      <p className={`mt-2 inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-bold ${getOmsLevelStyle(pm25NowClassification.level)}`}>
+                        <span aria-hidden="true">{pm25NowClassification.icon}</span>
+                        <span>Classificacao: {pm25NowClassification.level}</span>
+                      </p>
+                      <p className="mt-2 text-xs text-text-secondary">{pm25NowClassification.summary}</p>
+                      <p className="mt-1 text-xs font-medium text-text-secondary">Cuidado: {pm25NowClassification.recommendation}</p>
+                    </div>
+                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
+                      <p className="text-xs uppercase tracking-wide text-brand-primary">PM10</p>
+                      <p className="mt-2 text-3xl font-black text-text-primary">{stats.lastValue.pm10?.toFixed(1) ?? "-"}</p>
+                      <p className={`mt-2 inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-bold ${getOmsLevelStyle(pm10NowClassification.level)}`}>
+                        <span aria-hidden="true">{pm10NowClassification.icon}</span>
+                        <span>Classificacao: {pm10NowClassification.level}</span>
+                      </p>
+                      <p className="mt-2 text-xs text-text-secondary">{pm10NowClassification.summary}</p>
+                      <p className="mt-1 text-xs font-medium text-text-secondary">Cuidado: {pm10NowClassification.recommendation}</p>
+                    </div>
                   </div>
-                  <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                    <p className="text-xs uppercase tracking-wide text-brand-primary">PM10</p>
-                    <p className="mt-2 text-3xl font-black text-text-primary">
-                      {stats.lastValue.pm10?.toFixed(1) ?? "-"}
-                    </p>
-                    <p className="text-xs text-text-secondary mt-1">µg/m³</p>
+
+                  <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
+                      <p className="text-xs uppercase tracking-wide text-brand-primary">Temperatura</p>
+                      <p className="mt-2 text-2xl font-black text-text-primary">{stats.lastValue.temp?.toFixed(1) ?? "-"}</p>
+                      <p className="text-xs text-text-secondary mt-1">°C</p>
+                    </div>
+                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
+                      <p className="text-xs uppercase tracking-wide text-brand-primary">Umidade</p>
+                      <p className="mt-2 text-2xl font-black text-text-primary">{stats.lastValue.humidity?.toFixed(0) ?? "-"}</p>
+                      <p className="text-xs text-text-secondary mt-1">%</p>
+                    </div>
                   </div>
-                  <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                    <p className="text-xs uppercase tracking-wide text-brand-primary">Temperatura</p>
-                    <p className="mt-2 text-3xl font-black text-text-primary">
-                      {stats.lastValue.temp?.toFixed(1) ?? "-"}
-                    </p>
-                    <p className="text-xs text-text-secondary mt-1">°C</p>
-                  </div>
-                  <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                    <p className="text-xs uppercase tracking-wide text-brand-primary">Umidade</p>
-                    <p className="mt-2 text-3xl font-black text-text-primary">
-                      {stats.lastValue.humidity?.toFixed(0) ?? "-"}
-                    </p>
-                    <p className="text-xs text-text-secondary mt-1">%</p>
-                  </div>
-                </div>
+                </>
               ) : (
-                <p className="text-sm text-text-secondary">Nenhum dado disponível.</p>
+                <p className="text-sm text-text-secondary">Nenhum dado disponivel.</p>
               )}
             </div>
           )}
@@ -612,3 +648,4 @@ export function DadosPage() {
     </section>
   );
 }
+

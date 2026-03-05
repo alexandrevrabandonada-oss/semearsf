@@ -25,19 +25,38 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Verify
-        run: npm run verify
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Start Vite preview
+        run: |
+          nohup npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/vite-preview.log 2>&1 &
+          echo $! > /tmp/vite-preview.pid
+
+      - name: Wait for preview (port 4173)
+        run: |
+          node -e "const net=require('node:net');const host='127.0.0.1';const port=4173;const max=60;let attempt=0;const wait=()=>{attempt++;const s=net.createConnection({host,port});s.on('connect',()=>{s.end();console.log('Preview online');process.exit(0);});s.on('error',()=>{if(attempt>=max){console.error('Timeout waiting for preview on 4173');process.exit(1);}setTimeout(wait,1000);});};wait();"
 
       - name: UI smoke tests
         env:
           CI: true
+          PLAYWRIGHT_EXTERNAL_SERVER: true
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
-          PLAYWRIGHT_PORT: 4173
         run: npm run test:smoke:ui
 
       - name: Accessibility tests
         env:
           CI: true
+          PLAYWRIGHT_EXTERNAL_SERVER: true
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
-          PLAYWRIGHT_PORT: 4173
         run: npm run test:a11y
+
+      - name: Stop Vite preview
+        if: always()
+        run: |
+          if [ -f /tmp/vite-preview.pid ]; then
+            kill $(cat /tmp/vite-preview.pid) || true
+          fi

@@ -1,3 +1,4 @@
+import { isAboveOmsThreshold } from "./airQuality";
 import { assertSupabase } from "./supabase/client";
 
 export type Station = {
@@ -421,6 +422,7 @@ export type ListBlogParams = {
   tag?: string;
   limit?: number;
   offset?: number;
+  includeScheduled?: boolean;
 };
 
 function rowToBlogPost(row: Record<string, unknown>): BlogPost {
@@ -443,7 +445,7 @@ function rowToBlogPost(row: Record<string, unknown>): BlogPost {
 
 export async function listBlogPosts(params: ListBlogParams = {}): Promise<BlogPost[]> {
   try {
-    const { q, tag, limit = 50, offset = 0 } = params;
+    const { q, tag, limit = 50, offset = 0, includeScheduled = false } = params;
     const supabase = assertSupabase();
 
     let query = supabase
@@ -594,6 +596,7 @@ export type StationKPI = {
   station_code: string;
   station_name: string;
   measurements_count: number;
+  above_threshold_24h: number;
 };
 
 function toSafeNumber(value: unknown): number {
@@ -698,6 +701,10 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       supabase.from("push_events")
         .select("pollutant")
         .gt("ts", sevenDaysAgo),
+      // Threshold breaches in the last 24h (per station)
+      supabase.from("measurements")
+        .select("station_id, pm25, pm10, station:stations(code, name)")
+        .gt("ts", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
       // Network health
       supabase.rpc("get_station_health"),
       // Operations KPIs
@@ -714,9 +721,10 @@ export async function getSystemStatus(): Promise<SystemStatus> {
     const alerts7d = results[6] as { count: number };
     const alertsStations = results[7] as { data: any[] };
     const alertsPollutants = results[8] as { data: any[] };
-    const stationHealthData = results[9] as { data: StationHealth[] };
-    const opsKpiResult = results[10] as { data: OpsKPI[] };
-    const stationKpiResult = results[11] as { data: StationKPI[] };
+    const breaches24hResult = results[9] as { data: Array<{ station_id?: string; pm25?: number | null; pm10?: number | null; station?: { code?: string | null; name?: string | null } | Array<{ code?: string | null; name?: string | null }> | null }> };
+    const stationHealthData = results[10] as { data: StationHealth[] };
+    const opsKpiResult = results[11] as { data: OpsKPI[] };
+    const stationKpiResult = results[12] as { data: StationKPI[] };
 
     // Count top stations and pollutants
     const stationCounts = new Map<string, number>();
@@ -738,6 +746,14 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       .map(([pollutant, count]) => ({ pollutant, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
+
+    const breachCountsByStationCode = new Map<string, number>();
+    (breaches24hResult.data || []).forEach((row) => {
+      const stationPayload = Array.isArray(row.station) ? row.station[0] : row.station;
+      const stationCode = String(stationPayload?.code ?? "-");
+      if (!isAboveOmsThreshold(row.pm25 ?? null, row.pm10 ?? null)) return;
+      breachCountsByStationCode.set(stationCode, (breachCountsByStationCode.get(stationCode) || 0) + 1);
+    });
 
     // Network health breakdown
     const networkHealth = { ok: 0, degraded: 0, offline: 0, unknown: 0 };
@@ -777,7 +793,8 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         station_metrics: (stationKpiResult.data || []).map((row) => ({
           station_code: String(row.station_code ?? "-"),
           station_name: String(row.station_name ?? "Estação"),
-          measurements_count: toSafeNumber(row.measurements_count)
+          measurements_count: toSafeNumber(row.measurements_count),
+          above_threshold_24h: toSafeNumber(breachCountsByStationCode.get(String(row.station_code ?? "-")) ?? 0)
         }))
       },
       network_health: networkHealth
@@ -1288,6 +1305,12 @@ export async function getCorridorBySlug(slug: string): Promise<ClimateCorridorWi
     throw toAppError("Falha ao carregar corredor climático", error);
   }
 }
+
+
+
+
+
+
 
 
 

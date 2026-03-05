@@ -3,6 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 const isCI = !!process.env.CI;
 const ciPort = process.env.PLAYWRIGHT_PORT || '4173';
 const localPort = process.env.PLAYWRIGHT_PORT || '5173';
+const externalServer = process.env.PLAYWRIGHT_EXTERNAL_SERVER === 'true';
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || (isCI ? `http://127.0.0.1:${ciPort}` : `http://127.0.0.1:${localPort}`);
 
 /**
@@ -47,13 +48,15 @@ export default defineConfig({
     },
   ],
 
-  /* Run app server before tests */
-  webServer: {
-    command: isCI
-      ? `npm run preview -- --host 127.0.0.1 --port ${ciPort}`
-      : `npm run dev -- --host 127.0.0.1 --port ${localPort}`,
-    url: baseURL,
-    reuseExistingServer: !isCI,
-    timeout: 120000,
-  },
+  /* Run app server before tests (skip when CI provides external preview server) */
+  webServer: externalServer
+    ? undefined
+    : {
+        command: isCI
+          ? `npm run preview -- --host 127.0.0.1 --port ${ciPort}`
+          : `npm run dev -- --host 127.0.0.1 --port ${localPort}`,
+        url: baseURL,
+        reuseExistingServer: !isCI,
+        timeout: 120000,
+      },
 });

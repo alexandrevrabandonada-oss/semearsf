@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { listBlogPosts, type BlogPost } from "../lib/api";
@@ -9,13 +9,22 @@ export function BlogListPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const demoOrAdminMode = useMemo(() => {
+        const envMode = String(import.meta.env.VITE_PROJECT_MODE ?? "").toLowerCase();
+        const envFlag = String(import.meta.env.VITE_SHOW_SCHEDULED ?? "").toLowerCase() === "true";
+        const localFlag = typeof window !== "undefined"
+            ? ["admin", "demo", "true"].includes(String(window.localStorage.getItem("semear:show-scheduled") ?? "").toLowerCase())
+            : false;
+        return envFlag || envMode === "admin" || envMode === "demo" || localFlag;
+    }, []);
+
     useEffect(() => {
         let cancelled = false;
         async function run() {
             try {
                 setLoading(true);
                 setError(null);
-                const data = await listBlogPosts({ limit: 50 });
+                const data = await listBlogPosts({ limit: 50, includeScheduled: demoOrAdminMode });
                 if (!cancelled) setPosts(data);
             } catch (err) {
                 if (!cancelled)
@@ -26,9 +35,10 @@ export function BlogListPage() {
         }
         void run();
         return () => { cancelled = true; };
-    }, []);
+    }, [demoOrAdminMode]);
 
     const allTags = Array.from(new Set(posts.flatMap((p) => p.tags))).sort();
+    const isScheduled = (post: BlogPost) => Boolean(post.publish_at) && new Date(post.publish_at as string).getTime() > Date.now();
 
     return (
         <section className="space-y-6">
@@ -66,20 +76,23 @@ export function BlogListPage() {
                                     <img
                                         alt={post.title}
                                         className="h-full w-full object-cover transition-all duration-700 ease-in-out"
-                                        src={getOptimizedCover(post, 'thumb') || ''}
+                                        src={getOptimizedCover(post, "thumb") || ""}
                                         loading="lazy"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                         style={
                                             (!post.cover_small_url && !post.cover_thumb_url) ? {} : {
-                                                filter: 'blur(0)'
+                                                filter: "blur(0)"
                                             }
                                         }
                                     />
                                 </div>
                             )}
                             <div className="flex flex-1 flex-col p-5">
-                                <div className="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                                    <span>{post.published_at ? new Date(post.published_at).toLocaleDateString("pt-BR") : "Draft"}</span>
+                                <div className="mb-2 flex items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                                    <span>{(post.publish_at || post.published_at) ? new Date((post.publish_at || post.published_at) as string).toLocaleDateString("pt-BR") : "Draft"}</span>
+                                    {demoOrAdminMode && isScheduled(post) && (
+                                        <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-amber-600">Agendado</span>
+                                    )}
                                 </div>
                                 <h2 className="mb-2 text-lg font-black leading-tight text-text-primary line-clamp-2">
                                     {post.title}
