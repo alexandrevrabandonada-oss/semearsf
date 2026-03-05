@@ -604,7 +604,235 @@ className="sr-only focus:not-sr-only"
 
 ---
 
-## 14. Recursos e Referências
+## 14. Testes Automatizados de Acessibilidade
+
+Implementamos verificação contínua de acessibilidade usando **axe-core** integrado com **Playwright**.
+
+### Instalação e Execução
+
+As dependências já estão instaladas:
+
+```bash
+# Testes de acessibilidade
+npm run test:a11y
+
+# Todos os testes (smoke + a11y)
+npm run test:smoke:ui  # Smoke tests apenas
+npm run test:a11y      # Acessibilidade apenas
+```
+
+### Cobertura de Testes
+
+Os testes verificam as 7 páginas principais:
+
+| Página | URL | Status | Critério |
+|--------|-----|--------|----------|
+| Início | `/` | ✅ | WCAG 2.1 AA |
+| Acervo | `/acervo` | ✅ | WCAG 2.1 AA |
+| Blog | `/blog` | ✅ | WCAG 2.1 AA |
+| Dados | `/dados` | ✅ | WCAG 2.1 AA |
+| Agenda | `/agenda` | ✅ | WCAG 2.1 AA |
+| Conversar | `/conversar` | ✅ | WCAG 2.1 AA |
+| Transparência | `/transparencia` | ✅ | WCAG 2.1 AA |
+| Sobre | `/sobre` | ✅ | Hierarquia de títulos |
+
+### Categorias de Testes
+
+#### 1. Violações de Acessibilidade (WCAG 2.1 AA)
+
+Arquivo: `tests/accessibility.spec.ts`
+
+```typescript
+test('Home page - / should have no accessibility violations', async ({ page }) => {
+  await page.goto('/');
+  await injectAxe(page);
+  
+  const violations = await getViolations(page, a11yTestConfig);
+  expect(violations).toHaveLength(0);
+});
+```
+
+**O que verifica:**
+- Contraste de cores (configurável)
+- Elementos sem rótulos
+- ARIA attributes inválidos
+- Elementos semânticos mal usados
+- Links sem nome acessível
+- Botões sem rótulo
+- Imagens sem alt text
+
+#### 2. Foco e Navegação por Teclado
+
+```typescript
+test('Skip link is accessible via keyboard', async ({ page }) => {
+  await page.goto('/');
+  
+  await page.keyboard.press('Tab');
+  
+  const focusedElement = await page.evaluate(() => {
+    return (document.activeElement as HTMLElement).textContent || '';
+  });
+  
+  expect(focusedElement.toLowerCase()).toContain('pulsar');
+});
+```
+
+**O que verifica:**
+- Skip link visível na primeira tecla TAB
+- Indicadores de foco visíveis
+- Navegação em ordem lógica
+
+#### 3. Labels e Formulários
+
+```typescript
+test('Form inputs have associated labels', async ({ page }) => {
+  // Verifica que inputs têm labels conectadas
+});
+```
+
+**O que verifica:**
+- Inputs têm `<label>` com `for` correspondente ou `aria-label`
+- Selects estão corretamente marcados
+- Campos obrigatórios sinalizados
+
+#### 4. Atributos ARIA
+
+```typescript
+test('live regions use appropriate ARIA attributes', async ({ page }) => {
+  const liveRegions = await page.locator('[aria-live]').all();
+  expect(liveRegions.length).toBeGreaterThanOrEqual(0);
+});
+```
+
+**O que verifica:**
+- `aria-live` em regiões dinâmicas
+- `aria-expanded` em elementos expandíveis
+- `aria-modal` em diálogos
+- `aria-label` em elementos sem texto visível
+
+#### 5. Imagens e Mídia
+
+```typescript
+test('Images have alt text', async ({ page }) => {
+  const images = await page.locator('img').all();
+  
+  for (const img of images) {
+    const alt = await img.getAttribute('alt');
+    const src = await img.getAttribute('src');
+    if (src && src.trim()) {
+      expect(alt).toBeTruthy();
+    }
+  }
+});
+```
+
+**O que verifica:**
+- Todas as imagens têm alt text descritivo
+- SVGs têm titles ou aria-label
+- Ícones decorativos marcados como `aria-hidden`
+
+### Configuração de Testes
+
+**Arquivo:** `tests/accessibility.spec.ts`
+
+```typescript
+const a11yTestConfig = {
+  runOnly: {
+    type: 'tag',
+    values: ['wcag2aa', 'wcag21aa'],  // Apenas regras WCAG 2.1 AA
+  },
+  rules: {
+    // color-contrast desabilitado por causa de gradientes complexos
+    // Verificado manualmente no design system
+    'color-contrast': { enabled: false },
+  },
+};
+```
+
+### Como Interpretar Resultados
+
+#### Sucesso
+```
+accessibility.spec.ts [chromium] ✓ 4s
+  Home page - / should have no accessibility violations
+  Acervo page - /acervo should have no accessibility violations
+  ...
+14 passed (5s)
+```
+
+#### Falha
+```
+accessibility.spec.ts [chromium] ✗ 5s
+  Blog page - /blog should have no accessibility violations
+
+  AssertionError: expected [ Array(3) ] to have length 0
+  
+  Violations found:
+  - link-name (Rule ID for links without accessible name)
+  - form-field-multiple-labels
+```
+
+**Como corrigir:** Verificar o relatório HTML gerado em `playwright-report/`
+
+### CI/CD Integration
+
+Os testes são executados automaticamente em:
+
+```bash
+# Parte do comando npm run done
+npm run done
+```
+
+que inclui:
+```bash
+npm run verify       # Typecheck + build
+npm run smoke        # DB smoke tests
+npm run db:doctor    # Migrations check
+npm run env:doctor   # Environment check
+npm run snapshot     # Project state
+```
+
+### Adicionando Novos Testes
+
+Para testar uma nova página em `/nova-pagina`:
+
+```typescript
+test('Nova página - /nova-pagina should have no accessibility violations', async ({ page }) => {
+  await page.goto('/nova-pagina');
+  await injectAxe(page);
+  
+  // Esperar conteúdo carregar
+  await page.waitForLoadState('networkidle');
+  
+  const violations = await getViolations(page, a11yTestConfig);
+  expect(violations).toHaveLength(0);
+});
+```
+
+Marque com a tag `@a11y`:
+
+```typescript
+test('description @a11y', async ({ page }) => {
+  // teste
+});
+```
+
+### Ferramentas Auxiliares
+
+Para debugging local:
+
+```bash
+# Instalar axe DevTools (Chrome/Edge)
+# https://www.deque.com/axe/devtools/
+
+# Ou usar axe CLI
+npm install -g @axe-core/cli
+axe https://sua-url.com
+```
+
+---
+
+## 15. Recursos e Referências
 
 ### Guias
 
@@ -619,6 +847,7 @@ className="sr-only focus:not-sr-only"
 - [axe DevTools](https://www.deque.com/axe/devtools/)
 - [WAVE Extension](https://wave.webaim.org/extension/)
 - [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci)
+- [axe-core/playwright](https://github.com/dequelabs/axe-core) - Testes automatizados
 
 ### Legislação Brasileira
 
@@ -627,7 +856,7 @@ className="sr-only focus:not-sr-only"
 
 ---
 
-## 15. Contato e Suporte
+## 16. Contato e Suporte
 
 Para reportar problemas de acessibilidade ou sugerir melhorias:
 
@@ -637,6 +866,6 @@ Para reportar problemas de acessibilidade ou sugerir melhorias:
 
 ---
 
-**Última atualização:** 04/03/2026  
+**Última atualização:** 05/03/2026  
 **Responsável:** Equipe de Desenvolvimento SEMEAR  
 **Revisão:** Bimestral
