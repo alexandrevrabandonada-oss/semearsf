@@ -170,7 +170,7 @@ Estado: **pronto para fase de build/assinatura/publicação**, dependendo de key
 2. **Rodar `npm run test:smoke:ui`** e anexar resultado ao pipeline de release.
 3. **Organizar commits por tema** (Corredores, Conversar, TWA, Playwright, territorialização).
 4. **Fechar checklist TWA** com keystore final + `assetlinks.json` em produção.
-5. **Atualizar relatório institucional principal** para remover menções legadas do Grande Rio onde ainda houver.
+5. **Atualizar relatório institucional principal** para remover menções legadas ao Rio e manter o recorte em Volta Redonda/Sul Fluminense.
 
 ---
 

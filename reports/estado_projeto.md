@@ -1,6 +1,6 @@
 # Estado Atual do Projeto: SEMEAR PWA (04 de Março de 2026)
 
-Este relatório compila o estágio de desenvolvimento tecnológico, as infraestruturas implementadas e os fluxos de dados validados no PWA oficial do projeto SEMEAR. O aplicativo transicionou com sucesso de um piloto de monitoramento para uma Plataforma Cidadã interativa focada na Justiça Climática do Grande Rio.
+Este relatório compila o estágio de desenvolvimento tecnológico, as infraestruturas implementadas e os fluxos de dados validados no PWA oficial do projeto SEMEAR. O aplicativo transicionou com sucesso de um piloto de monitoramento para uma Plataforma Cidadã interativa focada na Justiça Climática de Volta Redonda e do Sul Fluminense.
 
 ---
 
