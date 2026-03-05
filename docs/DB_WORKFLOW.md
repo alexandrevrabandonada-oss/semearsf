@@ -1,35 +1,50 @@
 # Fluxo de Banco de Dados (DB Workflow) - SEMEAR PWA
 
-Este projeto utiliza o Supabase CLI para gerenciar migrações de banco de dados. Para garantir a integridade entre ambientes local e remoto, siga estas diretrizes.
+Este projeto utiliza o Supabase CLI para gerenciar migracoes de banco de dados. Para garantir a integridade entre ambientes local e remoto, siga estas diretrizes.
 
-## Nomenclatura de Migrações
+## Regra principal
 
-Todas as novas migrações **devem** seguir o padrão de 14 dígitos (timestamp) da CLI:
+Use sempre:
+```bash
+npm run db:push
+```
+
+Esse comando agora e seguro por padrao (`db-push-safe`):
+1. tenta reparar automaticamente o historico remoto legado `20260305`
+2. executa `npx supabase db push --include-all`
+3. imprime um resumo do fluxo
+4. falha apenas se o `db push` falhar de fato
+
+Nao use `npx supabase db push` diretamente no dia a dia do projeto.
+
+## Nomenclatura de Migracoes
+
+Todas as novas migracoes devem seguir o padrao de 14 digitos (timestamp) da CLI:
 `YYYYMMDDHHMMSS_descricao_da_mudanca.sql`
 
 Exemplo: `20260308000001_relatorio_gastos.sql`
 
 > [!IMPORTANT]
-> **Não renomeie migrações antigas**: Se uma migração já foi aplicada em produção (remoto), renomeá-la localmente causará conflitos de histórico. O `Migration Doctor` avisará sobre nomes fora do padrão, mas isso deve ser tratado apenas para **novas** migrações.
+> Nao renomeie migracoes antigas: se uma migracao ja foi aplicada em producao (remoto), renomea-la localmente causara conflitos de historico. O `Migration Doctor` avisara sobre nomes fora do padrao, mas isso deve ser tratado apenas para novas migracoes.
 
-## Ferramenta de Diagnóstico (Doctor)
+## Ferramenta de Diagnostico (Doctor)
 
-Se você encontrar erros de "diverging history" ou "out of sync", use:
+Se voce encontrar erros de "diverging history" ou "out of sync", use:
 ```bash
 npm run db:doctor
 ```
 
 O Doctor realiza:
-1. **Status Check**: Verifica se o DB local está rodando e se a CLI está vinculada.
-2. **CLI Scan**: Tenta listar migrações via Supabase CLI.
-3. **FS Fallback**: Se o CLI falhar, ele analisa a pasta `supabase/migrations` diretamente para garantir que os arquivos estão presentes.
-4. **Naming Lint**: Alerta sobre arquivos que não seguem o padrão de 14 dígitos.
+1. Status check: verifica se o DB local esta rodando e se a CLI esta vinculada.
+2. CLI scan: tenta listar migracoes via Supabase CLI.
+3. FS fallback: se o CLI falhar, ele analisa a pasta `supabase/migrations` diretamente para garantir que os arquivos estao presentes.
+4. Naming lint: alerta sobre arquivos que nao seguem o padrao de 14 digitos.
 
 ## Modo Remote-first
 
-Se você optou por não rodar o Supabase localmente, utilize os comandos remotos:
+Se voce optou por nao rodar o Supabase localmente, utilize os comandos remotos:
 
-1. Suba migrações diretamente para o projeto vinculado:
+1. Suba migracoes diretamente para o projeto vinculado:
    ```bash
    npm run db:push
    ```
@@ -37,7 +52,14 @@ Se você optou por não rodar o Supabase localmente, utilize os comandos remotos
    ```bash
    npm run db:types:remote
    ```
-   *Nota: Requer `SUPABASE_PROJECT_REF` no seu `.env.local`.*
+   Nota: requer `SUPABASE_PROJECT_REF` no `.env.local`.
+
+## Fluxo recomendado
+
+1. Criar a migration em `supabase/migrations/`
+2. Rodar `npm run db:push`
+3. Rodar `npm run db:doctor`
+4. Rodar `npm run done`
 
 ---
-*Nota: A integridade do banco é crítica para o funcionamento do PWA e das Edge Functions.*
+Nota: a integridade do banco e critica para o funcionamento do PWA e das Edge Functions.

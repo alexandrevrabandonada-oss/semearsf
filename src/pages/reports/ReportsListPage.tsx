@@ -205,9 +205,19 @@ export function ReportsListPage() {
                       {item.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {item.tags.slice(0, 5).map((itemTag) => (
-                            <span key={itemTag} className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary">
+                            <button
+                              key={itemTag}
+                              type="button"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                setTag(itemTag);
+                              }}
+                              className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-primary/5"
+                              aria-label={`Filtrar relatórios pela tag ${itemTag}`}
+                            >
                               {itemTag}
-                            </span>
+                            </button>
                           ))}
                         </div>
                       )}

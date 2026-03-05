@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "verify": "npm run typecheck && npm run build",
-    "db:push": "npx supabase db push",
+    "db:push": "node tools/db-push-safe.mjs",
     "db:status": "npx supabase db status",
     "db:types:local": "npx supabase gen types typescript --local > src/lib/supabase/database.types.ts",
     "db:types:remote": "source .env.local 2>/dev/null || true; npx supabase gen types typescript --project-id $SUPABASE_PROJECT_REF > src/lib/supabase/database.types.ts",

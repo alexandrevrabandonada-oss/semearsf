@@ -92,6 +92,10 @@ function ensureDistManifest() {
   return manifestPath;
 }
 
+function formatKiB(size) {
+  return (size / 1024).toFixed(2) + " KiB";
+}
+
 function readBuildChunksSummary() {
   const manifestPath = ensureDistManifest();
   if (!manifestPath || !fs.existsSync(manifestPath)) {
@@ -103,23 +107,28 @@ function readBuildChunksSummary() {
 
   for (const entry of Object.values(manifest)) {
     if (!entry || typeof entry !== "object") continue;
+    const assetPath = entry.file;
+    if (!assetPath || typeof assetPath !== "string") continue;
+    if (!assetPath.endsWith(".js") && !assetPath.endsWith(".css")) continue;
 
-    const maybeAdd = (assetPath) => {
-      if (!assetPath || typeof assetPath !== "string") return;
-      const fullPath = path.join("dist", assetPath);
-      if (!fs.existsSync(fullPath) || assets.has(assetPath)) return;
-      assets.set(assetPath, fs.statSync(fullPath).size);
-    };
-
-    maybeAdd(entry.file);
-    for (const cssFile of entry.css || []) maybeAdd(cssFile);
-    for (const assetFile of entry.assets || []) maybeAdd(assetFile);
+    const fullPath = path.join("dist", assetPath);
+    if (!fs.existsSync(fullPath) || assets.has(assetPath)) continue;
+    assets.set(assetPath, fs.statSync(fullPath).size);
   }
 
-  return Array.from(assets.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10)
-    .map(([assetPath, size]) => `- ${assetPath} (${(size / 1024).toFixed(2)} KiB)`);
+  const sorted = Array.from(assets.entries()).sort((a, b) => b[1] - a[1]);
+  const jsTotal = sorted
+    .filter(([assetPath]) => assetPath.endsWith(".js"))
+    .reduce((sum, [, size]) => sum + size, 0);
+  const cssTotal = sorted
+    .filter(([assetPath]) => assetPath.endsWith(".css"))
+    .reduce((sum, [, size]) => sum + size, 0);
+
+  return [
+    "- JS total: " + formatKiB(jsTotal),
+    "- CSS total: " + formatKiB(cssTotal),
+    ...sorted.slice(0, 10).map(([assetPath, size]) => "- " + assetPath + " (" + formatKiB(size) + ")")
+  ];
 }
 
 const report = [];

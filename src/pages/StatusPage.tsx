@@ -276,6 +276,12 @@ export function StatusPage() {
               )}
             </div>
             <div className="flex flex-wrap gap-2 lg:justify-end">
+              <Link
+                to={`/transparencia?month=${String(selectedMonth).padStart(2, "0")}&year=${selectedYear}`}
+                className="rounded-lg border border-primaria/20 bg-primaria/10 px-4 py-2 text-xs font-bold uppercase tracking-wide text-primaria hover:bg-primaria/20"
+              >
+                Ver gastos do mes
+              </Link>
               <button
                 type="button"
                 onClick={handleDownloadMonthlyCsv}
@@ -422,6 +428,10 @@ export function StatusPage() {
             <div className="flex justify-between items-center">
               <span className="text-xs font-bold text-texto/70 italic">Agenda</span>
               <span className="text-xs font-black text-texto">{status.content.upcoming_events.length} Eventos</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-bold text-texto/70 italic">Relatorios</span>
+              <span className="text-xs font-black text-texto">{status.content.reports_published_month} no mes</span>
             </div>
           </div>
           <p className="mt-auto text-[10px] text-texto/40 uppercase tracking-tighter">Sincronizado</p>

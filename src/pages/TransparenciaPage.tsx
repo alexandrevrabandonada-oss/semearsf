@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   getTransparencySummary,
   listExpenses,
@@ -31,6 +32,7 @@ function getMonthYear(dateStr: string): { month: string; year: string } {
 }
 
 export function TransparenciaPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [summary, setSummary] = useState<TransparencySummary | null>(null);
   const [links, setLinks] = useState<TransparencyLink[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -46,6 +48,18 @@ export function TransparenciaPage() {
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const month = searchParams.get("month") || "all";
+    const year = searchParams.get("year") || "all";
+    const category = searchParams.get("category") || "all";
+    const q = searchParams.get("q") || "";
+
+    setSelectedMonth((current) => (current === month ? current : month));
+    setSelectedYear((current) => (current === year ? current : year));
+    setSelectedCategory((current) => (current === category ? current : category));
+    setVendorQuery((current) => (current === q ? current : q));
+  }, [searchParams]);
 
   useEffect(() => {
     let cancelled = false;
@@ -109,6 +123,20 @@ export function TransparenciaPage() {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [viewerExpense]);
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams();
+    if (selectedMonth !== "all") nextParams.set("month", selectedMonth);
+    if (selectedYear !== "all") nextParams.set("year", selectedYear);
+    if (selectedCategory !== "all") nextParams.set("category", selectedCategory);
+    if (vendorQuery.trim()) nextParams.set("q", vendorQuery.trim());
+
+    const current = searchParams.toString();
+    const next = nextParams.toString();
+    if (current !== next) {
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [selectedMonth, selectedYear, selectedCategory, vendorQuery, searchParams, setSearchParams]);
 
   const monthOptions = useMemo(() => {
     const values = new Set<string>();
@@ -180,7 +208,7 @@ export function TransparenciaPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `gastos_transparencia_filtrado_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `gastos_transparencia_${selectedYear}_${selectedMonth}_${selectedCategory}_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

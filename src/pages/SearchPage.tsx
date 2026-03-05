@@ -43,6 +43,18 @@ const TYPE_LABEL: Record<SearchType, string> = {
   agenda: "Agenda"
 };
 
+function reportToSearchResult(report: ReportDocument): SearchResultItem {
+  return {
+    kind: "report",
+    title: report.title,
+    slug: report.slug,
+    excerpt: report.summary ?? "",
+    score: 0,
+    url: `/relatorios/${report.slug}`
+  };
+}
+
+
 export function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
@@ -70,6 +82,13 @@ export function SearchPage() {
             searchTransparency(query, 5),
             searchEvents(query, 5)
           ]);
+          const mixedWithReports = [...mixedRes];
+          reportsRes.forEach((report) => {
+            const reportResult = reportToSearchResult(report);
+            if (!mixedWithReports.some((item) => item.url === reportResult.url)) {
+              mixedWithReports.push(reportResult);
+            }
+          });
 
           const isAll = tipo === "todos";
           const isAcervo = tipo === "acervo";
@@ -82,7 +101,7 @@ export function SearchPage() {
             reports: isAll || isReports ? reportsRes : [],
             transparency: isAll || tipo === "transparencia" ? transRes : [],
             events: isAll || tipo === "agenda" ? eventsRes : [],
-            mixed: isAll ? mixedRes : []
+            mixed: isAll ? mixedWithReports : []
           });
         } else {
           const promises: Promise<any>[] = [];

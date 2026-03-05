@@ -755,6 +755,7 @@ export type SystemStatus = {
     upcoming_events: EventSummary[];
     latest_acervo: any[];
     latest_blog: BlogPost[];
+    reports_published_month: number;
   };
   transparency: TransparencySummary & {
     current_month_total_cents: number;
@@ -823,6 +824,10 @@ export async function getSystemStatus(): Promise<SystemStatus> {
         .select("category, amount_cents")
         .gte("occurred_on", monthStart.toISOString().slice(0, 10))
         .lt("occurred_on", monthEnd.toISOString().slice(0, 10)),
+      supabase.from("reports")
+        .select("*", { count: "exact", head: true })
+        .gte("published_at", monthStart.toISOString().slice(0, 10))
+        .lt("published_at", monthEnd.toISOString().slice(0, 10)),
       supabase.from("expenses")
         .select("category, amount_cents")
         .gte("occurred_on", sevenDaysAgo.slice(0, 10)),
@@ -855,17 +860,18 @@ export async function getSystemStatus(): Promise<SystemStatus> {
     const blog = results[2] as BlogPost[];
     const transparency = results[3] as TransparencySummary;
     const monthExpensesResult = results[4] as { data: Array<{ category: string; amount_cents: number }> };
-    const sevenDaysExpensesResult = results[5] as { data: Array<{ category: string; amount_cents: number }> };
-    const social7d = results[6] as { count: number };
-    const socialKinds = results[7] as { data: Array<{ kind: string | null }> };
-    const topShares = results[8] as { data: any[] };
-    const alerts7d = results[9] as { count: number };
-    const alertsStations = results[10] as { data: any[] };
-    const alertsPollutants = results[11] as { data: any[] };
-    const breaches24hResult = results[12] as { data: Array<{ station_id?: string; pm25?: number | null; pm10?: number | null; station?: { code?: string | null; name?: string | null } | Array<{ code?: string | null; name?: string | null }> | null }> };
-    const stationHealthData = results[13] as { data: StationHealth[] };
-    const opsKpiResult = results[14] as { data: OpsKPI[] };
-    const stationKpiResult = results[15] as { data: StationKPI[] };
+    const reportsPublishedMonth = results[5] as { count: number };
+    const sevenDaysExpensesResult = results[6] as { data: Array<{ category: string; amount_cents: number }> };
+    const social7d = results[7] as { count: number };
+    const socialKinds = results[8] as { data: Array<{ kind: string | null }> };
+    const topShares = results[9] as { data: any[] };
+    const alerts7d = results[10] as { count: number };
+    const alertsStations = results[11] as { data: any[] };
+    const alertsPollutants = results[12] as { data: any[] };
+    const breaches24hResult = results[13] as { data: Array<{ station_id?: string; pm25?: number | null; pm10?: number | null; station?: { code?: string | null; name?: string | null } | Array<{ code?: string | null; name?: string | null }> | null }> };
+    const stationHealthData = results[14] as { data: StationHealth[] };
+    const opsKpiResult = results[15] as { data: OpsKPI[] };
+    const stationKpiResult = results[16] as { data: StationKPI[] };
 
     const stationCounts = new Map<string, number>();
     (alertsStations.data || []).forEach((item: any) => {
@@ -939,7 +945,8 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       content: {
         upcoming_events: (events.data ?? []) as EventSummary[],
         latest_acervo: ((acervo.data ?? []) as any[]).filter((item) => isPublishTimeReached(String(item.publish_at ?? "") || null)),
-        latest_blog: blog
+        latest_blog: blog,
+        reports_published_month: reportsPublishedMonth.count || 0
       },
       transparency: {
         ...transparency,
