@@ -130,3 +130,20 @@ Os testes são resilientes e não dependem de dados exatos no banco. Eles verifi
 ```bash
 npx playwright test --headed --grep @smoke
 ```
+
+## CI (GitHub Actions)
+
+O repositório possui pipeline em `.github/workflows/ci.yml`, executado em `push` e `pull_request`.
+
+### Etapas do CI
+```bash
+npm ci
+npm run verify
+npm run test:smoke:ui
+npm run test:a11y
+```
+
+### Playwright no CI
+- O workflow instala browsers com `npx playwright install --with-deps chromium`.
+- Os testes sobem `vite preview` automaticamente via `playwright.config.ts` usando `http://127.0.0.1:4173`.
+- Localmente, o Playwright continua usando `vite dev` por padrão.
