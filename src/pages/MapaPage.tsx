@@ -113,6 +113,7 @@ export function MapaPage() {
 
   return (
     <section className="space-y-6">
+      <a href="#mapa-lista" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-brand-primary focus:shadow-lg">Pular mapa e ir para lista</a>
       {/* Header */}
       <div className="rounded-2xl border border-border-subtle bg-white p-6 md:p-8">
         <div className="flex items-center gap-3 mb-4">
@@ -139,8 +140,8 @@ export function MapaPage() {
       )}
 
       {/* Map Section */}
-      <section className="rounded-2xl border border-border-subtle bg-white p-6 overflow-hidden">
-        <h2 className="text-lg font-bold text-brand-primary mb-4">Mapa Interativo</h2>
+      <section aria-labelledby="mapa-interativo-titulo" className="rounded-2xl border border-border-subtle bg-white p-6 overflow-hidden">
+        <h2 id="mapa-interativo-titulo" className="text-lg font-bold text-brand-primary mb-4">Mapa Interativo</h2>
         
         {loading ? (
           <p aria-live="polite" className="text-sm text-text-secondary" role="status">
@@ -186,6 +187,7 @@ export function MapaPage() {
                         )}
                         <Link
                           to={`/dados?station=${station.code}`}
+                          aria-label={`Ver dados da estação ${station.name}`}
                           className="inline-block mt-2 rounded bg-brand-primary px-3 py-1 text-xs font-bold text-white hover:bg-brand-primary/90"
                         >
                           Ver Dados
@@ -267,8 +269,8 @@ export function MapaPage() {
       </section>
 
       {/* Accessible Fallback List */}
-      <section className="rounded-2xl border border-border-subtle bg-white p-6">
-        <h2 className="text-lg font-bold text-brand-primary mb-4">Lista de Estações e Corredores</h2>
+      <section id="mapa-lista" tabIndex={-1} aria-labelledby="mapa-lista-titulo" className="rounded-2xl border border-border-subtle bg-white p-6">
+        <h2 id="mapa-lista-titulo" className="text-lg font-bold text-brand-primary mb-4">Lista de Estações e Corredores</h2>
         <p className="text-sm text-text-secondary mb-4">
           Informações acessíveis para leitores de tela e navegação sem JavaScript.
         </p>
@@ -306,6 +308,7 @@ export function MapaPage() {
                     </div>
                     <Link
                       to={`/dados?station=${station.code}`}
+                      aria-label={`Ver dados da estação ${station.name}`}
                       className="rounded-md bg-brand-primary px-4 py-2 text-sm font-black uppercase tracking-wide text-white transition-colors hover:bg-brand-primary/90"
                     >
                       Ver Dados
@@ -344,6 +347,7 @@ export function MapaPage() {
                     </div>
                     <Link
                       to={`/corredores/${corridor.slug}`}
+                      aria-label={`Abrir corredor ${corridor.title}`}
                       className="rounded-md border border-brand-primary px-4 py-2 text-sm font-black uppercase tracking-wide text-brand-primary transition-colors hover:bg-brand-primary hover:text-white"
                     >
                       Abrir Corredor

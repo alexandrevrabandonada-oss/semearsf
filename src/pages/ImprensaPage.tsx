@@ -1,0 +1,139 @@
+import { Link } from "react-router-dom";
+
+import { INSTITUTIONAL_CITATION, INSTITUTIONAL_COORDINATION, INSTITUTIONAL_FUNDING, INSTITUTIONAL_SUMMARY, INSTITUTIONAL_TAGLINE, INSTITUTIONAL_UNIVERSITY_FULL_NAME } from "../content/institucional";
+
+const quickLinks = [
+  { href: "/dados", label: "Acessar painel publico de dados" },
+  { href: "/relatorios", label: "Consultar relatorios e notas tecnicas" },
+  { href: "/transparencia", label: "Ver transparencia financeira" },
+  { href: "/acervo/linha", label: "Explorar a linha do tempo do acervo" }
+];
+
+const citationBullets = [
+  "Informe o nome do projeto SEMEAR, a instituicao coordenadora e a data de acesso.",
+  "Descreva a estacao, o indicador e o recorte temporal usados na materia.",
+  "Se reproduzir numeros agregados, cite a pagina ou relatorio de origem com link direto.",
+  "Evite comparar periodos diferentes sem indicar claramente a janela analisada."
+];
+
+const contacts = [
+  { label: "Contato institucional", href: "mailto:contato@semear.uff.br", text: "contato@semear.uff.br" },
+  { label: "Coordenacao UFF", href: "mailto:coord.semear@id.uff.br", text: "coord.semear@id.uff.br" }
+];
+
+const downloads = [
+  { label: "Baixar logo SEMEAR (SVG)", href: "/brand/semear-logo.svg" },
+  { label: "Baixar logo UFF (SVG)", href: "/brand/uff-logo.svg" }
+];
+
+export function ImprensaPage() {
+  return (
+    <div className="space-y-6">
+      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
+        <h1 className="text-2xl font-black text-text-primary md:text-3xl">Imprensa</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-text-secondary md:text-base">
+          Página de apoio para jornalistas, assessorias, pesquisadores e parceiros que precisam de resumo institucional,
+          orientações de citação e acesso rápido aos materiais públicos do projeto.
+        </p>
+      </section>
+
+      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-black text-text-primary">Resumo institucional</h2>
+        <div className="mt-3 space-y-3 text-sm leading-relaxed text-text-secondary md:text-base">
+          <p>
+            {INSTITUTIONAL_SUMMARY}
+          </p>
+          <p>
+            {INSTITUTIONAL_TAGLINE}. O portal combina dados ambientais em tempo quase real, biblioteca oficial de relatórios, acervo histórico, agenda de atividades e prestação de contas em linguagem acessível.
+          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-secondary">
+            {INSTITUTIONAL_COORDINATION} · {INSTITUTIONAL_FUNDING}
+          </p>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-black text-text-primary">Como citar dados</h2>
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-text-secondary md:text-base">
+          {citationBullets.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <p className="mt-4 text-sm leading-relaxed text-text-secondary md:text-base">
+          {INSTITUTIONAL_CITATION}
+        </p>
+        <p className="mt-4 text-sm text-text-secondary">
+          Para contexto técnico adicional, consulte <Link className="font-semibold text-brand-primary underline" to="/como-ler-dados">Como ler os dados</Link>.
+        </p>
+      </section>
+
+      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-black text-text-primary">Links rapidos</h2>
+        <ul className="mt-3 grid gap-3 md:grid-cols-2">
+          {quickLinks.map((item) => (
+            <li key={item.href}>
+              <Link
+                to={item.href}
+                className="flex min-h-[52px] items-center rounded-xl border border-border-subtle px-4 py-3 text-sm font-semibold text-brand-primary transition-colors hover:bg-brand-primary-soft"
+              >
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-black text-text-primary">Contatos</h2>
+          <ul className="mt-3 space-y-3 text-sm text-text-secondary md:text-base">
+            {contacts.map((item) => (
+              <li key={item.href}>
+                <a className="font-semibold text-brand-primary underline" href={item.href}>
+                  {item.label}: {item.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-sm text-text-secondary">
+            Políticas de privacidade e tratamento de dados pessoais estão em {" "}
+            <Link className="font-semibold text-brand-primary underline" to="/privacidade-lgpd">
+              Privacidade e LGPD
+            </Link>.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-border-subtle bg-brand-primary-soft p-6 shadow-sm">
+          <h2 className="text-lg font-black text-brand-primary">Download de logos</h2>
+          <div className="mt-4 space-y-4">
+            <img
+              src="/brand/semear-logo.svg"
+              alt="Prévia da marca institucional do projeto SEMEAR"
+              className="w-full rounded-xl border border-border-subtle bg-white p-3"
+              loading="lazy"
+            />
+            <img
+              src="/brand/uff-logo.svg"
+              alt="Prévia da marca institucional da Universidade Federal Fluminense"
+              className="w-full rounded-xl border border-border-subtle bg-white p-3"
+              loading="lazy"
+            />
+          </div>
+          <ul className="mt-4 space-y-2">
+            {downloads.map((item) => (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  download
+                  className="inline-flex min-h-[44px] items-center font-semibold text-brand-primary underline"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    </div>
+  );
+}

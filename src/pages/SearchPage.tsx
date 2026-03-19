@@ -43,6 +43,13 @@ const TYPE_LABEL: Record<SearchType, string> = {
   agenda: "Agenda"
 };
 
+const REPORT_KIND_LABEL: Record<ReportDocument["kind"], string> = {
+  relatorio: "Relatório",
+  "nota-tecnica": "Nota Técnica",
+  boletim: "Boletim",
+  anexo: "Anexo"
+};
+
 function reportToSearchResult(report: ReportDocument): SearchResultItem {
   return {
     kind: "report",
@@ -246,7 +253,11 @@ export function SearchPage() {
                 Principais Resultados <span className="rounded-full bg-brand-primary/10 px-2 py-1 text-xs text-brand-primary">{results.mixed.length}</span>
               </h2>
               <div className="grid gap-4 md:grid-cols-2">
-                {results.mixed.map((item) => (
+                {results.mixed.map((item) => {
+                  const matchedReport = item.kind === "report"
+                    ? results.reports.find((report) => report.slug === item.slug)
+                    : null;
+                  return (
                   <Link
                     key={item.url}
                     to={item.url}
@@ -254,14 +265,15 @@ export function SearchPage() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="rounded-full px-3 py-1 text-xs font-semibold bg-brand-primary/10 text-brand-primary">
-                        {item.kind === "blog" ? "Blog" : item.kind === "report" ? "Relatório" : "Acervo"}
+                        {item.kind === "blog" ? "Blog" : item.kind === "report" ? (matchedReport ? REPORT_KIND_LABEL[matchedReport.kind] : "Relatório") : "Acervo"}
                       </span>
                       <span className="text-xs text-text-secondary">Score: {item.score.toFixed(2)}</span>
                     </div>
                     <h3 className="mt-2 text-base font-bold text-text-primary group-hover:text-brand-primary">{item.title}</h3>
                     {item.excerpt && <p className="mt-2 text-sm text-text-secondary line-clamp-2">{item.excerpt}</p>}
                   </Link>
-                ))}
+                  );
+                })}
               </div>
             </section>
           )}
@@ -278,7 +290,7 @@ export function SearchPage() {
                     to={`/relatorios/${report.slug}`}
                     className="group flex flex-col rounded-xl border border-brand-primary/25 bg-fundo/60 p-5 transition-all hover:border-brand-primary hover:bg-fundo/80"
                   >
-                    <span className="w-fit rounded-full bg-brand-primary/10 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-primary">Relatório</span>
+                    <span className="w-fit rounded-full bg-brand-primary/10 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-primary">{REPORT_KIND_LABEL[report.kind]}</span>
                     <h3 className="mt-2 font-bold text-texto group-hover:text-ciano">{report.title}</h3>
                     {report.summary && <p className="mt-2 line-clamp-2 text-xs text-texto/60">{report.summary}</p>}
                   </Link>

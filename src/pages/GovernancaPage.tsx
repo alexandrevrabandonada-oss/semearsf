@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import changelogRaw from "../../data/changelog.md?raw";
 
+import { INSTITUTIONAL_CITATION, INSTITUTIONAL_COORDINATION, INSTITUTIONAL_FUNDING, INSTITUTIONAL_SUMMARY, INSTITUTIONAL_TAGLINE } from "../content/institucional";
+
 function getLatestChangelogEntries(markdown: string, limit = 10): string[] {
   return markdown
     .split(/\r?\n/)
@@ -26,14 +28,14 @@ export function GovernancaPage() {
       <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
         <h1 className="text-2xl font-black text-text-primary md:text-3xl">Governança e Publicação</h1>
         <p className="mt-3 text-sm text-text-secondary md:text-base">
-          Regras públicas de publicação, correção, privacidade e transparência técnica do portal SEMEAR.
+          {INSTITUTIONAL_TAGLINE}. Regras públicas de publicação, correção, privacidade e transparência técnica do portal SEMEAR.
         </p>
       </section>
 
       <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
         <h2 className="text-lg font-black text-text-primary">Política de publicação</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-text-secondary md:text-base">
-          <li>Blog, acervo e relatórios são publicados somente após revisão editorial mínima e checagem institucional.</li>
+          <li>{INSTITUTIONAL_SUMMARY} Blog, acervo e relatórios são publicados somente após revisão editorial mínima e checagem institucional.</li>
           <li>Conteúdos programados usam data de publicação e permanecem ocultos até o momento previsto.</li>
           <li>Relatórios e notas técnicas entram na biblioteca pública com título, resumo, ano e arquivo PDF quando disponível.</li>
           <li>Itens sem comprovação mínima de origem, contexto ou autoria não devem ser publicados em área pública.</li>
@@ -54,8 +56,10 @@ export function GovernancaPage() {
         <h2 className="text-lg font-black text-text-primary">Privacidade e transparência técnica</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-text-secondary md:text-base">
           <li>Direitos de privacidade, dados pessoais e canais de contato estão descritos em <Link className="font-semibold text-brand-primary underline" to="/privacidade-lgpd">/privacidade-lgpd</Link>.</li>
+          <li>{INSTITUTIONAL_CITATION}</li>
           <li>Indicadores operacionais, integridade da rede e métricas públicas do portal ficam disponíveis em <Link className="font-semibold text-brand-primary underline" to="/status">/status</Link>.</li>
           <li>Logs públicos e changelog são sanitizados: não expõem segredos, tokens, chaves nem dados pessoais desnecessários.</li>
+          <li>{INSTITUTIONAL_FUNDING} e {INSTITUTIONAL_COORDINATION} compõem a identidade institucional exibida ao público.</li>
           <li>Eventos de compartilhamento são registrados com minimização de dados e hash de IP para análise agregada.</li>
         </ul>
       </section>

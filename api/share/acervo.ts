@@ -38,7 +38,7 @@ export default async function handler(req: any, res: any) {
 
   const { data: item, error } = await supabase
     .from('acervo_items')
-    .select('title, excerpt, cover_url, source_name, published_at, created_at, meta')
+    .select('title, excerpt, cover_url, cover_thumb_url, source_name, published_at, created_at, meta')
     .eq('slug', slug)
     .single();
 
@@ -72,7 +72,7 @@ export default async function handler(req: any, res: any) {
   const safeTitle = encodeURIComponent(item.title);
   const safeSubtitle = encodeURIComponent(subtitleText);
 
-  const image = item.cover_url || `${hostUrl}/api/og/card?kind=acervo&title=${safeTitle}&subtitle=${safeSubtitle}`;
+  const image = item.cover_thumb_url || `${hostUrl}/api/og/card?kind=acervo&title=${safeTitle}&subtitle=${safeSubtitle}`;
   const url = `${hostUrl}/acervo/item/${slug}`;
 
   const html = `

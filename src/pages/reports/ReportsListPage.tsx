@@ -6,7 +6,7 @@ import { listReports, type ReportDocument, type ReportKind } from "../../lib/api
 
 const KIND_LABEL: Record<ReportKind, string> = {
   relatorio: "Relatório",
-  "nota-tecnica": "Nota técnica",
+  "nota-tecnica": "Nota Técnica",
   boletim: "Boletim",
   anexo: "Anexo"
 };
@@ -76,6 +76,10 @@ export function ReportsListPage() {
     return Array.from(tags).sort((a, b) => a.localeCompare(b, "pt-BR"));
   }, [allReports]);
 
+  const featuredReports = useMemo(() => reports.filter((item) => item.featured).slice(0, 3), [reports]);
+  const featuredIds = useMemo(() => new Set(featuredReports.map((item) => item.id)), [featuredReports]);
+  const regularReports = useMemo(() => reports.filter((item) => !featuredIds.has(item.id)), [featuredIds, reports]);
+
   return (
     <section className="space-y-6">
       <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
@@ -102,20 +106,29 @@ export function ReportsListPage() {
             </select>
           </label>
 
-          <label className="block">
+          <div className="block md:col-span-2">
             <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-secondary">Tipo</span>
-            <select
-              value={kind}
-              onChange={(e) => setKind(e.target.value as "all" | ReportKind)}
-              className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm"
-            >
-              <option value="all">Todos</option>
-              <option value="relatorio">Relatório</option>
-              <option value="nota-tecnica">Nota técnica</option>
-              <option value="boletim">Boletim</option>
-              <option value="anexo">Anexo</option>
-            </select>
-          </label>
+            <div className="flex flex-wrap gap-2">
+              {(["all", "relatorio", "nota-tecnica", "boletim", "anexo"] as const).map((value) => {
+                const isActive = kind === value;
+                const label = value === "all" ? "Todos" : KIND_LABEL[value];
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setKind(value)}
+                    className={`rounded-full px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${
+                      isActive
+                        ? "bg-brand-primary text-white"
+                        : "border border-border-subtle bg-white text-text-secondary hover:border-brand-primary hover:text-brand-primary"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <label className="block">
             <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-secondary">Tag</span>
@@ -131,7 +144,7 @@ export function ReportsListPage() {
             </select>
           </label>
 
-          <label className="block">
+          <label className="block md:col-span-4">
             <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-secondary">Busca</span>
             <input
               type="search"
@@ -143,6 +156,58 @@ export function ReportsListPage() {
           </label>
         </div>
       </div>
+
+      {!loading && !error && featuredReports.length > 0 ? (
+        <div className="rounded-2xl border border-brand-primary/20 bg-gradient-to-br from-brand-primary/5 via-white to-white p-6 shadow-sm">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Destaques</p>
+              <h2 className="mt-1 text-xl font-black text-text-primary">Relatórios editoriais em evidência</h2>
+            </div>
+            <span className="rounded-full border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-secondary">
+              {featuredReports.length} selecionado(s)
+            </span>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {featuredReports.map((item) => {
+              const thumbUrl = getOptimizedCover(item, "thumb");
+              return (
+                <Link
+                  key={item.id}
+                  to={`/relatorios/${item.slug}`}
+                  className="group overflow-hidden rounded-2xl border border-brand-primary/20 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-primary hover:shadow-md"
+                >
+                  {thumbUrl ? (
+                    <img
+                      src={thumbUrl}
+                      alt={`Capa de ${item.title}`}
+                      loading="lazy"
+                      className="h-40 w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-40 flex-col justify-between bg-gradient-to-br from-brand-primary/10 via-white to-bg-surface p-4">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-primary">SEMEAR</span>
+                      <span className="text-sm font-black uppercase leading-tight text-text-primary">Destaque editorial</span>
+                    </div>
+                  )}
+                  <div className="space-y-3 p-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-brand-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary">
+                        Destaque
+                      </span>
+                      <span className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
+                        {KIND_LABEL[item.kind]}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-black text-text-primary group-hover:text-brand-primary">{item.title}</h3>
+                    {item.summary ? <p className="text-sm leading-relaxed text-text-secondary line-clamp-3">{item.summary}</p> : null}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
 
       <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
         {loading ? (
@@ -161,7 +226,7 @@ export function ReportsListPage() {
           </div>
         ) : (
           <ul className="space-y-3">
-            {reports.map((item) => {
+            {regularReports.map((item) => {
               const thumbUrl = getOptimizedCover(item, "thumb");
               return (
                 <li key={item.id}>
@@ -187,11 +252,6 @@ export function ReportsListPage() {
                     <div className="flex flex-col gap-2">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          {item.featured && (
-                            <span className="rounded-full bg-brand-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary">
-                              Destaque
-                            </span>
-                          )}
                           <span className="rounded-full bg-bg-surface px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary border border-border-subtle">
                             {KIND_LABEL[item.kind]}
                           </span>

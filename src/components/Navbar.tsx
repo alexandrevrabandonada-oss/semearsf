@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import { useInstallPrompt } from "../hooks/useInstallPrompt";
+import { INSTITUTIONAL_COORDINATION, INSTITUTIONAL_FUNDING, INSTITUTIONAL_UNIVERSITY_FULL_NAME } from "../content/institucional";
 
 const links = [
   { href: "/", label: "Home" },
@@ -53,9 +54,9 @@ export function Navbar() {
       {/* Institutional banner */}
       <div className="border-b border-border-subtle bg-brand-primary-soft/70">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-center gap-3 px-4 py-1.5 text-[11px] font-semibold text-brand-primary-dark md:justify-end md:px-6">
-          <span>Projeto financiado por emenda parlamentar</span>
+          <span>{INSTITUTIONAL_FUNDING}</span>
           <span className="hidden h-3 w-px bg-border-subtle md:block" aria-hidden="true" />
-          <span className="hidden md:inline">Coordenação: UFF</span>
+          <span className="hidden md:inline">{INSTITUTIONAL_COORDINATION}</span>
         </div>
       </div>
 
@@ -67,7 +68,7 @@ export function Navbar() {
               {import.meta.env.VITE_PROJECT_NAME || "SEMEAR"}
             </span>
             <span className="h-6 w-px bg-border-subtle" aria-hidden="true" />
-            <span className="inline-flex min-h-[32px] items-center rounded border border-border-subtle bg-bg-surface px-2 text-[10px] font-semibold tracking-[0.14em] text-text-secondary" aria-label="Universidade Federal Fluminense">
+            <span className="inline-flex min-h-[32px] items-center rounded border border-border-subtle bg-bg-surface px-2 text-[10px] font-semibold tracking-[0.14em] text-text-secondary" aria-label={INSTITUTIONAL_UNIVERSITY_FULL_NAME}>
               UFF
             </span>
           </div>

@@ -9,6 +9,8 @@ import {
   type TransparencySummary
 } from "../lib/api";
 
+import { INSTITUTIONAL_FUNDING } from "../content/institucional";
+
 function formatBRL(cents: number) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -269,7 +271,7 @@ export function TransparenciaPage() {
         </div>
 
         <div className="mt-6 rounded-lg border border-brand-primary/30 bg-brand-primary-soft p-4">
-          <p className="text-sm font-semibold text-brand-primary">✓ Todos os recursos são públicos, provenientes de emenda parlamentar</p>
+          <p className="text-sm font-semibold text-brand-primary">{INSTITUTIONAL_FUNDING} · todos os recursos são públicos</p>
           <p className="mt-1 text-sm text-text-secondary">Prestação de contas permanente e acessível à população</p>
         </div>
       </section>
@@ -278,7 +280,7 @@ export function TransparenciaPage() {
         <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Total histórico</p>
           <p className="mt-2 text-3xl font-black text-success">{summary ? formatBRL(summary.total_cents) : "R$ 0,00"}</p>
-          <p className="mt-1 text-xs text-text-secondary">Recursos de emenda parlamentar</p>
+          <p className="mt-1 text-xs text-text-secondary">{INSTITUTIONAL_FUNDING}</p>
         </div>
 
         <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">

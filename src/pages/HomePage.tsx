@@ -4,6 +4,14 @@ import { Link } from "react-router-dom";
 import type { AcervoItem, Event, StationOverview, BlogPost, TransparencySummary, AcervoCollection, ClimateCorridor, ReportDocument } from "../lib/api";
 import { useInstallPrompt } from "../hooks/useInstallPrompt";
 import { getOptimizedCover } from "../lib/imageOptimization";
+import { INSTITUTIONAL_COORDINATION, INSTITUTIONAL_TAGLINE, INSTITUTIONAL_UNIVERSITY_FULL_NAME } from "../content/institucional";
+
+const REPORT_KIND_LABEL: Record<ReportDocument["kind"], string> = {
+  relatorio: "Relatório",
+  "nota-tecnica": "Nota Técnica",
+  boletim: "Boletim",
+  anexo: "Anexo"
+};
 
 export function HomePage() {
   const { prompt, clearPrompt } = useInstallPrompt();
@@ -22,16 +30,20 @@ export function HomePage() {
     async function load() {
       try {
         setLoading(true);
-        const api = await import("../lib/api");
+        const [monitoringApi, contentApi, transparencyApi] = await Promise.all([
+          import("../lib/api/monitoring"),
+          import("../lib/api/content"),
+          import("../lib/api/transparency")
+        ]);
         const [stationsData, eventsData, acervoData, blogData, transData, collectionsData, corridorsData, reportsData] = await Promise.all([
-          api.getStationOverview(),
-          api.listUpcomingEvents(),
-          api.listAcervoItems({ featured: true, limit: 6 }),
-          api.listBlogPosts({ limit: 1 }),
-          api.getTransparencySummary(),
-          api.listFeaturedCollections(3),
-          api.listFeaturedCorridors(3),
-          api.listLatestReports(3)
+          monitoringApi.getStationOverview(),
+          contentApi.listUpcomingEvents(),
+          contentApi.listAcervoItems({ featured: true, limit: 6 }),
+          contentApi.listBlogPosts({ limit: 1 }),
+          transparencyApi.getTransparencySummary(),
+          contentApi.listFeaturedCollections(3),
+          contentApi.listFeaturedCorridors(3),
+          contentApi.listLatestReports(3)
         ]);
         setStations(stationsData);
         setEvents(eventsData.slice(0, 3));
@@ -40,7 +52,7 @@ export function HomePage() {
         setTransparency(transData);
         setCollections(collectionsData as AcervoCollection[]);
         setCorridors(corridorsData);
-        setReports(reportsData);
+        setReports(reportsData.filter((report) => report.featured).slice(0, 3));
       } catch (err) {
         console.error("Erro ao carregar dados da home:", err);
         setError("Não foi possível carregar as informações em tempo real.");
@@ -70,10 +82,10 @@ export function HomePage() {
                 SEMEAR
               </h2>
               <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                Coordenação: Universidade Federal Fluminense
+                {INSTITUTIONAL_COORDINATION}
               </p>
             </div>
-            <div className="ml-auto flex h-10 w-10 items-center justify-center rounded-lg border border-border-subtle bg-white text-[10px] font-bold tracking-[0.12em] text-text-primary/60" aria-label="Universidade Federal Fluminense">
+            <div className="ml-auto flex h-10 w-10 items-center justify-center rounded-lg border border-border-subtle bg-white text-[10px] font-bold tracking-[0.12em] text-text-primary/60" aria-label={INSTITUTIONAL_UNIVERSITY_FULL_NAME}>
               UFF
             </div>
           </div>
@@ -86,7 +98,7 @@ export function HomePage() {
             Monitoramento da Qualidade do Ar e Memória Socioambiental
           </h1>
           <p className="max-w-3xl text-base text-text-secondary md:text-lg leading-relaxed">
-            Plataforma pública-universitária que reúne dados científicos em tempo real, acervo histórico curado, rodas de conversa inclusivas e atividades participativas de vigilância popular em saúde.
+            {INSTITUTIONAL_TAGLINE}. Plataforma pública-universitária que reúne dados científicos em tempo real, acervo histórico curado, rodas de conversa inclusivas e atividades participativas de vigilância popular em saúde.
           </p>
         </div>
 
@@ -515,8 +527,12 @@ export function HomePage() {
               <p className="text-sm text-text-secondary">Publicações oficiais em PDF</p>
             </div>
           </div>
-          <Link className="text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/relatorios">
-            Ver todos →
+          <Link
+            className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-white px-4 py-2 text-sm font-bold text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-primary/5"
+            to="/relatorios"
+          >
+            Ver todos
+            <span aria-hidden="true">→</span>
           </Link>
         </div>
 
@@ -528,25 +544,55 @@ export function HomePage() {
           </div>
         ) : reports.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
-            <p className="text-sm text-text-secondary">Nenhum relatório disponível no momento.</p>
+            <p className="text-sm text-text-secondary">Nenhum relatório em destaque no momento.</p>
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-3">
-            {reports.map((report) => (
-              <Link
-                key={report.id}
-                to={`/relatorios/${report.slug}`}
-                className="rounded-lg border border-border-subtle bg-bg-surface p-4 transition-all hover:border-brand-primary hover:shadow-sm"
-              >
-                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-primary">
-                  {report.published_at ? new Date(report.published_at).toLocaleDateString("pt-BR") : "Sem data"}
-                </p>
-                <h3 className="mt-1 text-sm font-black text-text-primary line-clamp-2">{report.title}</h3>
-                {report.summary && (
-                  <p className="mt-2 text-xs text-text-secondary line-clamp-2">{report.summary}</p>
-                )}
-              </Link>
-            ))}
+          <div className="grid gap-5 lg:grid-cols-3">
+            {reports.map((report) => {
+              const thumbUrl = getOptimizedCover(report, "thumb");
+              return (
+                <Link
+                  key={report.id}
+                  to={
+                    "/relatorios/" + report.slug
+                  }
+                  className="group overflow-hidden rounded-2xl border border-border-subtle bg-white transition-all hover:-translate-y-0.5 hover:border-brand-primary hover:shadow-md"
+                >
+                  {thumbUrl ? (
+                    <img
+                      src={thumbUrl}
+                      alt={"Capa de " + report.title}
+                      loading="lazy"
+                      className="h-40 w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-40 flex-col justify-between bg-gradient-to-br from-brand-primary/10 via-white to-bg-surface p-5">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-primary">SEMEAR</span>
+                      <span className="max-w-[12rem] text-base font-black uppercase leading-tight text-text-primary">
+                        Relatórios e notas técnicas
+                      </span>
+                    </div>
+                  )}
+                  <div className="space-y-3 p-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-brand-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary">
+                        Destaque
+                      </span>
+                      <span className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
+                        {REPORT_KIND_LABEL[report.kind]}
+                      </span>
+                    </div>
+                    <h3 className="line-clamp-2 text-base font-black text-text-primary group-hover:text-brand-primary">{report.title}</h3>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
+                      {report.published_at ? new Date(report.published_at).toLocaleDateString("pt-BR") : "Sem data"}
+                    </p>
+                    {report.summary && (
+                      <p className="text-sm text-text-secondary line-clamp-3">{report.summary}</p>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
@@ -620,3 +666,4 @@ export function HomePage() {
     </section>
   );
 }
+

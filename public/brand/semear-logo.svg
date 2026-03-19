@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" role="img" aria-labelledby="title desc">
+  <title id="title">Logo SEMEAR</title>
+  <desc id="desc">Marca textual SEMEAR com barra verde institucional.</desc>
+  <rect width="420" height="120" rx="20" fill="#f6f4ee"/>
+  <rect x="28" y="24" width="12" height="72" rx="6" fill="#1d7a43"/>
+  <text x="62" y="62" fill="#0f4c5c" font-family="Georgia, serif" font-size="40" font-weight="700" letter-spacing="4">SEMEAR</text>
+  <text x="64" y="88" fill="#5d6b75" font-family="Arial, sans-serif" font-size="14" font-weight="600" letter-spacing="1.5">MONITORAMENTO E MEMÓRIA SOCIOAMBIENTAL</text>
+</svg>

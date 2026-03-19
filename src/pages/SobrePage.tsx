@@ -1,3 +1,5 @@
+import { INSTITUTIONAL_CITATION, INSTITUTIONAL_COORDINATION, INSTITUTIONAL_FUNDING, INSTITUTIONAL_SUMMARY, INSTITUTIONAL_TAGLINE, INSTITUTIONAL_UNIVERSITY_FULL_NAME } from "../content/institucional";
+
 export function SobrePage() {
   return (
     <div className="space-y-8">
@@ -8,7 +10,7 @@ export function SobrePage() {
             UFF
           </div>
           <div className="flex flex-col">
-            <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Universidade Federal Fluminense</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">{INSTITUTIONAL_UNIVERSITY_FULL_NAME}</span>
             <span className="text-base font-black uppercase tracking-wide text-brand-primary">SEMEAR</span>
           </div>
         </div>
@@ -17,7 +19,10 @@ export function SobrePage() {
           Sistema de Monitoramento e Memória Socioambiental
         </h1>
         <p className="mt-4 text-lg text-text-secondary leading-relaxed">
-          O SEMEAR é um projeto público-universitário de ciência aberta, vigilância popular em saúde e memória pública, coordenado pela Universidade Federal Fluminense (UFF) e financiado por emenda parlamentar.
+          {INSTITUTIONAL_SUMMARY}
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-text-secondary">
+          {INSTITUTIONAL_CITATION}
         </p>
       </section>
 
@@ -31,7 +36,7 @@ export function SobrePage() {
           </div>
           <h2 className="text-xl font-black text-text-primary">Projeto Público-Universitário</h2>
           <p className="mt-3 text-base text-text-secondary">
-            Iniciativa da Universidade Federal Fluminense (UFF) voltada para o monitoramento científico da qualidade do ar e a construção de memória socioambiental participativa.
+            {INSTITUTIONAL_TAGLINE}. Iniciativa da {INSTITUTIONAL_UNIVERSITY_FULL_NAME} (UFF) voltada para o monitoramento científico da qualidade do ar e a construção de memória socioambiental participativa.
           </p>
         </div>
 
@@ -43,7 +48,7 @@ export function SobrePage() {
           </div>
           <h2 className="text-xl font-black text-text-primary">Financiamento por Emenda Parlamentar</h2>
           <p className="mt-3 text-base text-text-secondary">
-            Recursos públicos destinados via emenda parlamentar, garantindo transparência total na aplicação dos investimentos e prestação de contas acessível à população.
+            {INSTITUTIONAL_FUNDING} com transparência total na aplicação dos investimentos e prestação de contas acessível à população.
           </p>
         </div>
       </section>
@@ -156,7 +161,7 @@ export function SobrePage() {
       <section className="rounded-2xl border border-border-subtle bg-brand-primary-soft p-8">
         <h2 className="mb-4 text-2xl font-black text-brand-primary">Coordenação e Contato</h2>
         <p className="text-base text-text-primary">
-          <strong>Coordenação Institucional:</strong> Universidade Federal Fluminense (UFF)
+          <strong>Coordenação Institucional:</strong> {INSTITUTIONAL_COORDINATION}
         </p>
         <p className="mt-2 text-base text-text-primary">
           <strong>E-mail:</strong> <a href="mailto:contato@semear.uff.br" className="text-brand-primary hover:underline">contato@semear.uff.br</a>

@@ -38,7 +38,7 @@ export default async function handler(req: any, res: any) {
 
     const { data: item, error } = await supabase
         .from('acervo_collections')
-        .select('title, excerpt, cover_url')
+        .select('title, excerpt, cover_url, cover_thumb_url')
         .eq('slug', slug)
         .single();
 
@@ -53,8 +53,7 @@ export default async function handler(req: any, res: any) {
     const safeTitle = encodeURIComponent(item.title);
     const safeSubtitle = encodeURIComponent(description);
 
-    // Fallback gracefully applies our dynamic serverless SVG endpoint if no DB cover_url exists
-    const image = item.cover_url || `${hostUrl}/api/og/card?kind=dossies&title=${safeTitle}&subtitle=${safeSubtitle}`;
+    const image = item.cover_thumb_url || `${hostUrl}/api/og/card?kind=dossies&title=${safeTitle}&subtitle=${safeSubtitle}`;
     const url = `${hostUrl}/dossies/${slug}`;
 
     const html = `

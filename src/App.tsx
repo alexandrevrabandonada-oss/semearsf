@@ -20,6 +20,8 @@ const ComoLerDadosPage = lazy(() => import("./pages/ComoLerDadosPage").then((m) 
 const ComoParticiparPage = lazy(() => import("./pages/ComoParticiparPage").then((m) => ({ default: m.ComoParticiparPage })));
 const PrivacidadeLgpdPage = lazy(() => import("./pages/PrivacidadeLgpdPage").then((m) => ({ default: m.PrivacidadeLgpdPage })));
 const GovernancaPage = lazy(() => import("./pages/GovernancaPage").then((m) => ({ default: m.GovernancaPage })));
+const ImprensaPage = lazy(() => import("./pages/ImprensaPage").then((m) => ({ default: m.ImprensaPage })));
+const ApresentacaoPage = lazy(() => import("./pages/ApresentacaoPage").then((m) => ({ default: m.ApresentacaoPage })));
 
 // Acervo lazy-loaded
 const AcervoPage = lazy(() => import("./pages/acervo/AcervoPage").then((m) => ({ default: m.AcervoPage })));
@@ -69,6 +71,8 @@ export default function App() {
           <Route path="/como-participar" element={<ComoParticiparPage />} />
           <Route path="/privacidade-lgpd" element={<PrivacidadeLgpdPage />} />
           <Route path="/governanca" element={<GovernancaPage />} />
+          <Route path="/imprensa" element={<ImprensaPage />} />
+          <Route path="/apresentacao" element={<ApresentacaoPage />} />
           <Route path="/acervo" element={<AcervoPage />} />
           <Route path="/acervo/linha" element={<AcervoTimelinePage />} />
           <Route path="/acervo/:area" element={<AcervoListPage />} />

@@ -21,12 +21,6 @@ function formatDate(value: unknown) {
   return date.toLocaleString("pt-BR");
 }
 
-function formatShortDate(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-}
-
 function formatCellValue(value: unknown) {
   if (value === null || value === undefined) return "-";
   if (typeof value === "boolean") return value ? "true" : "false";
@@ -77,7 +71,7 @@ export function DadosPage() {
   const [loadingMeasurements, setLoadingMeasurements] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPM25, setShowPM25] = useState(true);
-  const [showPM10, setShowPM10] = useState(true);
+  const [showPM10, setShowPM10] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(
     typeof document === "undefined" ? true : document.visibilityState === "visible"
   );
@@ -89,9 +83,9 @@ export function DadosPage() {
       try {
         setLoadingStations(true);
         setError(null);
-        const api = await import("../lib/api");
-        const data = await api.getStationOverview();
-        const health = await api.getStationHealth();
+        const monitoringApi = await import("../lib/api/monitoring");
+        const data = await monitoringApi.getStationOverview();
+        const health = await monitoringApi.getStationHealth();
         
         setStations(data);
         
@@ -126,10 +120,10 @@ export function DadosPage() {
       if (!silent) setLoadingMeasurements(true);
       setError(null);
       
-      const api = await import("../lib/api");
+      const monitoringApi = await import("../lib/api/monitoring");
       const [data24h, data7d] = await Promise.all([
-        api.getMeasurementsDownsampled(stationId, "24h"),
-        api.getMeasurementsDownsampled(stationId, "7d")
+        monitoringApi.getMeasurementsDownsampled(stationId, "24h"),
+        monitoringApi.getMeasurementsDownsampled(stationId, "7d")
       ]);
       
       setMeasurements24h(data24h);
@@ -229,7 +223,7 @@ export function DadosPage() {
     return [...currentMeasurements]
       .reverse()
       .map(m => ({
-        ts: formatShortDate(m.bucket_ts),
+        ts: m.bucket_ts,
         pm25: m.pm25,
         pm10: m.pm10,
         temp: m.temp,
@@ -608,4 +602,5 @@ export function DadosPage() {
     </section>
   );
 }
+
 

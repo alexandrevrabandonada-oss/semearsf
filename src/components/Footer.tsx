@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import { INSTITUTIONAL_FUNDING, INSTITUTIONAL_TAGLINE, INSTITUTIONAL_UNIVERSITY_FULL_NAME } from "../content/institucional";
+
 export function Footer() {
   return (
     <footer className="fixed inset-x-0 bottom-0 z-50 border-t border-border-subtle bg-white/95 backdrop-blur" role="contentinfo">
@@ -7,7 +9,7 @@ export function Footer() {
         <div className="mb-3 flex flex-col items-center gap-3 border-b border-border-subtle pb-3 md:flex-row md:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-8 items-center rounded border border-border-subtle bg-bg-surface px-2 text-xs font-bold tracking-wider text-text-secondary" aria-label="Universidade Federal Fluminense">
+              <span className="inline-flex h-8 items-center rounded border border-border-subtle bg-bg-surface px-2 text-xs font-bold tracking-wider text-text-secondary" aria-label={INSTITUTIONAL_UNIVERSITY_FULL_NAME}>
                 UFF
               </span>
               <span className="h-6 w-px bg-border-subtle" aria-hidden="true" />
@@ -36,8 +38,8 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col items-center gap-2 text-center text-sm text-text-secondary md:flex-row md:justify-between md:text-left">
-          <p>Plataforma publica-universitaria de monitoramento e memoria socioambiental</p>
-          <p className="text-xs font-semibold text-brand-primary">Financiado por emenda parlamentar</p>
+          <p>{INSTITUTIONAL_TAGLINE}</p>
+          <p className="text-xs font-semibold text-brand-primary">{INSTITUTIONAL_FUNDING}</p>
         </div>
 
         <nav aria-label="Guias institucionais" className="mt-2">
@@ -53,6 +55,9 @@ export function Footer() {
             </li>
             <li>
               <Link to="/governanca" className="transition-colors hover:text-brand-primary">Governança</Link>
+            </li>
+            <li>
+              <Link to="/imprensa" className="transition-colors hover:text-brand-primary">Imprensa</Link>
             </li>
           </ul>
         </nav>

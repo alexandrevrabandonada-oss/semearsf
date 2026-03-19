@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" role="img" aria-labelledby="title desc">
+  <title id="title">Logo UFF</title>
+  <desc id="desc">Identificação textual da Universidade Federal Fluminense.</desc>
+  <rect width="420" height="120" rx="20" fill="#ffffff"/>
+  <rect x="28" y="22" width="72" height="76" rx="14" fill="#0f4c5c"/>
+  <text x="44" y="73" fill="#ffffff" font-family="Georgia, serif" font-size="34" font-weight="700" letter-spacing="2">UFF</text>
+  <text x="124" y="52" fill="#0f4c5c" font-family="Georgia, serif" font-size="28" font-weight="700">Universidade Federal</text>
+  <text x="124" y="82" fill="#0f4c5c" font-family="Georgia, serif" font-size="28" font-weight="700">Fluminense</text>
+</svg>

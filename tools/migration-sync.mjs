@@ -3,11 +3,14 @@ import fs from "node:fs";
 import path from "node:path";
 
 const MIGRATIONS_DIR = path.join(process.cwd(), "supabase", "migrations");
+const NPM_CACHE_DIR = path.join(process.cwd(), ".npm-cache");
+const SUPABASE_CLI = "supabase@2.82.0";
 const VERSION_REGEX = /\b\d{14}\b/g;
 
 function run(cmd) {
   return execSync(cmd, {
     cwd: process.cwd(),
+    env: { ...process.env, npm_config_cache: NPM_CACHE_DIR },
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"]
   });
@@ -55,11 +58,15 @@ function createStub(version) {
 function main() {
   let remoteOutput = "";
   try {
-    remoteOutput = run("npx supabase migration list --linked");
+    remoteOutput = run(`npm exec --yes --package=${SUPABASE_CLI} -- supabase migration list --linked`);
   } catch (error) {
     const stderr = (error.stderr || "").toString().trim();
     const stdout = (error.stdout || "").toString().trim();
     const message = stderr || stdout || error.message;
+    if (/SUPABASE_DB_PASSWORD|Forbidden resource|403/i.test(message)) {
+      console.log("[migration-sync] remote versions unavailable (missing DB password or forbidden). skipping sync.");
+      process.exit(0);
+    }
     console.error(`[migration-sync] ERROR failed to read linked migrations: ${message}`);
     process.exit(1);
   }

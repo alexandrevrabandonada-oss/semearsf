@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const pagesToAudit = ["/", "/dados", "/agenda", "/conversar", "/acervo", "/blog", "/transparencia"];
+const pagesToAudit = ["/", "/dados", "/agenda", "/conversar", "/acervo", "/blog", "/transparencia", "/mapa"];
 
 async function expectNoA11yViolations(page: import("@playwright/test").Page): Promise<void> {
   const results = await new AxeBuilder({ page })
@@ -71,6 +71,28 @@ test.describe("Accessibility smoke @a11y", () => {
       ((focusState?.outlineStyle && focusState.outlineStyle !== "none") && focusState?.outlineWidth !== "0px");
 
     expect(Boolean(hasVisibleFocus)).toBeTruthy();
+  });
+
+  test("mapa should expose list and valid heading order", async ({ page }) => {
+    await page.goto("/mapa");
+    await page.waitForLoadState("networkidle");
+
+    await expect(page.getByRole("link", { name: /pular mapa e ir para lista/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /mapa de monitoramento/i, level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /lista de estações e corredores/i, level: 2 })).toBeVisible();
+
+    const list = page.locator("#mapa-lista ul");
+    await expect(list.first()).toBeVisible();
+
+    const headingTags = await page.locator("h1, h2, h3, h4, h5, h6").evaluateAll((nodes) =>
+      nodes.map((node) => node.tagName)
+    );
+    const levels = parseHeadingLevels(headingTags);
+    expect(levels.length).toBeGreaterThan(0);
+    expect(levels[0]).toBe(1);
+    for (let i = 1; i < levels.length; i += 1) {
+      expect(levels[i] - levels[i - 1]).toBeLessThanOrEqual(1);
+    }
   });
 
   test("headings should keep non-skipping order", async ({ page }) => {

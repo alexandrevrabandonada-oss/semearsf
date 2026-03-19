@@ -54,7 +54,7 @@ export default async function handler(req: any, res: any) {
   const description = report.summary || "Consulte este relatorio tecnico oficial do SEMEAR.";
   const safeTitle = encodeURIComponent(report.title);
   const safeSubtitle = encodeURIComponent(description);
-  const image = report.cover_thumb_url || report.cover_url || `${hostUrl}/api/og/card?kind=relatorios&title=${safeTitle}&subtitle=${safeSubtitle}`;
+  const image = report.cover_thumb_url || `${hostUrl}/api/og/card?kind=relatorios&title=${safeTitle}&subtitle=${safeSubtitle}`;
 
   const html = `
 <!DOCTYPE html>

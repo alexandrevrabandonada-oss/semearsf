@@ -6,11 +6,14 @@ import path from "node:path";
 const TIMEOUT_MS = 15000;
 const MIGRATIONS_DIR = path.join(process.cwd(), "supabase", "migrations");
 const ARCHIVE_DIR = path.join(process.cwd(), "supabase", "_archive_migrations");
+const NPM_CACHE_DIR = path.join(process.cwd(), ".npm-cache");
+const SUPABASE_CLI = "supabase@2.82.0";
 const VERSION_REGEX = /\b\d{14}\b/g;
 
 function run(cmd) {
   try {
     const stdout = execSync(cmd, {
+      env: { ...process.env, npm_config_cache: NPM_CACHE_DIR },
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
       timeout: TIMEOUT_MS
@@ -87,7 +90,7 @@ if (isRunning) {
   console.log("[OK] DB Local: Not running (remote-first mode)");
 }
 
-const linkRes = run("npx supabase projects list");
+const linkRes = run(`npm exec --yes --package=${SUPABASE_CLI} -- supabase projects list`);
 const isLinked = linkRes.success && !linkRes.output.includes("You are not logged in") && linkRes.output.trim().length > 0;
 
 if (isLinked) {
@@ -97,7 +100,7 @@ if (isLinked) {
 }
 
 console.log("\n--- LOCAL STATE ---");
-const localListRes = isRunning ? run("npx supabase migration list --local") : { success: false, skipped: true };
+const localListRes = isRunning ? run(`npm exec --yes --package=${SUPABASE_CLI} -- supabase migration list --local`) : { success: false, skipped: true };
 
 if (localListRes.success) {
   console.log("[OK] CLI local list: Sucesso");
@@ -125,7 +128,7 @@ if (fs.existsSync(MIGRATIONS_DIR)) {
 
 if (isLinked) {
   console.log("\n--- REMOTE STATE ---");
-  const linkedListRes = run("npx supabase migration list --linked");
+  const linkedListRes = run(`npm exec --yes --package=${SUPABASE_CLI} -- supabase migration list --linked`);
   if (linkedListRes.success) {
     console.log("[OK] CLI remote list: Sucesso");
 
@@ -146,7 +149,12 @@ if (isLinked) {
   } else {
     console.log("[ERROR] CLI remote list: Falhou");
     if (linkedListRes.error) {
-      process.stdout.write(`      Erro: ${linkedListRes.error.split("\n")[0]}\n`);
+      const remoteError = linkedListRes.error.split("\n")[0];
+      if (/SUPABASE_DB_PASSWORD|Forbidden resource|403/i.test(remoteError)) {
+        console.log("      [SKIP] Remote list requires SUPABASE_DB_PASSWORD or linked access.");
+      } else {
+        process.stdout.write(`      Erro: ${remoteError}\n`);
+      }
     }
   }
 }
