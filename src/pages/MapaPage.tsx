@@ -6,6 +6,8 @@ import "leaflet/dist/leaflet.css";
 
 import { getStationOverview, getStationHealth, listCorridors, type StationOverview, type StationHealth, type ClimateCorridor } from "../lib/api";
 
+import { OfflineBanner } from "../components/OfflineBanner";
+
 // Fix default marker icons in react-leaflet
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -73,6 +75,19 @@ export function MapaPage() {
   const [corridors, setCorridors] = useState<ClimateCorridor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState(typeof navigator === "undefined" ? true : navigator.onLine);
+
+
+  useEffect(() => {
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -115,6 +130,13 @@ export function MapaPage() {
     <section className="space-y-6">
       <a href="#mapa-lista" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-brand-primary focus:shadow-lg">Pular mapa e ir para lista</a>
       {/* Header */}
+      {!isOnline && (
+        <OfflineBanner
+          description="O mapa interativo depende de tiles externos. A lista abaixo continua disponível e você pode tentar novamente ao reconectar."
+          onRetry={() => window.location.reload()}
+        />
+      )}
+
       <div className="rounded-2xl border border-border-subtle bg-white p-6 md:p-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
@@ -147,6 +169,15 @@ export function MapaPage() {
           <p aria-live="polite" className="text-sm text-text-secondary" role="status">
             Carregando mapa...
           </p>
+        ) : !isOnline ? (
+          <div className="space-y-4">
+            <OfflineBanner
+              compact
+              description="Sem conexão, os tiles do mapa não carregam. A lista acessível abaixo continua disponível."
+              onRetry={() => window.location.reload()}
+            />
+            <p className="text-sm text-text-secondary">Use a lista de estações e corredores para navegação completa enquanto estiver offline.</p>
+          </div>
         ) : (
           <div className="relative" style={{ height: "500px" }}>
             <MapContainer

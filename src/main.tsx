@@ -4,8 +4,10 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./App";
 import { runDevContrastAudit } from "./lib/contrastAudit";
+import { initObservability } from "./lib/observability";
 import "./index.css";
 
+initObservability();
 runDevContrastAudit();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

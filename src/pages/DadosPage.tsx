@@ -2,8 +2,13 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react
 import { useSearchParams } from "react-router-dom";
 
 import { LoadingCard } from "../components/LoadingCard";
+import { OfflineBanner } from "../components/OfflineBanner";
+import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
+import { SkeletonCard } from "../components/SkeletonCard";
 import type { DownsampledMeasurement, StationOverview, StationHealth } from "../lib/api";
 import { classifyOmsPollutant } from "../lib/airQuality";
+import { trackCsvDownload } from "../lib/observability";
 
 const ENV_HINT = " Verifique .env.local (VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY).";
 const POLLING_INTERVAL_MS = 60_000;
@@ -257,6 +262,7 @@ export function DadosPage() {
     const today = new Date().toISOString().split("T")[0];
     a.href = url;
     a.download = `semear_${selectedStation.code}_${activeTab}_${today}.csv`;
+    trackCsvDownload("dados", currentMeasurements.length);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -266,6 +272,13 @@ export function DadosPage() {
   return (
     <section className="space-y-6">
       {/* Header */}
+      {!isOnline && (
+        <OfflineBanner
+          description="Algumas leituras podem ficar desatualizadas até a conexão voltar. Você pode revisar o que já foi carregado e tentar novamente quando estiver online."
+          onRetry={() => window.location.reload()}
+        />
+      )}
+
       <div className="rounded-2xl border border-border-subtle bg-white p-6 md:p-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
@@ -302,9 +315,7 @@ export function DadosPage() {
           </p>
         ) : null}
         {!loadingStations && !stations.length ? (
-          <p aria-live="polite" className="mt-3 text-sm text-text-secondary" role="status">
-            Nenhuma estação encontrada.
-          </p>
+          <div className="mt-3"><EmptyState title="Nenhuma estação encontrada" description="Não há estações carregadas no momento. Tente atualizar a lista quando houver conexão." /></div>
         ) : null}
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <label className="block">
@@ -454,7 +465,7 @@ export function DadosPage() {
                   </div>
                 </>
               ) : (
-                <p className="text-sm text-text-secondary">Nenhum dado disponivel.</p>
+                <EmptyState title="Nenhum dado disponível" description="Escolha outra estação ou aguarde novas medições." />
               )}
             </div>
           )}
@@ -467,9 +478,7 @@ export function DadosPage() {
                   Carregando medições...
                 </p>
               ) : currentMeasurements.length === 0 ? (
-                <p aria-live="polite" className="text-sm text-text-secondary" role="status">
-                  Não há medições para o período selecionado.
-                </p>
+                <EmptyState title="Sem medições para o período selecionado" description="Troque o período ou aguarde o próximo ciclo de coleta." />
               ) : (
                 <>
                   {/* Resumo textual para acessibilidade */}

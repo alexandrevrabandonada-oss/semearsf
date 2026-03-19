@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 
 function buildChunksManifest() {
@@ -38,6 +39,7 @@ function buildChunksManifest() {
 
 export default defineConfig({
   build: {
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -72,6 +74,27 @@ export default defineConfig({
   plugins: [
     react(),
     buildChunksManifest(),
+    ...(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_ORG && process.env.SENTRY_PROJECT
+      ? sentryVitePlugin({
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            release: {
+              name: process.env.SENTRY_RELEASE || process.env.VERCEL_GIT_COMMIT_SHA,
+              create: true,
+              finalize: true,
+              inject: true,
+              setCommits: { auto: true }
+            },
+            sourcemaps: {
+              assets: "./dist/assets",
+              ignore: ["node_modules/**"]
+            },
+            errorHandler(err) {
+              console.warn("Sentry sourcemap upload skipped:", err.message);
+            }
+          })
+      : []),
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
@@ -100,7 +123,64 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
         navigateFallback: "index.html",
+        additionalManifestEntries: [
+          { url: "/", revision: null },
+          { url: "/dados", revision: null },
+          { url: "/acervo", revision: null },
+          { url: "/acervo/linha", revision: null },
+          { url: "/blog", revision: null },
+          { url: "/relatorios", revision: null },
+          { url: "/transparencia", revision: null },
+          { url: "/status", revision: null },
+          { url: "/mapa", revision: null },
+          { url: "/governanca", revision: null },
+          { url: "/imprensa", revision: null },
+          { url: "/apresentacao", revision: null }
+        ],
         runtimeCaching: [
+          {
+            urlPattern: /^https?:\/\/.*\/api\/.*$/,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-runtime",
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 80,
+                maxAgeSeconds: 24 * 60 * 60
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/v1\/object\/public\/(?:reports|transparency)\/.*\.pdf$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "pdf-runtime",
+              expiration: {
+                maxEntries: 40,
+                maxAgeSeconds: 30 * 24 * 60 * 60
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/v1\/object\/public\/(?:acervo|reports|transparency)\/.*(?:thumb|cover).*\.(?:png|jpg|jpeg|webp|svg)$/,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "thumb-runtime",
+              expiration: {
+                maxEntries: 120,
+                maxAgeSeconds: 14 * 24 * 60 * 60
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/v1\/object\/public\/acervo\/.*(?:\.png|\.jpg|\.jpeg|\.webp|\.svg)$/,
             handler: "CacheFirst",

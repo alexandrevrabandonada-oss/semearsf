@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { LoadingCard } from "./components/LoadingCard";
+import { RouteObservability } from "./components/RouteObservability";
 import { PortalLayout } from "./layout/PortalLayout";
 
 // Eager-loaded (critical path)
@@ -53,6 +54,7 @@ const MapaPage = lazy(() => import("./pages/MapaPage").then((m) => ({ default: m
 export default function App() {
   return (
     <PortalLayout>
+      <RouteObservability />
       <Suspense fallback={<LoadingCard message="Carregando conteúdo da página..." />}>
         <Routes>
           <Route path="/" element={<HomePage />} />

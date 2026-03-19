@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { OfflineBanner } from "../../components/OfflineBanner";
 import { getReportBySlug, type ReportDocument } from "../../lib/api";
+import { trackShare } from "../../lib/observability";
 
 function getReportOpenKey(slug: string): string {
   return `report_pdf_opened_${slug}`;
@@ -138,6 +140,7 @@ export function ReportDetailPage() {
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/s/relatorios/${report.slug}`;
+    trackShare("relatorios", report.slug, "detail");
     if (navigator.share) {
       try {
         await navigator.share({
@@ -150,6 +153,7 @@ export function ReportDetailPage() {
         // fallback to clipboard
       }
     }
+    trackShare("relatorios", report.slug, "detail-copy");
     await navigator.clipboard.writeText(shareUrl);
     alert("Link de compartilhamento copiado.");
   };
@@ -161,14 +165,10 @@ export function ReportDetailPage() {
       </Link>
 
       {!isOnline && (
-        <div className="rounded-xl border border-amber-500/30 bg-amber-50 p-4 text-sm text-amber-900" role="alert" aria-live="polite">
-          <p className="font-bold uppercase tracking-wide">Modo offline</p>
-          {hasOpenedBefore ? (
-            <p className="mt-1">Este PDF já foi acessado neste dispositivo. Você pode tentar abrir pelo cache local.</p>
-          ) : (
-            <p className="mt-1">Este PDF ainda não foi acessado neste dispositivo. Conecte-se à internet para baixar e visualizar.</p>
-          )}
-        </div>
+        <OfflineBanner
+          description={hasOpenedBefore ? "Este PDF já foi acessado neste dispositivo. Você pode tentar abrir pelo cache local." : "Este PDF ainda não foi acessado neste dispositivo. Conecte-se à internet para baixar e visualizar."}
+          onRetry={() => window.location.reload()}
+        />
       )}
 
       <article className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">

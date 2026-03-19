@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+
+import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
+import { SkeletonCard } from "../components/SkeletonCard";
 import {
   getTransparencySummary,
   listExpenses,
@@ -8,6 +12,7 @@ import {
   type TransparencyLink,
   type TransparencySummary
 } from "../lib/api";
+import { trackCsvDownload } from "../lib/observability";
 
 import { INSTITUTIONAL_FUNDING } from "../content/institucional";
 
@@ -227,6 +232,7 @@ export function TransparenciaPage() {
     const a = document.createElement("a");
     a.href = url;
     a.download = `gastos_transparencia_${selectedYear}_${selectedMonth}_${selectedCategory}_${new Date().toISOString().slice(0, 10)}.csv`;
+    trackCsvDownload("transparencia", filteredExpenses.length);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -235,23 +241,27 @@ export function TransparenciaPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
+      <div className="grid gap-4 md:grid-cols-3">
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-2xl border-2 border-danger bg-danger/10 p-8 text-center">
-        <p className="text-base font-bold text-danger">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 inline-flex min-h-[44px] items-center rounded-lg bg-brand-primary px-6 py-3 text-sm font-bold text-white transition-all hover:bg-brand-primary-dark"
-        >
-          Tentar novamente
-        </button>
-      </div>
+      <ErrorState
+        description={error}
+        action={
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex min-h-[44px] items-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-brand-primary-dark"
+          >
+            Tentar novamente
+          </button>
+        }
+      />
     );
   }
 
@@ -414,7 +424,7 @@ export function TransparenciaPage() {
               ))}
               {filteredExpenses.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-base text-text-secondary">Nenhuma despesa para os filtros selecionados.</td>
+                  <td colSpan={6} className="py-12"><EmptyState title="Nenhuma despesa para os filtros selecionados" description="Ajuste os filtros para localizar lançamentos diferentes." /></td>
                 </tr>
               )}
             </tbody>
@@ -433,7 +443,7 @@ export function TransparenciaPage() {
             </a>
           ))}
           {links.length === 0 && (
-            <p className="col-span-full rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center text-base text-text-secondary">Nenhum link oficial cadastrado no momento.</p>
+            <div className="col-span-full"><EmptyState title="Nenhum link oficial cadastrado no momento" description="Os links oficiais aparecerão aqui quando forem publicados." /></div>
           )}
         </div>
       </section>

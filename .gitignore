@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.npm-cache/
 
 # Env files (never commit secrets)
 .env
@@ -17,6 +18,7 @@ dist/
 
 # Reports and Logs
 reports/state.md
+reports/lighthouse/
 db_push.log
 db_push_*.log
 trans_debug.txt

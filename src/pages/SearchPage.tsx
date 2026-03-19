@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+
+import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
+import { SkeletonCard } from "../components/SkeletonCard";
 import {
   searchAcervo,
   searchAll,
@@ -227,24 +231,32 @@ export function SearchPage() {
       </header>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20" role="status" aria-live="polite">
-          <div className="h-12 w-12 rounded-full border-4 border-brand-primary border-t-transparent animate-spin mb-4" aria-hidden="true" />
-          <p className="text-base font-semibold text-brand-primary">Buscando resultados...</p>
+        <div className="grid gap-4 md:grid-cols-2">
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       ) : error ? (
-        <div className="rounded-2xl border-2 border-danger bg-danger/10 p-10 text-center" role="alert">
-          <p className="text-base font-bold text-danger">{error}</p>
-        </div>
+        <ErrorState
+          description={error}
+          action={
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex min-h-[44px] items-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-brand-primary-dark"
+            >
+              Tentar novamente
+            </button>
+          }
+        />
       ) : query && totalResults === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border-subtle bg-bg-surface p-20 text-center">
-          <h2 className="text-xl font-bold text-text-primary">Nenhum resultado encontrado</h2>
-          <p className="mt-2 text-base text-text-secondary">Tente usar termos mais genéricos.</p>
-        </div>
+        <EmptyState
+          title="Nenhum resultado encontrado"
+          description="Tente usar termos mais genéricos."
+        />
       ) : !query ? (
-        <div className="rounded-2xl border border-dashed border-border-subtle bg-bg-surface p-20 text-center">
-          <h2 className="text-xl font-bold text-text-primary">Comece a digitar</h2>
-          <p className="mt-2 text-base text-text-secondary">Digite algo acima para buscar no portal.</p>
-        </div>
+        <EmptyState
+          title="Comece a digitar"
+          description="Digite algo acima para buscar no portal."
+        />
       ) : (
         <div className="space-y-12 pb-20">
           {results.mixed.length > 0 && (

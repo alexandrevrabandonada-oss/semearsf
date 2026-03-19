@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getOpsKpisMonth, getSystemStatus, type OpsKPI, type SystemStatus } from "../lib/api";
 import { getContrastAuditResults } from "../lib/contrastAudit";
+import { getObservabilityErrorSummaryLast24h, trackCsvDownload, trackShare } from "../lib/observability";
 
 const MONTH_OPTIONS = [
   { value: 1, label: "Janeiro" },
@@ -152,6 +153,7 @@ export function StatusPage() {
   const isDevAccessibilityVisible = import.meta.env.MODE !== "production";
   const contrastAudit = getContrastAuditResults();
   const contrastFailures = contrastAudit.filter((item) => !item.passes);
+  const observabilityErrors = getObservabilityErrorSummaryLast24h();
   const yearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
     return Array.from({ length: 4 }, (_, idx) => currentYear - idx);
@@ -185,6 +187,7 @@ export function StatusPage() {
     const a = document.createElement("a");
     a.href = url;
     a.download = `status_boletim_${selectedYear}_${String(selectedMonth).padStart(2, "0")}.csv`;
+    trackCsvDownload("status", rows.length);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -206,6 +209,7 @@ export function StatusPage() {
   const handleShareBulletin = async () => {
     const shareUrl = `${window.location.origin}/s/boletim/${selectedYear}-${String(selectedMonth).padStart(2, "0")}`;
     try {
+      trackShare("boletim", `${selectedYear}-${String(selectedMonth).padStart(2, "0")}`, "status");
       if (navigator.share) {
         await navigator.share({
           title: `Boletim SEMEAR — ${monthLabel}/${selectedYear}`,
@@ -214,6 +218,7 @@ export function StatusPage() {
         });
         setCopyFeedback("Link do boletim compartilhado.");
       } else {
+        trackShare("boletim", `${selectedYear}-${String(selectedMonth).padStart(2, "0")}`, "status-copy");
         await navigator.clipboard.writeText(shareUrl);
         setCopyFeedback("Link do boletim copiado.");
       }
@@ -523,6 +528,27 @@ export function StatusPage() {
           </div>
         </div>
 
+        <div className="rounded-2xl border border-red-500/30 bg-fundo/60 p-6 flex flex-col md:col-span-3">
+          <h2 className="text-xs font-black uppercase tracking-widest text-cta">Erros nas ultimas 24h</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-red-500/20 bg-base/20 p-4">
+              <p className="text-3xl font-black text-red-500">{formatNumber(observabilityErrors.total)}</p>
+              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Total agregado</p>
+            </div>
+            <div className="rounded-xl border border-red-500/15 bg-base/20 p-4">
+              <p className="text-3xl font-black text-texto">{formatNumber(observabilityErrors.apiErrors)}</p>
+              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Falhas de API</p>
+            </div>
+            <div className="rounded-xl border border-red-500/15 bg-base/20 p-4">
+              <p className="text-3xl font-black text-texto">{formatNumber(observabilityErrors.runtimeErrors)}</p>
+              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Erros de runtime</p>
+            </div>
+          </div>
+          <p className="mt-4 text-[11px] text-texto/50">
+            Contagem agregada e sanitizada dos eventos observados no navegador e nas respostas de API do portal.
+          </p>
+        </div>
+
         {isDevAccessibilityVisible && (
           <div className="rounded-2xl border border-amber-500/30 bg-fundo/60 p-6 flex flex-col md:col-span-3">
             <h2 className="text-xs font-black uppercase tracking-widest text-cta">Acessibilidade (dev)</h2>
@@ -714,6 +740,7 @@ export function StatusPage() {
     </section>
   );
 }
+
 
 
 

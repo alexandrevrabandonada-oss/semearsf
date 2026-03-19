@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { listCollections, type AcervoCollection } from "../../lib/api";
 import { getOptimizedCover } from "../../lib/imageOptimization";
+import { trackShare } from "../../lib/observability";
 
 export function CollectionsListPage() {
     const [collections, setCollections] = useState<AcervoCollection[]>([]);
@@ -88,6 +89,7 @@ export function CollectionsListPage() {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             const url = `${window.location.origin}/s/dossies/${col.slug}`;
+                                            trackShare("dossies", col.slug, "list");
                                             if (navigator.share) {
                                                 void navigator.share({
                                                     title: col.title,
@@ -95,6 +97,7 @@ export function CollectionsListPage() {
                                                     url
                                                 });
                                             } else {
+                                                trackShare("dossies", col.slug, "list-copy");
                                                 void navigator.clipboard.writeText(url);
                                                 alert("Link copiado!");
                                             }

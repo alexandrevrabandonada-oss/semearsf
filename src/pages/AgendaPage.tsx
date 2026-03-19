@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { listUpcomingEvents, type Event } from "../lib/api";
+import { trackShare } from "../lib/observability";
 
 const ENV_HINT = " Verifique .env.local (VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY).";
 
@@ -70,12 +71,14 @@ export function AgendaPage() {
                     className="inline-flex w-fit min-h-[44px] items-center rounded-md border border-brand-primary px-4 py-2 text-sm font-bold uppercase tracking-wide text-brand-primary transition-colors hover:bg-brand-primary hover:text-white"
                     onClick={() => {
                       const shareUrl = `${window.location.origin}/s/agenda/${event.id}`;
+                      trackShare("agenda", event.id, "agenda");
                       if (navigator.share) {
                         navigator.share({
                           title: String(event.title),
                           url: shareUrl
                         }).catch(console.error);
                       } else {
+                        trackShare("agenda", event.id, "agenda-copy");
                         void navigator.clipboard.writeText(shareUrl);
                         alert("Link copiado!");
                       }

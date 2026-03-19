@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { getAcervoBySlug, listCollectionsForItem, getRelatedItemsByCollections, type AcervoItem, type AcervoCollection } from "../../lib/api";
+import { trackShare } from "../../lib/observability";
 
 const KIND_LABELS: Record<string, string> = {
     paper: "Artigo científico",
@@ -153,6 +154,7 @@ export function AcervoItemPage() {
                             className="inline-flex items-center gap-1 rounded-full bg-brand-primary/10 px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-brand-primary hover:bg-brand-primary/20"
                             onClick={() => {
                                 const url = `${window.location.origin}/s/acervo/${item.slug}`;
+                                trackShare("acervo", item.slug, "item");
                                 if (navigator.share) {
                                     void navigator.share({
                                         title: item.title,
@@ -160,6 +162,7 @@ export function AcervoItemPage() {
                                         url
                                     });
                                 } else {
+                                    trackShare("acervo", item.slug, "item-copy");
                                     void navigator.clipboard.writeText(url);
                                     alert("Link de compartilhamento copiado!");
                                 }

@@ -5,6 +5,7 @@ import type { AcervoItem, Event, StationOverview, BlogPost, TransparencySummary,
 import { useInstallPrompt } from "../hooks/useInstallPrompt";
 import { getOptimizedCover } from "../lib/imageOptimization";
 import { INSTITUTIONAL_COORDINATION, INSTITUTIONAL_TAGLINE, INSTITUTIONAL_UNIVERSITY_FULL_NAME } from "../content/institucional";
+import { trackShare } from "../lib/observability";
 
 const REPORT_KIND_LABEL: Record<ReportDocument["kind"], string> = {
   relatorio: "Relatório",
@@ -380,8 +381,10 @@ export function HomePage() {
                         e.preventDefault();
                         const shareUrl = `${window.location.origin}/s/dossies/${col.slug}`;
                         if (navigator.share) {
+                          trackShare("dossies", col.slug, "home");
                           navigator.share({ title: col.title, text: col.excerpt || '', url: shareUrl }).catch(() => { });
                         } else {
+                          trackShare("dossies", col.slug, "home-copy");
                           navigator.clipboard.writeText(shareUrl);
                           alert("Link copiado para a área de transferência!");
                         }

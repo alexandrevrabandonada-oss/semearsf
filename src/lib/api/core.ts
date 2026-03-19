@@ -1,4 +1,5 @@
-import { assertSupabase as assertSupabaseClient } from "../supabase/client";
+import { trackApiError } from '../observability';
+import { assertSupabase as assertSupabaseClient } from '../supabase/client';
 
 export const assertSupabase = assertSupabaseClient;
 
@@ -340,6 +341,7 @@ export function toAppError(scope: string, error: unknown): Error {
     error && typeof error === "object" && "message" in error && typeof error.message === "string"
       ? error.message
       : "Erro inesperado na comunicacao com o banco.";
+  trackApiError(scope, error);
   return new Error(`${scope}: ${message}`);
 }
 
@@ -374,3 +376,5 @@ export function normalizeOpsKpi(raw?: Partial<OpsKPI> | null): OpsKPI {
     scheduled_content_items_count: toSafeNumber(raw?.scheduled_content_items_count)
   };
 }
+
+

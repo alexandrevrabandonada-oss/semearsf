@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { getBlogPostBySlug, type BlogPost } from "../lib/api";
+import { trackShare } from "../lib/observability";
 
 function SimpleMarkdown({ text }: { text: string }) {
     const html = text
@@ -103,6 +104,7 @@ export function BlogPostPage() {
                             className="ml-auto inline-flex items-center gap-1 rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-primary hover:bg-brand-primary/20"
                             onClick={() => {
                                 const url = `${window.location.origin}/s/blog/${post.slug}`;
+                                trackShare("blog", post.slug, "post");
                                 if (navigator.share) {
                                     void navigator.share({
                                         title: post.title,
@@ -110,6 +112,7 @@ export function BlogPostPage() {
                                         url
                                     });
                                 } else {
+                                    trackShare("blog", post.slug, "post-copy");
                                     void navigator.clipboard.writeText(url);
                                     alert("Link de compartilhamento copiado!");
                                 }

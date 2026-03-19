@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getCollectionBySlug, type CollectionWithItems } from "../../lib/api";
 import { getOptimizedCover } from "../../lib/imageOptimization";
+import { trackShare } from "../../lib/observability";
 
 const KIND_LABELS: Record<string, string> = {
     paper: "Artigo científico",
@@ -93,6 +94,7 @@ export function CollectionDetailPage() {
                             type="button"
                             onClick={() => {
                                 const url = `${window.location.origin}/s/dossies/${collection.slug}`;
+                                trackShare("dossies", collection.slug, "detail");
                                 if (navigator.share) {
                                     void navigator.share({
                                         title: collection.title,
@@ -100,6 +102,7 @@ export function CollectionDetailPage() {
                                         url
                                     });
                                 } else {
+                                    trackShare("dossies", collection.slug, "detail-copy");
                                     void navigator.clipboard.writeText(url);
                                     alert("Link de compartilhamento copiado!");
                                 }
