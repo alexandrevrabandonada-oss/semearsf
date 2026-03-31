@@ -161,18 +161,18 @@ export function ReportDetailPage() {
   return (
     <section className="space-y-6">
       <Link to="/relatorios" className="inline-flex items-center gap-1 text-xs font-semibold text-brand-primary/70 hover:text-brand-primary">
-        ← Voltar para relatórios
+        ← Voltar aos relatórios
       </Link>
 
       {!isOnline && (
         <OfflineBanner
-          description={hasOpenedBefore ? "Este PDF já foi acessado neste dispositivo. Você pode tentar abrir pelo cache local." : "Este PDF ainda não foi acessado neste dispositivo. Conecte-se à internet para baixar e visualizar."}
+          description={hasOpenedBefore ? "Este PDF já foi aberto neste dispositivo. Você pode tentar novamente pelo cache local." : "Este PDF ainda não foi aberto neste dispositivo. Conecte-se à internet para baixar e visualizar."}
           onRetry={() => window.location.reload()}
         />
       )}
 
       <article className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Documento Oficial</p>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Documento oficial</p>
         <h1 className="mt-2 text-2xl font-black text-text-primary md:text-4xl">{report.title}</h1>
         {report.summary && <p className="mt-3 text-base leading-relaxed text-text-secondary">{report.summary}</p>}
 
@@ -196,7 +196,7 @@ export function ReportDetailPage() {
             type="button"
             disabled={!hasPdf || !canOpenOffline}
             onClick={handleOpenPdf}
-            className="inline-flex min-h-[44px] items-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-brand-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="ui-btn-primary motion-focus px-5 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Abrir PDF
           </button>
@@ -204,9 +204,9 @@ export function ReportDetailPage() {
           <button
             type="button"
             onClick={() => { void handleShare(); }}
-            className="inline-flex min-h-[44px] items-center rounded-lg border border-border-subtle bg-white px-5 py-3 text-sm font-bold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg-surface"
+            className="ui-btn-secondary motion-focus px-5"
           >
-            Compartilhar relatório
+            Copiar ou compartilhar
           </button>
 
           {hasPdf && (
@@ -215,7 +215,7 @@ export function ReportDetailPage() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={markAsOpened}
-              className="inline-flex min-h-[44px] items-center rounded-lg border border-border-subtle bg-white px-5 py-3 text-sm font-bold uppercase tracking-wide text-text-primary transition-colors hover:bg-bg-surface"
+              className="ui-btn-secondary motion-focus px-5"
             >
               Abrir em nova aba
             </a>
@@ -226,7 +226,7 @@ export function ReportDetailPage() {
               href="/relatorios"
               className="inline-flex min-h-[44px] items-center rounded-lg border border-amber-500/30 bg-amber-50 px-5 py-3 text-sm font-bold uppercase tracking-wide text-amber-900"
             >
-              Conectar para baixar
+              Voltar aos relatórios
             </a>
           )}
         </div>
@@ -234,7 +234,7 @@ export function ReportDetailPage() {
 
       {isViewerOpen && hasPdf && (
         <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/75 p-4"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/75 p-4 motion-dialog"
           role="dialog"
           aria-modal="true"
           aria-labelledby="report-viewer-title"
@@ -242,16 +242,16 @@ export function ReportDetailPage() {
             if (e.target === e.currentTarget) setIsViewerOpen(false);
           }}
         >
-          <h2 id="report-viewer-title" className="sr-only">Visualizador de PDF</h2>
+          <h2 id="report-viewer-title" className="sr-only">Visualizador de PDF do relatório</h2>
 
-          <div ref={modalRef} className="w-full max-w-6xl">
+          <div ref={modalRef} className="motion-dialog w-full max-w-6xl">
             <div className="mb-3 flex w-full justify-end gap-2">
               <a
                 href={report.pdf_url as string}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={markAsOpened}
-                className="inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
+                className="motion-control inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
               >
                 Abrir em nova aba
               </a>
@@ -260,7 +260,7 @@ export function ReportDetailPage() {
                 type="button"
                 onClick={() => setIsViewerOpen(false)}
                 className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 text-white hover:bg-error/90"
-                aria-label="Fechar visualizador de relatório (ESC)"
+                aria-label="Fechar visualizador de PDF (ESC)"
               >
                 ✕
               </button>
@@ -278,3 +278,6 @@ export function ReportDetailPage() {
     </section>
   );
 }
+
+
+

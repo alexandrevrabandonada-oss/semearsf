@@ -27,7 +27,7 @@ export function CollectionsListPage() {
 
     return (
         <section className="space-y-6">
-            <div className="rounded-2xl border border-ciano/60 bg-fundo/80 p-6 md:p-8">
+            <div className="signature-shell logo-watermark-soft p-6 md:p-8">
                 <h1 className="text-2xl font-black uppercase tracking-wide text-cta md:text-4xl">Dossiês</h1>
                 <p className="mt-3 text-sm text-texto/90">
                     Coleções temáticas curadas pela equipe do SEMEAR para facilitar sua pesquisa.
@@ -39,16 +39,16 @@ export function CollectionsListPage() {
             ) : error ? (
                 <p className="rounded-md border border-acento/70 bg-acento/15 p-3 text-sm text-texto" aria-live="assertive">{error}</p>
             ) : collections.length === 0 ? (
-                <p className="text-sm text-texto/50 italic" aria-live="polite">Nenhum dossiê publicado ainda.</p>
+                <div className="document-placeholder p-6 text-center" aria-live="polite"><div className="mx-auto mb-4 flex max-w-xs items-center gap-3"><div className="seed-radial-divider flex-1" aria-hidden="true" /><span className="section-badge">Dossiês</span><div className="seed-radial-divider flex-1" aria-hidden="true" /></div><p className="text-sm text-text-secondary">Nenhum dossiê publicado ainda.</p></div>
             ) : (
                 <div className="grid gap-6 md:grid-cols-2" aria-live="polite">
                     {collections.map((col) => (
                         <div
                             key={col.id}
-                            className="group flex flex-col overflow-hidden rounded-2xl border border-ciano/40 bg-base/40 transition-all hover:border-ciano/60 hover:bg-base/60"
+                            className="group signature-surface flex flex-col overflow-hidden transition-all hover:border-ciano/60 hover:bg-base/60"
                         >
                             {col.cover_url && (
-                                <Link to={`/dossies/${col.slug}`} className="aspect-video w-full overflow-hidden bg-ciano/5 relative block">
+                                <Link to={`/dossies/${col.slug}`} className="document-placeholder aspect-video w-full overflow-hidden relative block">
                                     <img
                                         src={getOptimizedCover(col, 'small') || ''}
                                         alt={col.title}
@@ -79,9 +79,9 @@ export function CollectionsListPage() {
                                 <div className="mt-6 flex gap-2">
                                     <Link
                                         to={`/dossies/${col.slug}`}
-                                        className="flex-1 rounded-md bg-ciano px-3 py-2 text-center text-xs font-black uppercase tracking-widest text-base transition-colors hover:bg-ciano/90"
+                                        className="ui-btn-primary flex-1 rounded-full px-3 py-2 text-center text-xs font-black uppercase tracking-widest"
                                     >
-                                        Abrir
+                                        Abrir dossiê
                                     </Link>
                                     <button
                                         type="button"
@@ -102,7 +102,7 @@ export function CollectionsListPage() {
                                                 alert("Link copiado!");
                                             }
                                         }}
-                                        className="flex items-center justify-center rounded-md border border-ciano/40 bg-transparent px-4 py-2 text-ciano hover:bg-ciano hover:text-base transition-colors"
+                                        className="ui-btn-secondary flex items-center justify-center rounded-full px-4 py-2 text-ciano transition-colors"
                                     >
                                         <span className="sr-only">Compartilhar</span>
                                         <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -118,3 +118,4 @@ export function CollectionsListPage() {
         </section>
     );
 }
+

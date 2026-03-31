@@ -29,52 +29,49 @@ const downloads = [
 export function ImprensaPage() {
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
-        <h1 className="text-2xl font-black text-text-primary md:text-3xl">Imprensa</h1>
+      <section className="document-placeholder p-6 shadow-sm md:p-8">
+        <div className="mb-5 flex max-w-sm items-center gap-3">
+          <div className="seed-radial-divider flex-1" aria-hidden="true" />
+          <span className="seed-badge">Imprensa</span>
+          <div className="seed-radial-divider flex-1" aria-hidden="true" />
+        </div>
+        <h1 className="text-2xl font-black leading-tight text-text-primary md:text-3xl">Imprensa</h1>
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-text-secondary md:text-base">
           Página de apoio para jornalistas, assessorias, pesquisadores e parceiros que precisam de resumo institucional,
           orientações de citação e acesso rápido aos materiais públicos do projeto.
         </p>
       </section>
 
-      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+      <section className="surface-card logo-watermark-soft p-6 shadow-sm md:p-8">
         <h2 className="text-lg font-black text-text-primary">Resumo institucional</h2>
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-text-secondary md:text-base">
-          <p>
-            {INSTITUTIONAL_SUMMARY}
-          </p>
-          <p>
-            {INSTITUTIONAL_TAGLINE}. O portal combina dados ambientais em tempo quase real, biblioteca oficial de relatórios, acervo histórico, agenda de atividades e prestação de contas em linguagem acessível.
-          </p>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-secondary">
-            {INSTITUTIONAL_COORDINATION} · {INSTITUTIONAL_FUNDING}
-          </p>
+          <p>{INSTITUTIONAL_SUMMARY}</p>
+          <p>{INSTITUTIONAL_TAGLINE}. O portal combina dados ambientais em tempo quase real, biblioteca oficial de relatórios, acervo histórico, agenda de atividades e prestação de contas em linguagem acessível.</p>
+          <p className="seed-badge w-fit">{INSTITUTIONAL_COORDINATION} · {INSTITUTIONAL_FUNDING}</p>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+      <section className="surface-card p-6 shadow-sm md:p-8">
         <h2 className="text-lg font-black text-text-primary">Como citar dados</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-text-secondary md:text-base">
           {citationBullets.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
-        <p className="mt-4 text-sm leading-relaxed text-text-secondary md:text-base">
-          {INSTITUTIONAL_CITATION}
-        </p>
+        <p className="mt-4 text-sm leading-relaxed text-text-secondary md:text-base">{INSTITUTIONAL_CITATION}</p>
         <p className="mt-4 text-sm text-text-secondary">
           Para contexto técnico adicional, consulte <Link className="font-semibold text-brand-primary underline" to="/como-ler-dados">Como ler os dados</Link>.
         </p>
       </section>
 
-      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+      <section className="surface-card p-6 shadow-sm md:p-8">
         <h2 className="text-lg font-black text-text-primary">Links rapidos</h2>
         <ul className="mt-3 grid gap-3 md:grid-cols-2">
           {quickLinks.map((item) => (
             <li key={item.href}>
               <Link
                 to={item.href}
-                className="flex min-h-[52px] items-center rounded-xl border border-border-subtle px-4 py-3 text-sm font-semibold text-brand-primary transition-colors hover:bg-brand-primary-soft"
+                className="flex min-h-[52px] items-center rounded-xl border border-border-subtle bg-surface-1 px-4 py-3 text-sm font-semibold text-brand-primary transition-colors hover:bg-brand-primary-soft"
               >
                 {item.label}
               </Link>
@@ -84,7 +81,7 @@ export function ImprensaPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+        <div className="surface-card p-6 shadow-sm md:p-8">
           <h2 className="text-lg font-black text-text-primary">Contatos</h2>
           <ul className="mt-3 space-y-3 text-sm text-text-secondary md:text-base">
             {contacts.map((item) => (
@@ -103,7 +100,7 @@ export function ImprensaPage() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border-subtle bg-brand-primary-soft p-6 shadow-sm">
+        <div className="document-placeholder p-6 shadow-sm md:p-8">
           <h2 className="text-lg font-black text-brand-primary">Download de logos</h2>
           <div className="mt-4 space-y-4">
             <img
@@ -137,3 +134,4 @@ export function ImprensaPage() {
     </div>
   );
 }
+

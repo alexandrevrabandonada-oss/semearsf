@@ -274,7 +274,7 @@ export function DadosPage() {
       {/* Header */}
       {!isOnline && (
         <OfflineBanner
-          description="Algumas leituras podem ficar desatualizadas até a conexão voltar. Você pode revisar o que já foi carregado e tentar novamente quando estiver online."
+          description="Algumas leituras podem ficar desatualizadas até a conexão voltar. A lista da estação e o histórico carregado continuam disponíveis."
           onRetry={() => window.location.reload()}
         />
       )}
@@ -287,12 +287,12 @@ export function DadosPage() {
             </svg>
           </div>
           <div>
-            <h1 className="text-2xl font-black text-text-primary md:text-4xl">Monitoramento Ambiental</h1>
-            <p className="text-xs font-semibold tracking-wider text-text-secondary mt-1 uppercase">Qualidade do Ar em Tempo Real</p>
+            <h1 className="text-2xl font-black text-text-primary md:text-4xl">Dados ao vivo</h1>
+            <p className="text-xs font-semibold tracking-wider text-text-secondary mt-1 uppercase">Qualidade do ar e leitura meteorológica</p>
           </div>
         </div>
         <p className="mt-4 text-base leading-relaxed text-text-secondary">
-          Acompanhe as leituras de qualidade do ar de nossas estações públicas em Volta Redonda e no Sul Fluminense. Dados científicos atualizados, acessíveis e exportáveis.
+          Acompanhe as leituras das estações públicas de Volta Redonda e do Sul Fluminense. Leia agora, compare períodos e exporte o recorte em CSV.
         </p>
       </div>
 
@@ -300,22 +300,22 @@ export function DadosPage() {
         <h2 className="text-lg font-bold text-brand-primary">Como ler os dados</h2>
         <ul className="mt-3 space-y-2 text-sm text-text-secondary">
           <li><span className="font-semibold text-text-primary">1.</span> PM2.5 e PM10 medem material particulado no ar em µg/m³.</li>
-          <li><span className="font-semibold text-text-primary">2.</span> A classificacao OMS mostra o nivel atual: bom, moderado, alto ou muito alto.</li>
-          <li><span className="font-semibold text-text-primary">3.</span> Os cuidados sao preventivos e neutros, sem alarmismo.</li>
-          <li><span className="font-semibold text-text-primary">4.</span> Consulte tendencia em 24h/7d para contexto, nao apenas uma leitura isolada.</li>
+          <li><span className="font-semibold text-text-primary">2.</span> A classificação OMS resume o nível atual: bom, moderado, alto ou muito alto.</li>
+          <li><span className="font-semibold text-text-primary">3.</span> Use 24h e 7 dias para contexto. Uma leitura isolada pode enganar.</li>
+          <li><span className="font-semibold text-text-primary">4.</span> Quando houver indisponibilidade, recarregue os dados ou troque de estação.</li>
         </ul>
       </section>
 
       {/* Seleção de estação */}
       <section className="rounded-2xl border border-border-subtle bg-white p-6">
-        <h2 className="text-lg font-bold text-brand-primary">Estação de Monitoramento</h2>
+        <h2 className="text-lg font-bold text-brand-primary">Selecione uma estação</h2>
         {loadingStations ? (
           <p aria-live="polite" className="mt-3 text-sm text-text-secondary" role="status">
-            Carregando estações...
+            Carregando estações públicas...
           </p>
         ) : null}
         {!loadingStations && !stations.length ? (
-          <div className="mt-3"><EmptyState title="Nenhuma estação encontrada" description="Não há estações carregadas no momento. Tente atualizar a lista quando houver conexão." /></div>
+          <div className="mt-3"><EmptyState title="Nenhuma estação disponível" description="Não foi possível carregar estações agora. Tente novamente quando a conexão voltar ou abra a página mais tarde." action={<button className="ui-btn-secondary px-5" onClick={() => window.location.reload()} type="button">Recarregar dados</button>} /></div>
         ) : null}
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <label className="block">
@@ -326,7 +326,7 @@ export function DadosPage() {
               onChange={(e) => setSelectedStationId(e.target.value || null)}
               value={selectedStationId ?? ""}
             >
-              {!selectedStationId ? <option value="">Selecione...</option> : null}
+              {!selectedStationId ? <option value="">Selecione uma estação</option> : null}
               {stations.map((station) => (
                 <option key={station.station_id} value={station.station_id}>
                   {String(station.name ?? station.station_id)}
@@ -340,23 +340,23 @@ export function DadosPage() {
             onClick={() => selectedStationId && void loadMeasurements(selectedStationId)}
             type="button"
           >
-            Atualizar agora
+            Atualizar leitura
           </button>
         </div>
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-            <p className="text-xs uppercase tracking-wide text-brand-primary">Status da Estação</p>
+            <p className="text-xs uppercase tracking-wide text-brand-primary">Status da estação</p>
             <p className={`mt-1 text-sm font-bold ${isOnline ? "text-accent-green" : "text-error"}`}>
               {selectedStationId ? (isOnline ? "● Online" : "● Offline") : "-"}
             </p>
           </div>
           <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-            <p className="text-xs uppercase tracking-wide text-brand-primary">Última Atualização</p>
+            <p className="text-xs uppercase tracking-wide text-brand-primary">Última atualização</p>
             <p className="mt-1 text-sm font-bold text-text-primary">{stats.lastTime ? formatDate(stats.lastTime) : "-"}</p>
           </div>
           <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-            <p className="text-xs uppercase tracking-wide text-brand-primary">Qualidade do Dado</p>
+            <p className="text-xs uppercase tracking-wide text-brand-primary">Qualidade dos dados</p>
             {selectedStationId && stationHealth.has(selectedStationId) ? (
               (() => {
                 const health = stationHealth.get(selectedStationId)!;
@@ -404,7 +404,7 @@ export function DadosPage() {
               onClick={() => setActiveTab("24h")}
               type="button"
             >
-              Últimas 24h
+              24h
             </button>
             <button
               role="tab"
@@ -418,17 +418,17 @@ export function DadosPage() {
               onClick={() => setActiveTab("7d")}
               type="button"
             >
-              Últimos 7 dias
+              7 dias
             </button>
           </div>
 
                     {/* Painel Agora */}
           {activeTab === "now" && (
             <div role="tabpanel" id="panel-now" aria-labelledby="tab-now">
-              <h2 className="text-lg font-bold text-brand-primary mb-4">Ultima leitura</h2>
+              <h2 className="text-lg font-bold text-brand-primary mb-4">Leitura atual</h2>
               {stats.lastValue ? (
                 <>
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid gap-5 md:grid-cols-2">
                     <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
                       <p className="text-xs uppercase tracking-wide text-brand-primary">PM2.5</p>
                       <p className="mt-2 text-3xl font-black text-text-primary">{stats.lastValue.pm25?.toFixed(1) ?? "-"}</p>
@@ -451,7 +451,7 @@ export function DadosPage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <div className="mt-4 grid gap-5 md:grid-cols-2">
                     <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
                       <p className="text-xs uppercase tracking-wide text-brand-primary">Temperatura</p>
                       <p className="mt-2 text-2xl font-black text-text-primary">{stats.lastValue.temp?.toFixed(1) ?? "-"}</p>
@@ -465,7 +465,7 @@ export function DadosPage() {
                   </div>
                 </>
               ) : (
-                <EmptyState title="Nenhum dado disponível" description="Escolha outra estação ou aguarde novas medições." />
+                <EmptyState title="Sem leitura disponível agora" description="Escolha outra estação ou aguarde o próximo envio de dados." />
               )}
             </div>
           )}
@@ -475,10 +475,10 @@ export function DadosPage() {
             <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
               {loadingMeasurements ? (
                 <p aria-live="polite" className="text-sm text-text-secondary" role="status">
-                  Carregando medições...
+                  Carregando medições do período...
                 </p>
               ) : currentMeasurements.length === 0 ? (
-                <EmptyState title="Sem medições para o período selecionado" description="Troque o período ou aguarde o próximo ciclo de coleta." />
+                <EmptyState title="Sem medições para este intervalo" description="Troque para outro intervalo ou aguarde o próximo ciclo de coleta." />
               ) : (
                 <>
                   {/* Resumo textual para acessibilidade */}
@@ -487,7 +487,7 @@ export function DadosPage() {
                   </div>
 
                   {/* Cards de resumo */}
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+                  <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4 mb-6">
                     <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
                       <p className="text-xs uppercase tracking-wide text-brand-primary">PM2.5 Média</p>
                       <p className="mt-2 text-2xl font-black text-text-primary">
@@ -557,7 +557,7 @@ export function DadosPage() {
 
                   {/* Gráfico */}
                   <div className="rounded-lg border border-border-subtle bg-white p-4 mb-6">
-                    <h3 className="text-sm font-bold text-brand-primary mb-4">Evolução Temporal</h3>
+                    <h3 className="text-sm font-bold text-brand-primary mb-4">Evolução temporal</h3>
                     <Suspense fallback={<LoadingCard message="Carregando gráfico histórico..." />}>
                       <MeasurementsChart data={chartData} showPM25={showPM25} showPM10={showPM10} />
                     </Suspense>
@@ -566,7 +566,7 @@ export function DadosPage() {
                   {/* Tabela fallback para acessibilidade */}
                   <details className="rounded-lg border border-border-subtle bg-bg-surface p-4">
                     <summary className="cursor-pointer text-sm font-bold text-brand-primary">
-                      Ver tabela de dados (acessível para leitores de tela)
+                      Abrir tabela em texto
                     </summary>
                     <div className="mt-4 overflow-x-auto">
                       <table className="min-w-full border-collapse text-sm">
@@ -611,5 +611,7 @@ export function DadosPage() {
     </section>
   );
 }
+
+
 
 

@@ -136,7 +136,7 @@ export function AcervoListPage() {
 
     return (
         <section className="space-y-6">
-            <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
+            <div className="signature-shell document-placeholder p-6 shadow-sm md:p-8">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Acervo / {meta.label}</p>
                 <h1 className="mt-2 text-2xl font-black uppercase tracking-wide text-text-primary md:text-4xl">
                     {meta.emoji} {meta.label}
@@ -145,7 +145,7 @@ export function AcervoListPage() {
             </div>
 
             {/* Filters */}
-            <div className="rounded-2xl border border-border-subtle bg-white p-4 shadow-sm">
+            <div className="signature-surface logo-watermark-soft p-4 shadow-sm">
                 <div className="grid gap-4 md:grid-cols-4">
                     <label className="block">
                         <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-secondary">Busca</span>
@@ -203,7 +203,7 @@ export function AcervoListPage() {
             </div>
 
             {/* Results */}
-            <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+            <div className="signature-surface p-6 shadow-sm">
                 {loading ? (
                     <p aria-live="polite" className="text-base text-text-secondary" role="status">
                         Carregando {meta.label.toLowerCase()}...
@@ -213,7 +213,7 @@ export function AcervoListPage() {
                         {error}
                     </p>
                 ) : filtered.length === 0 ? (
-                    <div className="py-8 text-center">
+                    <div className="document-placeholder py-8 text-center">
                         <p className="text-4xl">📭</p>
                         <p aria-live="polite" className="mt-3 text-base font-semibold text-text-secondary" role="status">
                             {items.length === 0
@@ -226,7 +226,7 @@ export function AcervoListPage() {
                         {filtered.map((item) => (
                             <li key={item.slug}>
                                 <Link
-                                    className="flex flex-col gap-1 rounded-xl border border-border-subtle bg-bg-surface p-4 transition-all hover:border-brand-primary hover:shadow-md"
+                                    className="motion-list-item flex flex-col gap-1 rounded-xl border border-border-subtle bg-bg-surface p-4 motion-surface motion-surface-hover"
                                     to={`/acervo/item/${item.slug}`}
                                 >
                                     <div className="flex flex-wrap items-start justify-between gap-2">
@@ -280,3 +280,5 @@ export function AcervoListPage() {
         </section>
     );
 }
+
+

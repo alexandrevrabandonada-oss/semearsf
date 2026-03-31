@@ -1,11 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import type { AcervoItem, Event, StationOverview, BlogPost, TransparencySummary, AcervoCollection, ClimateCorridor, ReportDocument } from "../lib/api";
+import { Chip, IconShell, SectionHeader, SurfaceCard } from "../components/BrandSystem";
+import type {
+  AcervoCollection,
+  AcervoItem,
+  BlogPost,
+  ClimateCorridor,
+  Event,
+  ReportDocument,
+  StationOverview,
+  TransparencySummary
+} from "../lib/api";
 import { useInstallPrompt } from "../hooks/useInstallPrompt";
 import { getOptimizedCover } from "../lib/imageOptimization";
-import { INSTITUTIONAL_COORDINATION, INSTITUTIONAL_TAGLINE, INSTITUTIONAL_UNIVERSITY_FULL_NAME } from "../content/institucional";
-import { trackShare } from "../lib/observability";
+import { INSTITUTIONAL_COORDINATION, INSTITUTIONAL_TAGLINE } from "../content/institucional";
 
 const REPORT_KIND_LABEL: Record<ReportDocument["kind"], string> = {
   relatorio: "Relatório",
@@ -13,6 +22,15 @@ const REPORT_KIND_LABEL: Record<ReportDocument["kind"], string> = {
   boletim: "Boletim",
   anexo: "Anexo"
 };
+
+function formatDateTime(value: string) {
+  return new Date(value).toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
 
 export function HomePage() {
   const { prompt, clearPrompt } = useInstallPrompt();
@@ -64,609 +82,600 @@ export function HomePage() {
     void load();
   }, []);
 
-  const onlineCount = stations.filter(s => s.is_online).length;
+  const onlineCount = stations.filter((s) => s.is_online).length;
   const offlineCount = stations.length - onlineCount;
+  const formatCurrency = (cents: number) => (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-  const formatCurrency = (cents: number) => {
-    return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  };
+  const featuredCollection = collections[0] ?? null;
+  const secondaryCollections = collections.slice(1, 3);
+  const featuredCorridor = corridors[0] ?? null;
+  const supportingCorridors = corridors.slice(1, 3);
+  const featuredReport = reports[0] ?? null;
+  const supportingReports = reports.slice(1, 3);
+  const featuredEvent = events[0] ?? null;
+  const upcomingEvents = events.slice(1, 3);
+
+  const heroMetrics = useMemo(
+    () => [
+      { label: "estações online", value: String(onlineCount), tone: "seed" as const },
+      { label: "dossiês", value: String(collections.length), tone: "active" as const },
+      { label: "relatórios", value: String(reports.length), tone: "lab" as const }
+    ],
+    [collections.length, onlineCount, reports.length]
+  );
 
   return (
-    <section className="space-y-8">
-      {/* Hero Section - Institutional Portal */}
-      <div className="rounded-2xl border border-border-subtle bg-gradient-to-br from-white via-white to-bg-surface/30 p-8 shadow-sm md:p-12">
-        {/* Institutional Lockup */}
-        <div className="mb-8 flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col gap-1">
-              <h2 className="text-3xl font-black uppercase tracking-[0.18em] text-brand-primary-dark md:text-4xl">
+    <section className="space-y-12">
+      <SurfaceCard className="signature-shell logo-watermark-soft overflow-hidden border-brand-primary/12 bg-gradient-to-br from-surface-1 via-surface-1 to-surface-2 p-6 shadow-[0_20px_60px_rgba(17,38,59,0.08)] md:p-8">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.9fr)]">
+          <div className="relative space-y-7">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="seed-badge">Selo institucional</span>
+              <span className="ui-chip">PWA público-universitário</span>
+              <span className="ui-chip ui-chip-active">UFF</span>
+            </div>
+
+            <div className="seed-radial-divider max-w-sm" aria-hidden="true" />
+
+            <div className="space-y-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-text-secondary">{INSTITUTIONAL_COORDINATION}</p>
+              <h1 className="max-w-3xl text-5xl font-black leading-[0.92] tracking-[-0.04em] text-text-primary md:text-6xl lg:text-[4.75rem]">
                 SEMEAR
-              </h2>
-              <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                {INSTITUTIONAL_COORDINATION}
+              </h1>
+              <div className="h-1.5 w-28 rounded-full bg-gradient-to-r from-accent-seed via-brand-primary to-accent-lab" aria-hidden="true" />
+            </div>
+
+            <div className="max-w-3xl space-y-4">
+              <p className="text-2xl font-black leading-tight text-brand-primary-dark md:text-3xl">
+                Monitoramento da qualidade do ar e memória socioambiental em uma interface pública de referência.
+              </p>
+              <p className="max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg">
+                {INSTITUTIONAL_TAGLINE}. Plataforma pública-universitária que reúne dados científicos em tempo real, acervo histórico curado, rodas de conversa inclusivas e atividades participativas de vigilância popular em saúde.
               </p>
             </div>
-            <div className="ml-auto flex h-10 w-10 items-center justify-center rounded-lg border border-border-subtle bg-white text-[10px] font-bold tracking-[0.12em] text-text-primary/60" aria-label={INSTITUTIONAL_UNIVERSITY_FULL_NAME}>
-              UFF
-            </div>
-          </div>
-          <div className="h-1 w-24 bg-accent-green rounded-full" aria-hidden="true" />
-        </div>
 
-        {/* Main Heading with clear hierarchy */}
-        <div className="space-y-4 border-t border-border-subtle pt-6">
-          <h1 className="text-4xl font-black leading-tight text-text-primary md:text-5xl lg:text-6xl">
-            Monitoramento da Qualidade do Ar e Memória Socioambiental
-          </h1>
-          <p className="max-w-3xl text-base text-text-secondary md:text-lg leading-relaxed">
-            {INSTITUTIONAL_TAGLINE}. Plataforma pública-universitária que reúne dados científicos em tempo real, acervo histórico curado, rodas de conversa inclusivas e atividades participativas de vigilância popular em saúde.
-          </p>
-        </div>
-
-        {/* Institutional Search */}
-        <div className="mt-8 max-w-2xl">
-          <label htmlFor="home-search" className="mb-2 block text-sm font-semibold text-text-primary">
-            Buscar no portal
-          </label>
-          <div className="relative group">
-            <input
-              id="home-search"
-              type="search"
-              placeholder="Digite palavras-chave (ex: qualidade do ar, eventos, documentos...)"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const q = (e.target as HTMLInputElement).value;
-                  if (q.trim()) window.location.href = `/buscar?q=${encodeURIComponent(q)}`;
-                }
-              }}
-              className="w-full rounded-lg border-2 border-border-subtle bg-white px-6 py-4 pr-12 text-base text-text-primary placeholder:text-text-secondary/60 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
-            />
-            <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        {/* Primary CTAs */}
-        <div className="mt-8 flex flex-wrap gap-4">
-          {prompt && (
-            <button
-              onClick={async () => {
-                await prompt.prompt();
-                const { outcome } = await prompt.userChoice;
-                if (outcome === 'accepted') clearPrompt();
-              }}
-              className="rounded-lg bg-brand-primary px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition-all hover:bg-brand-primary-dark hover:shadow-md"
-            >
-              📱 Instalar Aplicativo
-            </button>
-          )}
-          <Link 
-            to="/dados" 
-            className="rounded-lg bg-accent-green px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition-all hover:bg-success hover:shadow-md"
-          >
-            Dados em Tempo Real
-          </Link>
-          <Link 
-            to="/agenda" 
-            className="rounded-lg border-2 border-brand-primary bg-white px-6 py-3 text-sm font-bold uppercase tracking-wide text-brand-primary transition-all hover:bg-brand-primary hover:text-white"
-          >
-            Agenda de Atividades
-          </Link>
-          <Link 
-            to="/acervo" 
-            className="rounded-lg border-2 border-text-secondary/30 bg-white px-6 py-3 text-sm font-bold uppercase tracking-wide text-text-primary transition-all hover:border-brand-primary hover:text-brand-primary"
-          >
-            Explorar Acervo
-          </Link>
-        </div>
-      </div>
-
-      {/* Dados Agora - Real-time monitoring */}
-      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-green/10 text-accent-green">
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-2xl font-black text-text-primary">Dados Agora</h2>
-            <p className="text-sm text-text-secondary">Monitoramento em tempo real</p>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="h-32 w-full animate-pulse rounded-lg bg-bg-surface" />
-        ) : error ? (
-          <p className="text-sm text-danger">{error}</p>
-        ) : (
-          <div className="space-y-4">
-            <div className="flex items-center gap-6">
-              <div className="flex flex-col">
-                <span className="text-4xl font-black text-success">{onlineCount}</span>
-                <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Estações Online</span>
-              </div>
-              <div className="h-12 w-px bg-border-subtle" />
-              <div className="flex flex-col">
-                <span className="text-4xl font-black text-text-secondary">{offlineCount}</span>
-                <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Offline</span>
-              </div>
-            </div>
-
-            <div className="space-y-3 rounded-lg bg-bg-surface p-4">
-              {stations.filter(s => s.pm25 !== null).slice(0, 2).map(s => (
-                <div key={s.station_id} className="flex items-center justify-between border-b border-border-subtle pb-3 last:border-0 last:pb-0">
-                  <span className="text-sm font-semibold text-text-primary truncate mr-4">{s.name}</span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg font-black text-text-primary">{Math.round(s.pm25!)} µg/m³</span>
-                    <span className="text-xs text-text-secondary">{new Date(s.last_ts!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
+            <div className="max-w-2xl space-y-3">
+              <label htmlFor="home-search" className="block text-sm font-semibold text-text-primary">
+                Buscar no portal
+              </label>
+              <div className="group relative">
+                <input
+                  id="home-search"
+                  type="search"
+                  placeholder="Busque por dados, relatórios, acervo ou atividades..."
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const q = (e.target as HTMLInputElement).value;
+                      if (q.trim()) window.location.href = `/buscar?q=${encodeURIComponent(q)}`;
+                    }
+                  }}
+                  className="w-full rounded-full border-2 border-border-subtle bg-surface-1 px-6 py-4 pr-14 text-base text-text-primary shadow-[0_1px_0_rgba(17,38,59,0.02)] transition-all duration-200 placeholder:text-text-secondary/60 focus:border-brand-primary focus:ring-4 focus:ring-focus-ring/30"
+                />
+                <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-brand-primary-soft p-2 text-brand-primary transition-transform group-focus-within:scale-110">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
                 </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              {prompt && (
+                <button
+                  onClick={async () => {
+                    await prompt.prompt();
+                    const { outcome } = await prompt.userChoice;
+                    if (outcome === "accepted") clearPrompt();
+                  }}
+                  className="ui-btn-primary px-6 shadow-[0_12px_30px_rgba(0,93,170,0.18)] hover:shadow-[0_18px_40px_rgba(0,93,170,0.24)]"
+                >
+                  Instalar aplicativo
+                </button>
+              )}
+              <Link to="/dados" className="ui-btn-primary bg-accent-lab px-6 hover:bg-accent-lab/90">
+                Ir para dados
+              </Link>
+              <Link to="/agenda" className="ui-btn-secondary px-6">
+                Ver agenda
+              </Link>
+              <Link to="/acervo" className="ui-btn-ghost px-6">
+                Ir para acervo
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {heroMetrics.map((metric) => (
+                <Chip key={metric.label} tone={metric.tone}>
+                  <span className="font-black text-sm text-text-primary">{metric.value}</span>
+                  <span>{metric.label}</span>
+                </Chip>
               ))}
-              <p className="pt-2 text-xs text-text-secondary italic">
-                Medições de MP2.5 (material particulado fino)
-              </p>
             </div>
           </div>
-        )}
 
-        <Link className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/dados">
-          Acessar painel completo de dados
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
-      </div>
-
-      {/* Próximas Atividades */}
-      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-yellow/10 text-accent-brown">
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-2xl font-black text-text-primary">Próximas Atividades</h2>
-            <p className="text-sm text-text-secondary">Agenda pública de eventos e encontros</p>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="space-y-3">
-            <div className="h-20 w-full animate-pulse rounded-lg bg-bg-surface" />
-            <div className="h-20 w-full animate-pulse rounded-lg bg-bg-surface" />
-          </div>
-        ) : error ? (
-          <p className="text-sm text-danger">{error}</p>
-        ) : events.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
-            <p className="text-sm text-text-secondary">Nenhum evento publicado para os próximos dias.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {events.map((event) => (
-              <Link
-                key={event.id}
-                to="/agenda"
-                className="group flex items-center gap-4 rounded-lg border border-border-subtle bg-white p-4 transition-all hover:border-brand-primary hover:shadow-md"
-              >
-                <div className="flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-accent-yellow/10 text-accent-brown">
-                  <span className="text-xl font-black">{new Date(event.start_at).getDate()}</span>
-                  <span className="text-xs font-semibold uppercase">{new Date(event.start_at).toLocaleDateString("pt-BR", { month: "short" })}</span>
+            <div className="grid gap-4">
+            <div className="signature-surface motion-list-item p-5 motion-surface motion-surface-hover">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-2">
+                  <span className="section-badge">Painel instantâneo</span>
+                  <h2 className="text-xl font-black text-text-primary">Dados agora</h2>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-base font-bold text-text-primary group-hover:text-brand-primary">{event.title}</h3>
-                  <p className="text-xs text-text-secondary">{new Date(event.start_at).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</p>
+                <IconShell tone="lab" className="h-12 w-12 rounded-full">
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </IconShell>
+              </div>
+
+              {loading ? (
+                <div className="mt-6 space-y-3">
+                  <div className="seed-skeleton h-16 rounded-2xl" />
+                  <div className="seed-skeleton h-16 rounded-2xl" />
                 </div>
-              </Link>
-            ))}
-          </div>
-        )}
+              ) : error ? (
+                <p className="mt-6 text-sm text-danger">{error}</p>
+              ) : (
+                <div className="mt-6 space-y-5">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-2xl border border-border-subtle bg-brand-primary-soft/60 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary-dark">Online</p>
+                      <p className="mt-2 text-4xl font-black text-text-primary">{onlineCount}</p>
+                    </div>
+                    <div className="rounded-2xl border border-border-subtle bg-surface-2 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Offline</p>
+                      <p className="mt-2 text-4xl font-black text-text-primary">{offlineCount}</p>
+                    </div>
+                  </div>
 
-        <Link className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/agenda">
-          Ver agenda completa
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
-      </div>
-
-      {/* Dossiês em Destaque */}
-      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-2xl font-black text-text-primary">Dossiês em Destaque</h2>
-              <p className="text-sm text-text-secondary">Coleções temáticas curadas</p>
-            </div>
-          </div>
-          <Link className="text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/dossies">
-            Ver todos →
-          </Link>
-        </div>
-
-        {loading ? (
-          <div className="grid gap-6 md:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-64 animate-pulse rounded-lg bg-bg-surface" />
-            ))}
-          </div>
-        ) : collections.length === 0 ? (
-          <div className="rounded-2xl border border-brand-primary/20 bg-gradient-to-br from-brand-primary/5 via-transparent to-transparent p-12 text-center space-y-6">
-            <div className="mx-auto h-16 w-16 rounded-full bg-brand-primary/10 flex items-center justify-center">
-              <svg className="h-8 w-8 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            
-            <div className="space-y-2">
-              <p className="text-lg font-black text-text-primary">Explore o Acervo Completo</p>
-              <p className="text-base text-text-secondary leading-relaxed max-w-2xl mx-auto">
-                Estamos preparando dossiês temáticos curados sobre qualidade do ar, memória industrial e saúde. 
-                Enquanto isso, mergulhe em nosso acervo de documentos, fotografias, artigos científicos e testemunhos.
-              </p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
-              <Link 
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-primary px-6 py-3 text-sm font-bold text-white transition-all hover:bg-brand-primary-dark hover:shadow-md"
-                to="/acervo"
-              >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m-6-4a9 9 0 110 18 9 9 0 010-18z" />
-                </svg>
-                Explorar Acervo
-              </Link>
-              <Link 
-                className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-brand-primary bg-white px-6 py-3 text-sm font-bold text-brand-primary transition-all hover:bg-brand-primary hover:text-white"
-                to="/acervo/linha"
-              >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Ver Linha do Tempo
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-3">
-            {collections.map((col) => (
-              <div
-                key={col.id}
-                className="group flex flex-col overflow-hidden rounded-xl border border-border-subtle bg-white shadow-sm transition-all hover:border-brand-primary hover:shadow-md"
-              >
-                {col.cover_url && (
-                  <Link to={`/dossies/${col.slug}`} className="aspect-video w-full overflow-hidden bg-bg-surface">
-                    <img
-                      src={getOptimizedCover(col, 'thumb') || ''}
-                      alt={col.title}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </Link>
-                )}
-                <div className="flex flex-1 flex-col p-6">
-                  <Link to={`/dossies/${col.slug}`}>
-                    <h3 className="text-lg font-bold text-text-primary transition-colors group-hover:text-brand-primary">{col.title}</h3>
-                  </Link>
-                  {col.excerpt && <p className="mt-2 text-sm text-text-secondary line-clamp-2">{col.excerpt}</p>}
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {col.tags.slice(0, 2).map((tag) => (
-                      <span key={tag} className="rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary">
-                        {tag}
-                      </span>
+                  <div className="motion-list-item space-y-3 rounded-2xl border border-border-subtle bg-surface-2/80 p-4">
+                    {stations.filter((s) => s.pm25 !== null).slice(0, 3).map((station) => (
+                      <div key={station.station_id} className="flex items-center justify-between gap-4 border-b border-divider-subtle pb-3 last:border-0 last:pb-0">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-text-primary">{station.name}</p>
+                          <p className="text-xs text-text-secondary">Última leitura</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-black text-text-primary">{Math.round(station.pm25!)} µg/m³</p>
+                          <p className="text-xs text-text-secondary">{station.last_ts ? formatDateTime(station.last_ts) : "-"}</p>
+                        </div>
+                      </div>
                     ))}
                   </div>
+                </div>
+              )}
+            </div>
 
-                  <div className="mt-6 flex gap-2">
-                    <Link
-                      to={`/dossies/${col.slug}`}
-                      className="flex-1 rounded-lg bg-brand-primary px-4 py-2 text-center text-sm font-bold text-white transition-all hover:bg-brand-primary-dark"
-                    >
-                      Abrir Dossiê
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const shareUrl = `${window.location.origin}/s/dossies/${col.slug}`;
-                        if (navigator.share) {
-                          trackShare("dossies", col.slug, "home");
-                          navigator.share({ title: col.title, text: col.excerpt || '', url: shareUrl }).catch(() => { });
-                        } else {
-                          trackShare("dossies", col.slug, "home-copy");
-                          navigator.clipboard.writeText(shareUrl);
-                          alert("Link copiado para a área de transferência!");
-                        }
-                      }}
-                      className="flex items-center justify-center rounded-lg border border-border-subtle bg-white px-3 py-2 text-text-secondary transition-all hover:border-brand-primary hover:text-brand-primary"
-                      aria-label="Compartilhar dossiê"
-                    >
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                      </svg>
-                    </button>
-                  </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="signature-surface motion-list-item p-5">
+                <p className="section-badge">Acervo</p>
+                <p className="mt-3 text-3xl font-black text-text-primary">{acervo.length}</p>
+                <p className="mt-1 text-sm text-text-secondary">Itens destacados para navegação rápida.</p>
+              </div>
+            <div className="signature-surface motion-list-item p-5">
+                <p className="section-badge">Transparência</p>
+                <p className="mt-3 text-3xl font-black text-text-primary">{transparency ? formatCurrency(transparency.total_cents) : "—"}</p>
+                <p className="mt-1 text-sm text-text-secondary">Recursos investidos no projeto.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </SurfaceCard>
+
+      <SurfaceCard className="p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Dados agora"
+          title="Monitoramento em tempo real"
+          description="Leituras recentes, disponibilidade das estações e contexto imediato para navegação pública."
+          action={<Link className="ui-btn-ghost" to="/dados">Ir para dados</Link>}
+        />
+
+        <div className="mt-6 rounded-[1.5rem] border border-border-subtle bg-surface-1 p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Resumo operacional</p>
+              <h3 className="mt-1 text-xl font-black text-text-primary">Estações e leituras</h3>
+            </div>
+            <IconShell tone="brand" className="h-12 w-12 rounded-full">
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </IconShell>
+          </div>
+
+          <div className="mt-5 grid gap-5 sm:grid-cols-3">
+            <div className="rounded-2xl bg-brand-primary-soft/60 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary-dark">Online</p>
+              <p className="mt-2 text-3xl font-black text-text-primary">{onlineCount}</p>
+            </div>
+            <div className="rounded-2xl bg-surface-2 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Offline</p>
+              <p className="mt-2 text-3xl font-black text-text-primary">{offlineCount}</p>
+            </div>
+            <div className="rounded-2xl bg-surface-2 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Fontes</p>
+              <p className="mt-2 text-3xl font-black text-text-primary">{stations.length}</p>
+            </div>
+          </div>
+          <div className="mt-5 space-y-3">
+            {stations.filter((s) => s.pm25 !== null).slice(0, 2).map((station) => (
+              <div key={station.station_id} className="flex items-center justify-between rounded-2xl border border-divider-subtle bg-surface-2 px-4 py-3">
+                <div>
+                  <p className="text-sm font-semibold text-text-primary">{station.name}</p>
+                  <p className="text-xs text-text-secondary">Última leitura registrada</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-black text-text-primary">{Math.round(station.pm25!)} µg/m³</p>
+                  <p className="text-xs text-text-secondary">{station.last_ts ? formatDateTime(station.last_ts) : "-"}</p>
                 </div>
               </div>
             ))}
           </div>
-        )}
-      </div>
-      {/* Destaques do Acervo */}
-      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-brown/10 text-accent-brown">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-2xl font-black text-text-primary">Destaques do Acervo</h2>
-              <p className="text-sm text-text-secondary">Documentos, imagens e memória histórica</p>
-            </div>
-          </div>
-          <Link className="text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/acervo">
-            Ver acervo completo →
-          </Link>
-        </div>
-
-        {loading ? (
-          <div className="grid gap-4 md:grid-cols-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 animate-pulse rounded-lg bg-bg-surface" />
-            ))}
-          </div>
-        ) : acervo.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
-            <p className="text-sm text-text-secondary">Nenhum destaque disponível.</p>
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-4">
-            {acervo.slice(0, 4).map((item) => (
-              <Link
-                key={item.id}
-                to={`/acervo/item/${item.slug}`}
-                className="group flex flex-col gap-2 rounded-lg border border-border-subtle bg-white p-4 transition-all hover:border-brand-primary hover:shadow-md"
-              >
-                <span className="inline-block rounded-full bg-accent-brown/10 px-2 py-1 text-xs font-semibold text-accent-brown">
-                  {item.kind}
-                </span>
-                <h3 className="line-clamp-2 text-sm font-bold text-text-primary group-hover:text-brand-primary">{item.title}</h3>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Corredores Climáticos */}
-      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 text-success">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-2xl font-black text-text-primary">Corredores Climáticos</h2>
-              <p className="text-sm text-text-secondary">Rotas e recortes territoriais monitorados</p>
-            </div>
-          </div>
-          <Link className="text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/corredores">
-            Ver mapa →
-          </Link>
-        </div>
-
-        {loading ? (
-          <div className="grid gap-6 md:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-64 animate-pulse rounded-lg bg-bg-surface" />
-            ))}
-          </div>
-        ) : corridors.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
-            <p className="text-sm text-text-secondary">Nenhum corredor em destaque no momento.</p>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-3">
-            {corridors.map((c) => (
-              <Link
-                key={c.id}
-                to={`/corredores/${c.slug}`}
-                className="group flex flex-col overflow-hidden rounded-xl border border-border-subtle bg-white shadow-sm transition-all hover:border-success hover:shadow-md"
-              >
-                {c.cover_url && (
-                  <div className="h-48 w-full overflow-hidden bg-bg-surface">
-                    <img
-                      src={getOptimizedCover(c, "thumb") || c.cover_url}
-                      alt={c.title}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                )}
-                <div className="flex flex-1 flex-col p-6">
-                  <h3 className="mb-2 text-lg font-bold text-text-primary transition-colors group-hover:text-success">
-                    {c.title}
-                  </h3>
-                  {c.excerpt && (
-                    <p className="mb-4 flex-grow text-sm text-text-secondary line-clamp-2">
-                      {c.excerpt}
-                    </p>
-                  )}
-                  <div className="flex items-center justify-between text-sm font-bold text-success">
-                    <span>Explorar corredor</span>
-                    <span className="transition-transform group-hover:translate-x-1">→</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Relatórios e Notas Técnicas */}
-      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h6m-6 4h10M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H9l-3 3v11a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-2xl font-black text-text-primary">Relatórios e Notas Técnicas</h2>
-              <p className="text-sm text-text-secondary">Publicações oficiais em PDF</p>
-            </div>
-          </div>
-          <Link
-            className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-white px-4 py-2 text-sm font-bold text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-primary/5"
-            to="/relatorios"
-          >
-            Ver todos
+          <Link className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/dados">
+            Ir para dados
             <span aria-hidden="true">→</span>
           </Link>
         </div>
+      </SurfaceCard>
 
+      <SurfaceCard className="p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Agenda"
+          title="Ver agenda"
+          description="Um ritmo mais editorial para a agenda pública, com destaque para o próximo encontro e menos repetição de cards iguais."
+          action={<Link className="ui-btn-ghost" to="/agenda">Ver agenda completa</Link>}
+        />
         {loading ? (
-          <div className="grid gap-4 md:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-28 animate-pulse rounded-lg bg-bg-surface" />
-            ))}
+          <div className="mt-6 space-y-4">
+            <div className="seed-skeleton h-56 rounded-[1.5rem]" />
+            <div className="grid gap-5 md:grid-cols-2">
+              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
+              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
+            </div>
           </div>
-        ) : reports.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border-subtle bg-bg-surface p-8 text-center">
+        ) : error ? (
+          <p className="mt-6 text-sm text-danger">{error}</p>
+        ) : !featuredEvent ? (
+          <div className="mt-6 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+            <p className="text-sm text-text-secondary">Nenhum evento publicado para os próximos dias.</p>
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+            <Link to="/agenda" className="group motion-list-item overflow-hidden rounded-[1.75rem] border border-border-subtle bg-surface-1 motion-surface motion-surface-hover">
+              <div className="flex items-stretch">
+                <div className="flex w-28 flex-col justify-center bg-gradient-to-br from-accent-yellow/20 via-surface-2 to-surface-1 p-4 text-center">
+                  <span className="text-4xl font-black text-text-primary">{new Date(featuredEvent.start_at).getDate()}</span>
+                  <span className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                    {new Date(featuredEvent.start_at).toLocaleDateString("pt-BR", { month: "short" })}
+                  </span>
+                </div>
+                <div className="flex-1 p-5">
+                  <span className="section-badge">Próximo encontro</span>
+                  <h3 className="mt-3 text-2xl font-black text-text-primary transition-colors group-hover:text-brand-primary">
+                    {featuredEvent.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-text-secondary line-clamp-3">
+                    {typeof featuredEvent.description === "string" && featuredEvent.description.trim()
+                      ? featuredEvent.description
+                      : "Atividade pública aberta para participação e circulação de conhecimento."}
+                  </p>
+                  <p className="mt-4 text-sm font-semibold text-text-primary">{formatDateTime(featuredEvent.start_at)}</p>
+                </div>
+              </div>
+            </Link>
+            <div className="space-y-4">
+              {upcomingEvents.length === 0 ? (
+                <div className="rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+                  <p className="text-sm text-text-secondary">Nenhum outro evento publicado.</p>
+                </div>
+              ) : upcomingEvents.map((event) => (
+                <Link key={event.id} to="/agenda" className="group motion-list-item flex items-center gap-4 rounded-[1.5rem] border border-border-subtle bg-surface-1 p-4 motion-surface motion-surface-hover">
+                  <div className="flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-2xl bg-brand-primary-soft text-brand-primary-dark">
+                    <span className="text-xl font-black">{new Date(event.start_at).getDate()}</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.16em]">{new Date(event.start_at).toLocaleDateString("pt-BR", { month: "short" })}</span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-base font-bold text-text-primary transition-colors group-hover:text-brand-primary">{event.title}</h3>
+                    <p className="mt-1 text-sm text-text-secondary">{formatDateTime(event.start_at)}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </SurfaceCard>
+
+      <SurfaceCard className="p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Dossiês"
+          title="Dossiês em destaque"
+          description="Mais editorial, com um cartão principal maior e apoios menores para criar hierarquia e evitar repetição visual."
+          action={<Link className="ui-btn-ghost" to="/dossies">Ver todos</Link>}
+        />
+        {loading ? (
+          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+            <div className="seed-skeleton h-80 rounded-[1.75rem]" />
+            <div className="grid gap-4">
+              <div className="seed-skeleton h-36 rounded-[1.5rem]" />
+              <div className="seed-skeleton h-36 rounded-[1.5rem]" />
+            </div>
+          </div>
+        ) : !featuredCollection ? (
+          <div className="mt-6 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+            <p className="text-sm text-text-secondary">Nenhum dossiê em destaque no momento.</p>
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+            <Link to={`/dossies/${featuredCollection.slug}`} className="group motion-list-item overflow-hidden rounded-[1.75rem] border border-border-subtle bg-surface-1 shadow-[0_1px_2px_rgba(17,38,59,0.04)] motion-surface motion-surface-hover">
+              <div className="grid h-full lg:grid-cols-[minmax(0,0.95fr)_minmax(260px,1fr)]">
+                <div className="document-placeholder relative min-h-[18rem] bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2">
+                  {featuredCollection.cover_url ? (
+                    <img src={getOptimizedCover(featuredCollection, "thumb") || ""} alt={featuredCollection.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                  ) : null}
+                </div>
+                <div className="flex flex-col justify-between p-5">
+                  <div className="space-y-3">
+                    <span className="section-badge">Dossiê principal</span>
+                    <h3 className="text-2xl font-black leading-tight text-text-primary transition-colors group-hover:text-brand-primary">{featuredCollection.title}</h3>
+                    {featuredCollection.excerpt ? <p className="text-sm leading-relaxed text-text-secondary line-clamp-4">{featuredCollection.excerpt}</p> : null}
+                  </div>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {featuredCollection.tags.slice(0, 3).map((tag) => <Chip key={tag} tone="active">{tag}</Chip>)}
+                  </div>
+                </div>
+              </div>
+            </Link>
+            <div className="grid gap-4">
+              {secondaryCollections.length === 0 ? (
+                <div className="rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+                  <p className="text-sm text-text-secondary">Outros dossiês aparecerão aqui.</p>
+                </div>
+              ) : (
+                secondaryCollections.map((col) => (
+                  <Link key={col.id} to={`/dossies/${col.slug}`} className="group motion-list-item grid gap-4 rounded-[1.5rem] border border-border-subtle bg-surface-1 p-4 motion-surface motion-surface-hover md:grid-cols-[112px_minmax(0,1fr)]">
+                    <div className="overflow-hidden rounded-2xl bg-surface-2">
+                      {col.cover_url ? (
+                        <img src={getOptimizedCover(col, "thumb") || ""} alt={col.title} loading="lazy" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full min-h-28 items-center justify-center bg-gradient-to-br from-brand-primary-soft to-surface-2">
+                          <IconShell tone="seed" className="h-11 w-11 rounded-full">
+                            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                          </IconShell>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-text-primary transition-colors group-hover:text-brand-primary">{col.title}</h3>
+                        {col.excerpt ? <p className="mt-2 text-sm text-text-secondary line-clamp-2">{col.excerpt}</p> : null}
+                      </div>
+                      <div className="mt-4 flex flex-wrap gap-2">{col.tags.slice(0, 2).map((tag) => <span key={tag} className="ui-chip">{tag}</span>)}</div>
+                    </div>
+                  </Link>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </SurfaceCard>
+
+      <SurfaceCard className="p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Corredores"
+          title="Corredores climáticos"
+          description="Rotas e recortes territoriais monitorados em linguagem mais sintética e visualmente mais territorial."
+          action={<Link className="ui-btn-ghost" to="/corredores">Ver mapa</Link>}
+        />
+        {loading ? (
+          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+            <div className="seed-skeleton h-72 rounded-[1.75rem]" />
+            <div className="space-y-4">
+              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
+              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
+            </div>
+          </div>
+        ) : !featuredCorridor ? (
+          <div className="mt-6 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+            <p className="text-sm text-text-secondary">Nenhum corredor em destaque no momento.</p>
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+            <Link to={`/corredores/${featuredCorridor.slug}`} className="group motion-list-item overflow-hidden rounded-[1.75rem] border border-border-subtle bg-surface-1 motion-surface motion-surface-hover">
+              <div className="relative min-h-[18rem] bg-gradient-to-br from-success/10 via-surface-1 to-surface-2">
+                {featuredCorridor.cover_url ? (
+                  <img src={getOptimizedCover(featuredCorridor, "thumb") || featuredCorridor.cover_url} alt={featuredCorridor.title} className="h-full w-full object-cover" />
+                ) : null}
+              </div>
+              <div className="p-5">
+                <span className="section-badge">Corredor principal</span>
+                <h3 className="mt-3 text-2xl font-black text-text-primary transition-colors group-hover:text-brand-primary">{featuredCorridor.title}</h3>
+                {featuredCorridor.excerpt ? <p className="mt-3 text-sm leading-relaxed text-text-secondary">{featuredCorridor.excerpt}</p> : null}
+                <div className="mt-4 flex items-center gap-2 text-sm font-bold text-success">
+                  <span>Explorar corredor</span>
+                  <span aria-hidden="true">→</span>
+                </div>
+              </div>
+            </Link>
+            <div className="grid gap-4">
+              {supportingCorridors.length === 0 ? (
+                <div className="rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+                  <p className="text-sm text-text-secondary">Outros corredores aparecerão aqui.</p>
+                </div>
+              ) : (
+                supportingCorridors.map((corridor) => (
+                  <Link key={corridor.id} to={`/corredores/${corridor.slug}`} className="group motion-list-item flex items-center gap-4 rounded-[1.5rem] border border-border-subtle bg-surface-1 p-4 motion-surface motion-surface-hover">
+                    <div className="h-20 w-24 overflow-hidden rounded-2xl bg-surface-2">
+                      {corridor.cover_url ? (
+                        <img src={getOptimizedCover(corridor, "thumb") || corridor.cover_url} alt={corridor.title} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center bg-gradient-to-br from-success/10 to-surface-2">
+                          <IconShell tone="seed" className="h-10 w-10 rounded-full">
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                            </svg>
+                          </IconShell>
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-base font-bold text-text-primary transition-colors group-hover:text-success">{corridor.title}</h3>
+                      {corridor.excerpt ? <p className="mt-1 text-sm text-text-secondary line-clamp-2">{corridor.excerpt}</p> : null}
+                    </div>
+                  </Link>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </SurfaceCard>
+
+      <SurfaceCard className="p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Novidades"
+          title="O que há de novo"
+          description="Blog e transparência ganham uma leitura mais serena, com mais destaque para o conteúdo editorial e menos blocos equivalentes."
+          action={<Link className="ui-btn-ghost" to="/status">Ver status</Link>}
+        />
+        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
+          <div className="grid gap-4">
+            <div className="motion-list-item rounded-[1.5rem] border border-border-subtle bg-surface-1 p-5">
+              <p className="section-badge">Blog</p>
+              {latestBlog ? (
+                <Link to={`/blog/${latestBlog.slug}`} className="group mt-4 block">
+                  <h3 className="text-2xl font-black text-text-primary transition-colors group-hover:text-brand-primary">{latestBlog.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-text-secondary line-clamp-4">{latestBlog.excerpt}</p>
+                </Link>
+              ) : (
+                <p className="mt-4 text-sm text-text-secondary">Nenhuma atualização recente.</p>
+              )}
+              <Link className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/blog">
+                Ver todos os posts
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+            <div className="motion-list-item rounded-[1.5rem] border border-border-subtle bg-gradient-to-br from-brand-primary-soft/70 via-surface-1 to-surface-1 p-5">
+              <p className="section-badge">Transparência financeira</p>
+              <p className="mt-4 text-4xl font-black text-text-primary">{transparency ? formatCurrency(transparency.total_cents) : "—"}</p>
+              <p className="mt-2 text-sm text-text-secondary">Recursos investidos no projeto.</p>
+              <Link className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/transparencia">
+                Acessar prestação de contas
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
+          <div className="grid gap-4">
+            <div className="motion-list-item rounded-[1.5rem] border border-border-subtle bg-surface-1 p-5">
+              <p className="section-badge">Resumo do sistema</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl bg-surface-2 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Acervo</p>
+                  <p className="mt-2 text-2xl font-black text-text-primary">{acervo.length}</p>
+                </div>
+                <div className="rounded-2xl bg-surface-2 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Dossiês</p>
+                  <p className="mt-2 text-2xl font-black text-text-primary">{collections.length}</p>
+                </div>
+                <div className="rounded-2xl bg-surface-2 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Relatórios</p>
+                  <p className="mt-2 text-2xl font-black text-text-primary">{reports.length}</p>
+                </div>
+              </div>
+            </div>
+            <div className="motion-list-item rounded-[1.5rem] border border-border-subtle bg-surface-1 p-5">
+              <p className="section-badge">Chamada editorial</p>
+              <p className="mt-4 text-sm leading-relaxed text-text-secondary">
+                O SEMEAR combina dados, memória e participação pública em uma experiência que precisa parecer uma referência institucional, não apenas um portal funcional.
+              </p>
+            </div>
+          </div>
+        </div>
+      </SurfaceCard>
+
+      <SurfaceCard className="p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Relatórios"
+          title="Relatórios e notas técnicas"
+          description="A última camada da home traz os documentos oficiais com destaque editorial, thumbnail reforçada e cards menos genéricos."
+          action={<Link className="ui-btn-ghost" to="/relatorios">Ver todos</Link>}
+        />
+        {loading ? (
+          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+            <div className="seed-skeleton h-72 rounded-[1.75rem]" />
+            <div className="space-y-4">
+              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
+              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
+            </div>
+          </div>
+        ) : !featuredReport ? (
+          <div className="mt-6 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
             <p className="text-sm text-text-secondary">Nenhum relatório em destaque no momento.</p>
           </div>
         ) : (
-          <div className="grid gap-5 lg:grid-cols-3">
-            {reports.map((report) => {
-              const thumbUrl = getOptimizedCover(report, "thumb");
-              return (
-                <Link
-                  key={report.id}
-                  to={
-                    "/relatorios/" + report.slug
-                  }
-                  className="group overflow-hidden rounded-2xl border border-border-subtle bg-white transition-all hover:-translate-y-0.5 hover:border-brand-primary hover:shadow-md"
-                >
-                  {thumbUrl ? (
-                    <img
-                      src={thumbUrl}
-                      alt={"Capa de " + report.title}
-                      loading="lazy"
-                      className="h-40 w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-40 flex-col justify-between bg-gradient-to-br from-brand-primary/10 via-white to-bg-surface p-5">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-primary">SEMEAR</span>
-                      <span className="max-w-[12rem] text-base font-black uppercase leading-tight text-text-primary">
-                        Relatórios e notas técnicas
-                      </span>
-                    </div>
-                  )}
-                  <div className="space-y-3 p-5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-brand-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary">
-                        Destaque
-                      </span>
-                      <span className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
-                        {REPORT_KIND_LABEL[report.kind]}
-                      </span>
-                    </div>
-                    <h3 className="line-clamp-2 text-base font-black text-text-primary group-hover:text-brand-primary">{report.title}</h3>
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
-                      {report.published_at ? new Date(report.published_at).toLocaleDateString("pt-BR") : "Sem data"}
-                    </p>
-                    {report.summary && (
-                      <p className="text-sm text-text-secondary line-clamp-3">{report.summary}</p>
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
+          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+            <Link to={`/relatorios/${featuredReport.slug}`} className="group motion-list-item overflow-hidden rounded-[1.75rem] border border-border-subtle bg-surface-1 motion-surface motion-surface-hover">
+              {getOptimizedCover(featuredReport, "thumb") ? (
+                <img src={getOptimizedCover(featuredReport, "thumb") || ""} alt={`Capa de ${featuredReport.title}`} loading="lazy" className="h-60 w-full object-cover" />
+              ) : (
+                <div className="report-placeholder flex h-60 flex-col justify-between bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2 p-6">
+                  <span className="section-badge w-fit">SEMEAR</span>
+                  <span className="max-w-md text-2xl font-black uppercase leading-tight text-text-primary">Relatórios e notas técnicas</span>
+                </div>
+              )}
+              <div className="space-y-4 p-5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Chip tone="active">Destaque</Chip>
+                  <Chip tone="default">{REPORT_KIND_LABEL[featuredReport.kind]}</Chip>
+                </div>
+                <h3 className="text-2xl font-black leading-tight text-text-primary transition-colors group-hover:text-brand-primary">{featuredReport.title}</h3>
+                <p className="text-sm text-text-secondary">{featuredReport.published_at ? new Date(featuredReport.published_at).toLocaleDateString("pt-BR") : "Sem data"}</p>
+                {featuredReport.summary ? <p className="text-sm leading-relaxed text-text-secondary line-clamp-4">{featuredReport.summary}</p> : null}
+              </div>
+            </Link>
+            <div className="grid gap-4">
+              {supportingReports.length === 0 ? (
+                <div className="rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+                  <p className="text-sm text-text-secondary">Outros relatórios aparecerão aqui.</p>
+                </div>
+              ) : (
+                supportingReports.map((report) => {
+                  const thumbUrl = getOptimizedCover(report, "thumb");
+                  return (
+                    <Link
+                      key={report.id}
+                      to={`/relatorios/${report.slug}`}
+                    className="group motion-list-item flex gap-4 rounded-[1.5rem] border border-border-subtle bg-surface-1 p-4 motion-surface motion-surface-hover"
+                    >
+                      <div className="h-24 w-20 overflow-hidden rounded-2xl bg-surface-2">
+                        {thumbUrl ? (
+                          <img src={thumbUrl} alt={`Capa de ${report.title}`} className="h-full w-full object-cover" loading="lazy" />
+                        ) : (
+                          <div className="document-placeholder flex h-full items-center justify-center bg-gradient-to-br from-brand-primary-soft to-surface-2 text-xs font-black uppercase tracking-[0.16em] text-brand-primary-dark">
+                            PDF
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="ui-chip">{REPORT_KIND_LABEL[report.kind]}</span>
+                          <span className="text-xs text-text-secondary">{report.published_at ? new Date(report.published_at).toLocaleDateString("pt-BR") : "Sem data"}</span>
+                        </div>
+                        <h3 className="mt-2 text-base font-bold text-text-primary transition-colors group-hover:text-brand-primary">{report.title}</h3>
+                        {report.summary ? <p className="mt-2 text-sm text-text-secondary line-clamp-2">{report.summary}</p> : null}
+                      </div>
+                    </Link>
+                  );
+                })
+              )}
+            </div>
           </div>
         )}
-      </div>
-
-      {/* O Que Há de Novo - Blog + Transparência */}
-      <div className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-2xl font-black text-text-primary">O Que Há de Novo</h2>
-            <p className="text-sm text-text-secondary">Últimas atualizações e transparência</p>
-          </div>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Blog Latest */}
-          <div className="rounded-lg border border-border-subtle bg-bg-surface p-6">
-            <p className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-primary">Última Publicação do Blog</p>
-            {loading ? (
-              <div className="h-20 animate-pulse rounded-lg bg-white" />
-            ) : latestBlog ? (
-              <Link to={`/blog/${latestBlog.slug}`} className="group block">
-                <h3 className="text-base font-bold text-text-primary group-hover:text-brand-primary">{latestBlog.title}</h3>
-                <p className="mt-2 text-xs text-text-secondary">{new Date(latestBlog.published_at!).toLocaleDateString("pt-BR", { day: '2-digit', month: 'long', year: 'numeric' })}</p>
-              </Link>
-            ) : (
-              <p className="text-sm text-text-secondary italic">Nenhum post recente.</p>
-            )}
-            <Link className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/blog">
-              Ver todos os posts
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
-
-          {/* Transparency */}
-          <div className="rounded-lg border border-border-subtle bg-bg-surface p-6">
-            <p className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-primary">Transparência Financeira</p>
-            {loading ? (
-              <div className="h-20 animate-pulse rounded-lg bg-white" />
-            ) : transparency ? (
-              <div>
-                <p className="text-3xl font-black text-text-primary">{formatCurrency(transparency.total_cents)}</p>
-                <p className="mt-2 text-xs text-text-secondary">Recursos investidos no projeto</p>
-              </div>
-            ) : (
-              <p className="text-sm text-text-secondary italic">Sem dados financeiros disponíveis.</p>
-            )}
-            <Link className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/transparencia">
-              Acessar prestação de contas
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
-        </div>
-
-        <Link className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/status">
-          Ver status completo do sistema
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
-      </div>
-
+      </SurfaceCard>
     </section>
   );
 }
+
+
+
+
 

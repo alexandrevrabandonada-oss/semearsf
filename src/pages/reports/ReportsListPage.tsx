@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { Chip, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
 import { getOptimizedCover } from "../../lib/imageOptimization";
 import { listReports, type ReportDocument, type ReportKind } from "../../lib/api";
 
@@ -81,23 +82,23 @@ export function ReportsListPage() {
   const regularReports = useMemo(() => reports.filter((item) => !featuredIds.has(item.id)), [featuredIds, reports]);
 
   return (
-    <section className="space-y-6">
-      <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Biblioteca Oficial</p>
-        <h1 className="mt-2 text-2xl font-black uppercase tracking-wide text-text-primary md:text-4xl">Relatórios</h1>
-        <p className="mt-2 text-base leading-relaxed text-text-secondary">
-          Relatórios, notas técnicas, boletins e anexos oficiais em PDF para consulta pública e controle social.
-        </p>
-      </div>
+    <section className="space-y-12">
+      <SurfaceCard className="signature-shell logo-watermark-soft p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Biblioteca oficial"
+          title="Relatórios"
+          description="Relatórios, notas técnicas, boletins e anexos oficiais em PDF para consulta pública e controle social."
+        />
+      </SurfaceCard>
 
-      <div className="rounded-2xl border border-border-subtle bg-white p-4 shadow-sm">
-        <div className="grid gap-3 md:grid-cols-4">
+      <SurfaceCard className="p-5 md:p-6">
+        <div className="grid gap-5 md:grid-cols-4">
           <label className="block">
             <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-secondary">Ano</span>
             <select
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm"
+              className="motion-focus w-full rounded-full border border-border-subtle bg-surface-1 px-3 py-2 text-sm"
             >
               <option value="all">Todos</option>
               {yearOptions.map((value) => (
@@ -117,11 +118,7 @@ export function ReportsListPage() {
                     key={value}
                     type="button"
                     onClick={() => setKind(value)}
-                    className={`rounded-full px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${
-                      isActive
-                        ? "bg-brand-primary text-white"
-                        : "border border-border-subtle bg-white text-text-secondary hover:border-brand-primary hover:text-brand-primary"
-                    }`}
+                    className={`motion-tab ${isActive ? "motion-tab-active" : ""}`}
                   >
                     {label}
                   </button>
@@ -135,7 +132,7 @@ export function ReportsListPage() {
             <select
               value={tag}
               onChange={(e) => setTag(e.target.value)}
-              className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm"
+              className="motion-focus w-full rounded-full border border-border-subtle bg-surface-1 px-3 py-2 text-sm"
             >
               <option value="all">Todas</option>
               {tagOptions.map((value) => (
@@ -151,65 +148,59 @@ export function ReportsListPage() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Título ou resumo..."
-              className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm"
+              className="motion-focus w-full rounded-full border border-border-subtle bg-surface-1 px-3 py-2 text-sm"
             />
           </label>
         </div>
-      </div>
+      </SurfaceCard>
 
       {!loading && !error && featuredReports.length > 0 ? (
-        <div className="rounded-2xl border border-brand-primary/20 bg-gradient-to-br from-brand-primary/5 via-white to-white p-6 shadow-sm">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Destaques</p>
-              <h2 className="mt-1 text-xl font-black text-text-primary">Relatórios editoriais em evidência</h2>
+        <SurfaceCard className="signature-shell border-brand-primary/15 bg-gradient-to-br from-brand-primary-soft/60 via-surface-1 to-surface-1 p-6">
+          <div className="mb-5 flex items-end justify-between gap-3">
+            <div className="space-y-2">
+              <span className="section-badge">Destaques</span>
+              <h2 className="text-xl font-black leading-tight text-text-primary md:text-2xl">Relatórios editoriais em evidência</h2>
             </div>
-            <span className="rounded-full border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-secondary">
-              {featuredReports.length} selecionado(s)
-            </span>
+            <Chip tone="active">{featuredReports.length} selecionado(s)</Chip>
           </div>
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-5 lg:grid-cols-3">
             {featuredReports.map((item) => {
               const thumbUrl = getOptimizedCover(item, "thumb");
               return (
                 <Link
                   key={item.id}
                   to={`/relatorios/${item.slug}`}
-                  className="group overflow-hidden rounded-2xl border border-brand-primary/20 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-primary hover:shadow-md"
+                  className="group motion-list-item signature-surface overflow-hidden motion-surface motion-surface-hover"
                 >
                   {thumbUrl ? (
                     <img
                       src={thumbUrl}
                       alt={`Capa de ${item.title}`}
                       loading="lazy"
-                      className="h-40 w-full object-cover"
+                      className="h-44 w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-40 flex-col justify-between bg-gradient-to-br from-brand-primary/10 via-white to-bg-surface p-4">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-primary">SEMEAR</span>
-                      <span className="text-sm font-black uppercase leading-tight text-text-primary">Destaque editorial</span>
+                    <div className="report-placeholder flex h-44 flex-col justify-between p-5">
+                      <span className="section-badge w-fit">SEMEAR</span>
+                      <span className="text-base font-black uppercase leading-tight text-text-primary">Destaque editorial</span>
                     </div>
                   )}
                   <div className="space-y-3 p-5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-brand-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary">
-                        Destaque
-                      </span>
-                      <span className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
-                        {KIND_LABEL[item.kind]}
-                      </span>
+                      <Chip tone="active">Destaque</Chip>
+                      <Chip tone="default">{KIND_LABEL[item.kind]}</Chip>
                     </div>
-                    <h3 className="text-lg font-black text-text-primary group-hover:text-brand-primary">{item.title}</h3>
+                    <h3 className="text-lg font-black leading-tight text-text-primary transition-colors group-hover:text-brand-primary">{item.title}</h3>
                     {item.summary ? <p className="text-sm leading-relaxed text-text-secondary line-clamp-3">{item.summary}</p> : null}
                   </div>
                 </Link>
               );
             })}
           </div>
-        </div>
+        </SurfaceCard>
       ) : null}
 
-      <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+      <SurfaceCard className="p-6">
         {loading ? (
           <p aria-live="polite" className="text-base text-text-secondary" role="status">Carregando relatórios...</p>
         ) : error ? (
@@ -217,9 +208,14 @@ export function ReportsListPage() {
             {error}
           </p>
         ) : reports.length === 0 ? (
-          <div className="rounded-xl border-2 border-dashed border-brand-primary/30 bg-brand-primary/5 p-10 text-center">
+          <div className="report-placeholder p-10 text-center">
+            <div className="mx-auto mb-5 flex max-w-xs items-center gap-3">
+              <div className="seed-radial-divider flex-1" aria-hidden="true" />
+              <span className="section-badge">Relatórios</span>
+              <div className="seed-radial-divider flex-1" aria-hidden="true" />
+            </div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Biblioteca institucional</p>
-            <h2 className="mt-2 text-xl font-black text-text-primary">Nenhum documento encontrado para os filtros aplicados</h2>
+            <h2 className="mt-2 text-xl font-black leading-tight text-text-primary">Nenhum documento encontrado para os filtros aplicados</h2>
             <p className="mx-auto mt-2 max-w-2xl text-sm text-text-secondary">
               Ajuste ano, tipo, tag ou termo de busca para localizar relatórios oficiais. Este acervo é atualizado de forma contínua pela equipe técnica.
             </p>
@@ -232,27 +228,27 @@ export function ReportsListPage() {
                 <li key={item.id}>
                   <Link
                     to={`/relatorios/${item.slug}`}
-                    className="grid gap-4 rounded-xl border border-border-subtle bg-bg-surface p-4 transition-all hover:border-brand-primary hover:shadow-md md:grid-cols-[132px_minmax(0,1fr)] md:items-start"
+                    className="signature-surface motion-list-item grid gap-4 p-4 motion-surface motion-surface-hover md:grid-cols-[132px_minmax(0,1fr)] md:items-start"
                   >
                     {thumbUrl ? (
-                      <div className="overflow-hidden rounded-lg border border-border-subtle bg-white">
+                      <div className="overflow-hidden rounded-2xl border border-border-subtle bg-white">
                         <img
                           src={thumbUrl}
                           alt={`Capa de ${item.title}`}
                           loading="lazy"
-                          className="h-24 w-full object-cover md:h-28"
+                          className="h-28 w-full object-cover"
                         />
                       </div>
                     ) : (
-                      <div className="flex h-24 w-full flex-col justify-between rounded-lg border border-dashed border-brand-primary/25 bg-gradient-to-br from-brand-primary/10 via-white to-bg-surface p-3 md:h-28">
-                        <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-primary">SEMEAR</span>
+                      <div className="document-placeholder flex h-28 w-full flex-col justify-between p-3">
+                        <span className="section-badge w-fit">SEMEAR</span>
                         <span className="text-xs font-black uppercase leading-tight text-text-primary">Documento oficial</span>
                       </div>
                     )}
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <span className="rounded-full bg-bg-surface px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary border border-border-subtle">
+                          <span className="rounded-full border border-border-subtle bg-surface-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
                             {KIND_LABEL[item.kind]}
                           </span>
                         </div>
@@ -260,7 +256,7 @@ export function ReportsListPage() {
                           {item.published_at ? new Date(item.published_at).toLocaleDateString("pt-BR") : "Sem data"}
                         </span>
                       </div>
-                      <h2 className="text-base font-black text-text-primary">{item.title}</h2>
+                      <h2 className="text-base font-black leading-tight text-text-primary">{item.title}</h2>
                       {item.summary && <p className="text-sm leading-relaxed text-text-secondary line-clamp-2">{item.summary}</p>}
                       {item.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
@@ -273,7 +269,7 @@ export function ReportsListPage() {
                                 event.stopPropagation();
                                 setTag(itemTag);
                               }}
-                              className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-primary/5"
+                              className="motion-control rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary hover:border-brand-primary hover:bg-brand-primary/5"
                               aria-label={`Filtrar relatórios pela tag ${itemTag}`}
                             >
                               {itemTag}
@@ -288,7 +284,10 @@ export function ReportsListPage() {
             })}
           </ul>
         )}
-      </div>
+      </SurfaceCard>
     </section>
   );
 }
+
+
+

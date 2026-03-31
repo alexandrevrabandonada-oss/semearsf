@@ -39,7 +39,7 @@ export function PortalLayout({ children }: PropsWithChildren) {
       </a>
       <Navbar />
       {!isOnline && (
-        <div className="mx-auto w-full max-w-6xl px-4 pt-4 md:px-6">
+        <div className="mx-auto w-full max-w-7xl px-4 pt-4 md:px-6">
           <OfflineBanner
             compact
             description="Você continua navegando com o que já foi carregado. Alguns dados e PDFs podem ficar indisponíveis até a conexão voltar."
@@ -47,8 +47,9 @@ export function PortalLayout({ children }: PropsWithChildren) {
           />
         </div>
       )}
-      <main id="main-content" className="mx-auto w-full max-w-6xl px-4 pb-28 pt-44 md:px-6 md:pt-44">{children}</main>
+      <main id="main-content" className="mx-auto w-full max-w-7xl px-4 pb-40 pt-48 md:px-6 md:pt-48">{children}</main>
       <Footer />
     </div>
   );
 }
+

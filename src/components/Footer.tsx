@@ -1,67 +1,99 @@
 import { Link } from "react-router-dom";
 
-import { INSTITUTIONAL_FUNDING, INSTITUTIONAL_TAGLINE, INSTITUTIONAL_UNIVERSITY_FULL_NAME } from "../content/institucional";
+import { INSTITUTIONAL_COORDINATION, INSTITUTIONAL_FUNDING, INSTITUTIONAL_TAGLINE, INSTITUTIONAL_UNIVERSITY_FULL_NAME } from "../content/institucional";
+
+const editorialLinks = [
+  { to: "/dados", label: "Dados" },
+  { to: "/acervo", label: "Acervo" },
+  { to: "/agenda", label: "Agenda" },
+  { to: "/relatorios", label: "Relatórios" },
+  { to: "/corredores", label: "Corredores" }
+];
+
+const institutionalLinks = [
+  { to: "/sobre", label: "Sobre" },
+  { to: "/transparencia", label: "Transparência" },
+  { to: "/governanca", label: "Governança" },
+  { to: "/privacidade-lgpd", label: "Privacidade e LGPD" },
+  { to: "/imprensa", label: "Imprensa" }
+];
 
 export function Footer() {
   return (
-    <footer className="fixed inset-x-0 bottom-0 z-50 border-t border-border-subtle bg-white/95 backdrop-blur" role="contentinfo">
-      <div className="mx-auto w-full max-w-6xl px-4 py-4 md:px-6">
-        <div className="mb-3 flex flex-col items-center gap-3 border-b border-border-subtle pb-3 md:flex-row md:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex h-8 items-center rounded border border-border-subtle bg-bg-surface px-2 text-xs font-bold tracking-wider text-text-secondary" aria-label={INSTITUTIONAL_UNIVERSITY_FULL_NAME}>
-                UFF
-              </span>
-              <span className="h-6 w-px bg-border-subtle" aria-hidden="true" />
-              <span className="text-sm font-black uppercase tracking-wider text-brand-primary">
-                SEMEAR
-              </span>
+    <footer className="fixed inset-x-0 bottom-0 z-50 border-t border-border-subtle bg-surface-1/96 backdrop-blur-xl" role="contentinfo">
+      <div className="signature-shell logo-watermark-soft">
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-7">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)_minmax(0,0.9fr)]">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <img
+                  src="/brand/semear-logo.svg"
+                  alt=""
+                  aria-hidden="true"
+                  className="h-14 w-14 rounded-2xl border border-border-subtle bg-surface-1 object-contain p-1 shadow-[0_8px_20px_rgba(17,38,59,0.06)]"
+                />
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="section-badge" aria-label={INSTITUTIONAL_UNIVERSITY_FULL_NAME}>
+                      UFF
+                    </span>
+                    <span className="text-lg font-black uppercase tracking-[0.18em] text-brand-primary">
+                      SEMEAR
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                    {INSTITUTIONAL_COORDINATION}
+                  </p>
+                </div>
+              </div>
+
+              <p className="max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">
+                Ciência aberta, vigilância popular em saúde e memória socioambiental em uma plataforma pública de referência.
+              </p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">
+                {INSTITUTIONAL_TAGLINE}
+              </p>
+            </div>
+
+            <div>
+              <p className="section-badge mb-4">Explorar</p>
+              <ul className="space-y-2 text-sm font-semibold text-text-secondary">
+                {editorialLinks.map((link) => (
+                  <li key={link.to}>
+                    <Link to={link.to} className="transition-colors hover:text-brand-primary">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="section-badge mb-4">Institucional</p>
+              <ul className="space-y-2 text-sm font-semibold text-text-secondary">
+                {institutionalLinks.map((link) => (
+                  <li key={link.to}>
+                    <Link to={link.to} className="transition-colors hover:text-brand-primary">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 
-          <nav aria-label="Links institucionais do rodape">
-            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm font-semibold text-text-secondary">
-              <li>
-                <Link to="/sobre" className="transition-colors hover:text-brand-primary">Sobre</Link>
-              </li>
-              <li>
-                <Link to="/transparencia" className="transition-colors hover:text-brand-primary">Transparencia</Link>
-              </li>
-              <li>
-                <Link to="/status" className="transition-colors hover:text-brand-primary">Status</Link>
-              </li>
-              <li>
-                <a href="mailto:contato@semear.uff.br" className="transition-colors hover:text-brand-primary">Contato</a>
-              </li>
-            </ul>
-          </nav>
+          <div className="mt-8 flex flex-col gap-4 border-t border-divider-subtle pt-4 md:flex-row md:items-center md:justify-between">
+            <p className="max-w-2xl text-sm leading-relaxed text-text-secondary">
+              O SEMEAR combina dados em tempo real, memória pública e participação social em uma experiência institucional clara e confiável.
+            </p>
+            <div className="text-right">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">{INSTITUTIONAL_FUNDING}</p>
+              <p className="mt-1 text-xs text-text-secondary">Dados abertos, memória pública e cuidado editorial.</p>
+            </div>
+          </div>
         </div>
-
-        <div className="flex flex-col items-center gap-2 text-center text-sm text-text-secondary md:flex-row md:justify-between md:text-left">
-          <p>{INSTITUTIONAL_TAGLINE}</p>
-          <p className="text-xs font-semibold text-brand-primary">{INSTITUTIONAL_FUNDING}</p>
-        </div>
-
-        <nav aria-label="Guias institucionais" className="mt-2">
-          <ul className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-text-secondary md:justify-start">
-            <li>
-              <Link to="/como-ler-dados" className="transition-colors hover:text-brand-primary">Como ler dados</Link>
-            </li>
-            <li>
-              <Link to="/como-participar" className="transition-colors hover:text-brand-primary">Como participar</Link>
-            </li>
-            <li>
-              <Link to="/privacidade-lgpd" className="transition-colors hover:text-brand-primary">Privacidade e LGPD</Link>
-            </li>
-            <li>
-              <Link to="/governanca" className="transition-colors hover:text-brand-primary">Governança</Link>
-            </li>
-            <li>
-              <Link to="/imprensa" className="transition-colors hover:text-brand-primary">Imprensa</Link>
-            </li>
-          </ul>
-        </nav>
       </div>
     </footer>
   );
 }
+

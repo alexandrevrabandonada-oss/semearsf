@@ -256,7 +256,7 @@ export function TransparenciaPage() {
         action={
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex min-h-[44px] items-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-brand-primary-dark"
+            className="ui-btn-primary motion-focus px-5"
           >
             Tentar novamente
           </button>
@@ -275,8 +275,8 @@ export function TransparenciaPage() {
             </svg>
           </div>
           <div>
-            <h1 className="text-3xl font-black text-text-primary md:text-4xl">Transparência e Prestação de Contas</h1>
-            <p className="mt-2 text-base text-text-secondary">Acompanhamento financeiro completo e auditável do projeto SEMEAR</p>
+            <h1 className="text-3xl font-black text-text-primary md:text-4xl">Transparência e prestação de contas</h1>
+            <p className="mt-2 text-base text-text-secondary">Acompanhamento financeiro público e auditável do projeto SEMEAR</p>
           </div>
         </div>
 
@@ -314,32 +314,32 @@ export function TransparenciaPage() {
       </section>
 
       <section className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm">
-        <h2 className="text-lg font-black text-text-primary">Filtros de despesas</h2>
+        <h2 className="text-lg font-black text-text-primary">Filtrar lançamentos</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-4">
           <div>
             <label htmlFor="filtro-mes" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Mês</label>
-            <select id="filtro-mes" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
+            <select id="filtro-mes" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="motion-focus w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
               <option value="all">Todos</option>
               {monthOptions.map((month) => <option key={month} value={month}>{month}</option>)}
             </select>
           </div>
           <div>
             <label htmlFor="filtro-ano" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Ano</label>
-            <select id="filtro-ano" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
+            <select id="filtro-ano" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="motion-focus w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
               <option value="all">Todos</option>
               {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
             </select>
           </div>
           <div>
             <label htmlFor="filtro-categoria" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Categoria</label>
-            <select id="filtro-categoria" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
+            <select id="filtro-categoria" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="motion-focus w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
               <option value="all">Todas</option>
               {categoryOptions.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
             </select>
           </div>
           <div>
             <label htmlFor="filtro-fornecedor" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Fornecedor (busca)</label>
-            <input id="filtro-fornecedor" type="search" value={vendorQuery} onChange={(e) => setVendorQuery(e.target.value)} placeholder="Digite o nome" className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm" />
+            <input id="filtro-fornecedor" type="search" value={vendorQuery} onChange={(e) => setVendorQuery(e.target.value)} placeholder="Digite o nome" className="motion-focus w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm" />
           </div>
         </div>
       </section>
@@ -378,8 +378,8 @@ export function TransparenciaPage() {
             <h2 className="text-2xl font-black text-text-primary">Despesas lançadas</h2>
             <p className="mt-1 text-xs text-text-secondary">Documentos são publicados quando disponíveis.</p>
           </div>
-          <button type="button" onClick={handleDownloadExpensesCsv} className="inline-flex min-h-[44px] items-center rounded-lg border border-border-subtle bg-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-brand-primary transition-colors hover:bg-bg-surface">
-            Baixar CSV
+          <button type="button" onClick={handleDownloadExpensesCsv} className="ui-btn-secondary motion-focus px-4">
+            Baixar CSV do filtro
           </button>
         </div>
 
@@ -398,7 +398,7 @@ export function TransparenciaPage() {
             </thead>
             <tbody className="divide-y divide-border-subtle">
               {filteredExpenses.map((exp) => (
-                <tr key={exp.id} className="transition-colors hover:bg-bg-surface">
+                <tr key={exp.id} className="motion-control hover:bg-bg-surface">
                   <td className="whitespace-nowrap px-4 py-4 font-mono text-sm text-text-secondary">{new Date(exp.occurred_on).toLocaleDateString("pt-BR")}</td>
                   <td className="px-4 py-4 font-semibold text-text-primary">{exp.vendor}</td>
                   <td className="hidden px-4 py-4 md:table-cell"><span className="inline-block rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary">{exp.category}</span></td>
@@ -411,7 +411,7 @@ export function TransparenciaPage() {
                         onClick={() => setViewerExpense(exp)}
                         className="inline-flex items-center gap-1 text-sm font-bold text-brand-primary hover:underline"
                       >
-                        Ver documento
+                        Abrir documento
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
@@ -424,7 +424,7 @@ export function TransparenciaPage() {
               ))}
               {filteredExpenses.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-12"><EmptyState title="Nenhuma despesa para os filtros selecionados" description="Ajuste os filtros para localizar lançamentos diferentes." /></td>
+                  <td colSpan={6} className="py-12"><EmptyState title="Nenhum lançamento para os filtros selecionados" description="Ajuste mês, ano, categoria ou fornecedor para localizar outro lançamento." /></td>
                 </tr>
               )}
             </tbody>
@@ -436,21 +436,21 @@ export function TransparenciaPage() {
         <h2 className="text-2xl font-black text-text-primary">Links oficiais de controle</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {links.map((link) => (
-            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="group flex flex-col gap-2 rounded-xl border border-border-subtle bg-bg-surface p-4 transition-all hover:border-brand-primary hover:shadow-md">
+            <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="group motion-list-item flex flex-col gap-2 rounded-xl border border-border-subtle bg-bg-surface p-4 motion-surface motion-surface-hover">
               <span className="inline-block rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary">{link.kind}</span>
               <span className="text-base font-bold text-text-primary group-hover:text-brand-primary">{link.title}</span>
               <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-text-secondary">Acessar link externo</span>
             </a>
           ))}
           {links.length === 0 && (
-            <div className="col-span-full"><EmptyState title="Nenhum link oficial cadastrado no momento" description="Os links oficiais aparecerão aqui quando forem publicados." /></div>
+            <div className="col-span-full"><EmptyState title="Nenhum link oficial disponível no momento" description="Os links oficiais aparecerão aqui quando forem publicados." /></div>
           )}
         </div>
       </section>
 
       {viewerExpense?.document_url && (
         <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/75 p-4"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/75 p-4 motion-dialog"
           role="dialog"
           aria-modal="true"
           aria-labelledby="transparencia-viewer-title"
@@ -465,15 +465,15 @@ export function TransparenciaPage() {
                 href={viewerExpense.document_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
+                className="motion-control inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
               >
-                Abrir em nova aba
+                Abrir documento
               </a>
               <button
                 ref={closeButtonRef}
                 type="button"
                 onClick={() => setViewerExpense(null)}
-                className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 text-white hover:bg-error/90"
+                className="motion-control inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 text-white hover:bg-error/90"
                 aria-label="Fechar visualizador de documento (ESC)"
               >
                 ✕
@@ -482,7 +482,7 @@ export function TransparenciaPage() {
             <iframe
               src={viewerExpense.document_url}
               title={`Documento de ${viewerExpense.vendor}`}
-              className="h-[80vh] w-full rounded-xl border border-white/20 bg-white"
+              className="motion-pop h-[80vh] w-full rounded-xl border border-white/20 bg-white"
             />
           </div>
         </div>
@@ -490,3 +490,5 @@ export function TransparenciaPage() {
     </div>
   );
 }
+
+

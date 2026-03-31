@@ -128,11 +128,11 @@ export function MapaPage() {
 
   return (
     <section className="space-y-6">
-      <a href="#mapa-lista" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-brand-primary focus:shadow-lg">Pular mapa e ir para lista</a>
+      <a href="#mapa-lista" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-brand-primary focus:shadow-lg">Pular o mapa e ir para a lista acessível</a>
       {/* Header */}
       {!isOnline && (
         <OfflineBanner
-          description="O mapa interativo depende de tiles externos. A lista abaixo continua disponível e você pode tentar novamente ao reconectar."
+          description="O mapa interativo depende de tiles externos. A lista abaixo continua disponível mesmo sem conexão."
           onRetry={() => window.location.reload()}
         />
       )}
@@ -145,12 +145,12 @@ export function MapaPage() {
             </svg>
           </div>
           <div>
-            <h1 className="text-2xl font-black text-text-primary md:text-4xl">Mapa de Monitoramento</h1>
-            <p className="text-xs font-semibold tracking-wider text-text-secondary mt-1 uppercase">Estações de Qualidade do Ar e Corredores Climáticos</p>
+            <h1 className="text-2xl font-black text-text-primary md:text-4xl">Mapa de monitoramento</h1>
+            <p className="text-xs font-semibold tracking-wider text-text-secondary mt-1 uppercase">Estações de qualidade do ar e corredores climáticos</p>
           </div>
         </div>
         <p className="mt-4 text-base leading-relaxed text-text-secondary">
-          Visualize a localização das estações de monitoramento e os corredores climáticos mapeados em Volta Redonda e região. Clique nos marcadores para acessar dados detalhados.
+          Visualize a localização das estações e dos corredores climáticos mapeados em Volta Redonda e região. Se o mapa não carregar, use a lista acessível abaixo.
         </p>
       </div>
 
@@ -163,7 +163,7 @@ export function MapaPage() {
 
       {/* Map Section */}
       <section aria-labelledby="mapa-interativo-titulo" className="rounded-2xl border border-border-subtle bg-white p-6 overflow-hidden">
-        <h2 id="mapa-interativo-titulo" className="text-lg font-bold text-brand-primary mb-4">Mapa Interativo</h2>
+        <h2 id="mapa-interativo-titulo" className="text-lg font-bold text-brand-primary mb-4">Mapa interativo</h2>
         
         {loading ? (
           <p aria-live="polite" className="text-sm text-text-secondary" role="status">
@@ -173,7 +173,7 @@ export function MapaPage() {
           <div className="space-y-4">
             <OfflineBanner
               compact
-              description="Sem conexão, os tiles do mapa não carregam. A lista acessível abaixo continua disponível."
+              description="Sem conexão, o mapa pode não carregar. A lista acessível abaixo continua disponível."
               onRetry={() => window.location.reload()}
             />
             <p className="text-sm text-text-secondary">Use a lista de estações e corredores para navegação completa enquanto estiver offline.</p>
@@ -218,10 +218,10 @@ export function MapaPage() {
                         )}
                         <Link
                           to={`/dados?station=${station.code}`}
-                          aria-label={`Ver dados da estação ${station.name}`}
-                          className="inline-block mt-2 rounded bg-brand-primary px-3 py-1 text-xs font-bold text-white hover:bg-brand-primary/90"
+                          aria-label={`Abrir dados da estação ${station.name}`}
+                          className="ui-btn-primary motion-focus mt-2 px-3 py-1 text-xs"
                         >
-                          Ver Dados
+                          Abrir dados da estação
                         </Link>
                       </div>
                     </Popup>
@@ -251,9 +251,9 @@ export function MapaPage() {
                             <p class="text-xs text-gray-600 mb-2">${corridor.excerpt || ""}</p>
                             <a 
                               href="/corredores/${corridor.slug}" 
-                              class="inline-block mt-2 rounded bg-brand-primary px-3 py-1 text-xs font-bold text-white hover:bg-brand-primary/90"
+                              class="ui-btn-primary inline-block mt-2 px-3 py-1 text-xs"
                             >
-                              Abrir Corredor
+                              Abrir corredor climático
                             </a>
                           </div>
                         `);
@@ -276,19 +276,19 @@ export function MapaPage() {
             <div className="grid gap-3 md:grid-cols-2">
               <div className="flex items-center gap-2">
                 <div style={{ backgroundColor: '#22c55e', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>✓</div>
-                <span className="text-xs text-text-secondary"><strong>Excelente:</strong> Qualidade confiável</span>
+                <span className="text-xs text-text-secondary"><strong>Excelente:</strong> leitura confiável</span>
               </div>
               <div className="flex items-center gap-2">
                 <div style={{ backgroundColor: '#eab308', color: '#000', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>⚠</div>
-                <span className="text-xs text-text-secondary"><strong>Degradado:</strong> Qualidade comprometida</span>
+                <span className="text-xs text-text-secondary"><strong>Degradado:</strong> qualidade comprometida</span>
               </div>
               <div className="flex items-center gap-2">
                 <div style={{ backgroundColor: '#ef4444', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>✕</div>
-                <span className="text-xs text-text-secondary"><strong>Offline:</strong> Sem comunicação</span>
+                <span className="text-xs text-text-secondary"><strong>Offline:</strong> sem comunicação</span>
               </div>
               <div className="flex items-center gap-2">
                 <div style={{ backgroundColor: '#a1a1a1', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>?</div>
-                <span className="text-xs text-text-secondary"><strong>Desconhecido:</strong> Sem dados</span>
+                <span className="text-xs text-text-secondary"><strong>Desconhecido:</strong> sem dados</span>
               </div>
               <div className="flex items-center gap-2">
                 <div style={{ backgroundColor: '#10b981', height: '4px', width: '30px' }}></div>
@@ -301,7 +301,7 @@ export function MapaPage() {
 
       {/* Accessible Fallback List */}
       <section id="mapa-lista" tabIndex={-1} aria-labelledby="mapa-lista-titulo" className="rounded-2xl border border-border-subtle bg-white p-6">
-        <h2 id="mapa-lista-titulo" className="text-lg font-bold text-brand-primary mb-4">Lista de Estações e Corredores</h2>
+        <h2 id="mapa-lista-titulo" className="text-lg font-bold text-brand-primary mb-4">Lista acessível de estações e corredores</h2>
         <p className="text-sm text-text-secondary mb-4">
           Informações acessíveis para leitores de tela e navegação sem JavaScript.
         </p>
@@ -314,7 +314,7 @@ export function MapaPage() {
               Carregando estações...
             </p>
           ) : stations.length === 0 ? (
-            <p className="text-sm text-text-secondary">Nenhuma estação encontrada.</p>
+            <p className="text-sm text-text-secondary">Nenhuma estação encontrada no momento.</p>
           ) : (
             <ul className="space-y-3">
               {stations.map((station) => (
@@ -339,10 +339,10 @@ export function MapaPage() {
                     </div>
                     <Link
                       to={`/dados?station=${station.code}`}
-                      aria-label={`Ver dados da estação ${station.name}`}
-                      className="rounded-md bg-brand-primary px-4 py-2 text-sm font-black uppercase tracking-wide text-white transition-colors hover:bg-brand-primary/90"
+                      aria-label={`Abrir dados da estação ${station.name}`}
+                      className="ui-btn-primary motion-focus px-4 py-2 text-sm"
                     >
-                      Ver Dados
+                      Abrir dados da estação
                     </Link>
                   </div>
                 </li>
@@ -359,7 +359,7 @@ export function MapaPage() {
               Carregando corredores...
             </p>
           ) : corridors.length === 0 ? (
-            <p className="text-sm text-text-secondary">Nenhum corredor climático encontrado.</p>
+            <p className="text-sm text-text-secondary">Nenhum corredor climático encontrado no momento.</p>
           ) : (
             <ul className="space-y-3">
               {corridors.map((corridor) => (
@@ -379,9 +379,9 @@ export function MapaPage() {
                     <Link
                       to={`/corredores/${corridor.slug}`}
                       aria-label={`Abrir corredor ${corridor.title}`}
-                      className="rounded-md border border-brand-primary px-4 py-2 text-sm font-black uppercase tracking-wide text-brand-primary transition-colors hover:bg-brand-primary hover:text-white"
+                      className="ui-btn-secondary motion-focus px-4 py-2 text-sm"
                     >
-                      Abrir Corredor
+                      Abrir corredor
                     </Link>
                   </div>
                 </li>
@@ -393,3 +393,5 @@ export function MapaPage() {
     </section>
   );
 }
+
+

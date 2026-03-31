@@ -352,7 +352,7 @@ export function StatusPage() {
                 disabled={monthlyLoading || Boolean(monthlyError)}
                 className="rounded-lg border border-ciano/20 bg-ciano/10 px-4 py-2 text-xs font-bold uppercase tracking-wide text-ciano hover:bg-ciano/20 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Baixar CSV
+                Baixar CSV do período
               </button>
               <button
                 type="button"
@@ -528,7 +528,7 @@ export function StatusPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-red-500/30 bg-fundo/60 p-6 flex flex-col md:col-span-3">
+        <div className="seed-placeholder logo-watermark-soft p-6 flex flex-col md:col-span-3">
           <h2 className="text-xs font-black uppercase tracking-widest text-cta">Erros nas ultimas 24h</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-red-500/20 bg-base/20 p-4">
@@ -580,7 +580,7 @@ export function StatusPage() {
           </div>
         )}
 
-        <div className="rounded-2xl border border-base/40 bg-fundo/60 p-6 flex flex-col md:col-span-3">
+        <div className="seed-placeholder logo-watermark-soft p-6 flex flex-col md:col-span-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-xs font-black uppercase tracking-widest text-cta">Operacao (ultimos 7 dias)</h2>
             <button
@@ -693,7 +693,7 @@ export function StatusPage() {
           <h3 className="text-xl font-black text-cta uppercase tracking-widest">Proximos Passos</h3>
           <div className="space-y-4">
             {status.content.upcoming_events.length === 0 ? (
-              <p className="text-sm text-texto/40 italic">Nenhum evento agendado.</p>
+              <div className="seed-placeholder p-4 text-center text-texto/60"><div className="mb-3 flex items-center gap-3"><div className="seed-radial-divider flex-1" aria-hidden="true" /><span className="section-badge">Agenda</span><div className="seed-radial-divider flex-1" aria-hidden="true" /></div><p className="text-sm italic">Nenhum evento agendado.</p></div>
             ) : (
               status.content.upcoming_events.map((ev) => (
                 <div key={ev.id} className="border-l-2 border-acento pl-4">
@@ -708,7 +708,7 @@ export function StatusPage() {
             <h4 className="text-sm font-black text-ciano uppercase tracking-widest mb-4">Blog</h4>
             <div className="space-y-3">
               {status.content.latest_blog.length === 0 ? (
-                <p className="text-xs text-texto/40 italic">Nenhum post disponivel.</p>
+                <div className="seed-placeholder p-4 text-center text-texto/60"><div className="mb-3 flex items-center gap-3"><div className="seed-radial-divider flex-1" aria-hidden="true" /><span className="section-badge">Blog</span><div className="seed-radial-divider flex-1" aria-hidden="true" /></div><p className="text-xs italic">Nenhum post disponivel.</p></div>
               ) : (
                 status.content.latest_blog.map((post) => (
                   <Link to={`/blog/${post.slug}`} key={post.id} className="block group">
@@ -725,7 +725,7 @@ export function StatusPage() {
           <h3 className="text-xl font-black text-cta uppercase tracking-widest">Memoria Digital</h3>
           <div className="space-y-4">
             {status.content.latest_acervo.length === 0 ? (
-              <p className="text-sm text-texto/40 italic">Acervo vazio.</p>
+              <div className="seed-placeholder p-4 text-center text-texto/60"><div className="mb-3 flex items-center gap-3"><div className="seed-radial-divider flex-1" aria-hidden="true" /><span className="section-badge">Acervo</span><div className="seed-radial-divider flex-1" aria-hidden="true" /></div><p className="text-sm italic">Acervo vazio.</p></div>
             ) : (
               status.content.latest_acervo.map((item) => (
                 <Link to={`/acervo/item/${item.slug}`} key={item.id} className="flex flex-col border border-ciano/20 bg-base/20 rounded-xl p-4 hover:border-ciano/40 transition-all">
