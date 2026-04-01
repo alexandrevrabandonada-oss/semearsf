@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import { SectionHeader, SurfaceCard } from "../components/BrandSystem";
+import { BrandRadialDivider, BrandWatermarkPanel } from "../components/BrandMicro";
 import { INSTITUTIONAL_CITATION, INSTITUTIONAL_COORDINATION, INSTITUTIONAL_FUNDING, INSTITUTIONAL_SUMMARY, INSTITUTIONAL_TAGLINE, INSTITUTIONAL_UNIVERSITY_FULL_NAME } from "../content/institucional";
 
 const quickLinks = [
@@ -28,30 +30,27 @@ const downloads = [
 
 export function ImprensaPage() {
   return (
-    <div className="space-y-6">
-      <section className="document-placeholder p-6 shadow-sm md:p-8">
-        <div className="mb-5 flex max-w-sm items-center gap-3">
-          <div className="seed-radial-divider flex-1" aria-hidden="true" />
-          <span className="seed-badge">Imprensa</span>
-          <div className="seed-radial-divider flex-1" aria-hidden="true" />
-        </div>
-        <h1 className="text-2xl font-black leading-tight text-text-primary md:text-3xl">Imprensa</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-text-secondary md:text-base">
-          Página de apoio para jornalistas, assessorias, pesquisadores e parceiros que precisam de resumo institucional,
-          orientações de citação e acesso rápido aos materiais públicos do projeto.
-        </p>
-      </section>
+    <section className="space-y-6">
+      <SurfaceCard className="document-placeholder p-6 shadow-sm md:p-8">
+        <SectionHeader
+          eyebrow="Imprensa"
+          title="Imprensa"
+          description="Página de apoio para jornalistas, assessorias, pesquisadores e parceiros com resumo institucional, orientações de citação e acesso rápido aos materiais públicos do projeto."
+        />
+      </SurfaceCard>
 
-      <section className="surface-card logo-watermark-soft p-6 shadow-sm md:p-8">
+      <SurfaceCard className="surface-card logo-watermark-soft p-6 shadow-sm md:p-8">
+        <BrandWatermarkPanel>
         <h2 className="text-lg font-black text-text-primary">Resumo institucional</h2>
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-text-secondary md:text-base">
           <p>{INSTITUTIONAL_SUMMARY}</p>
           <p>{INSTITUTIONAL_TAGLINE}. O portal combina dados ambientais em tempo quase real, biblioteca oficial de relatórios, acervo histórico, agenda de atividades e prestação de contas em linguagem acessível.</p>
           <p className="seed-badge w-fit">{INSTITUTIONAL_COORDINATION} · {INSTITUTIONAL_FUNDING}</p>
         </div>
-      </section>
+        </BrandWatermarkPanel>
+      </SurfaceCard>
 
-      <section className="surface-card p-6 shadow-sm md:p-8">
+      <SurfaceCard className="surface-card p-6 shadow-sm md:p-8">
         <h2 className="text-lg font-black text-text-primary">Como citar dados</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-text-secondary md:text-base">
           {citationBullets.map((item) => (
@@ -62,9 +61,10 @@ export function ImprensaPage() {
         <p className="mt-4 text-sm text-text-secondary">
           Para contexto técnico adicional, consulte <Link className="font-semibold text-brand-primary underline" to="/como-ler-dados">Como ler os dados</Link>.
         </p>
-      </section>
+        <BrandRadialDivider className="radial-divider-subtle mt-4" />
+      </SurfaceCard>
 
-      <section className="surface-card p-6 shadow-sm md:p-8">
+      <SurfaceCard className="surface-card p-6 shadow-sm md:p-8">
         <h2 className="text-lg font-black text-text-primary">Links rapidos</h2>
         <ul className="mt-3 grid gap-3 md:grid-cols-2">
           {quickLinks.map((item) => (
@@ -78,10 +78,10 @@ export function ImprensaPage() {
             </li>
           ))}
         </ul>
-      </section>
+      </SurfaceCard>
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="surface-card p-6 shadow-sm md:p-8">
+        <SurfaceCard className="surface-card p-6 shadow-sm md:p-8">
           <h2 className="text-lg font-black text-text-primary">Contatos</h2>
           <ul className="mt-3 space-y-3 text-sm text-text-secondary md:text-base">
             {contacts.map((item) => (
@@ -98,9 +98,9 @@ export function ImprensaPage() {
               Privacidade e LGPD
             </Link>.
           </p>
-        </div>
+        </SurfaceCard>
 
-        <div className="document-placeholder p-6 shadow-sm md:p-8">
+        <SurfaceCard className="document-placeholder p-6 shadow-sm md:p-8">
           <h2 className="text-lg font-black text-brand-primary">Download de logos</h2>
           <div className="mt-4 space-y-4">
             <img
@@ -129,9 +129,9 @@ export function ImprensaPage() {
               </li>
             ))}
           </ul>
-        </div>
+        </SurfaceCard>
       </section>
-    </div>
+    </section>
   );
 }
 

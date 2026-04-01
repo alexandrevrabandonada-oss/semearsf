@@ -25,11 +25,13 @@ type ChipProps = {
 };
 
 type EditorialCardVariant = "standard" | "featured" | "compact" | "text" | "media";
+type EditorialCardTone = "editorial" | "featured" | "tecnico" | "documental";
 
 type EditorialCardProps = {
   children: ReactNode;
   className?: string;
   variant?: EditorialCardVariant;
+  tone?: EditorialCardTone;
 };
 
 const iconToneClasses: Record<NonNullable<IconShellProps["tone"]>, string> = {
@@ -54,13 +56,18 @@ export function SurfaceCard({ children, className = "" }: SurfaceCardProps) {
 export function SectionHeader({ eyebrow, title, description, action }: SectionHeaderProps) {
   return (
     <div className="space-y-3.5">
-      <div className="flex flex-col gap-2.5 md:flex-row md:items-start md:justify-between">
-        <div className="space-y-2">
-          <span className="section-badge">{eyebrow}</span>
+      <div className="section-header-shell semear-seed-wave">
+        <div className="flex flex-col gap-2.5 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="section-badge">{eyebrow}</span>
+              <span className="semear-core-disc h-6 w-6" aria-hidden="true" />
+            </div>
           <h2 className="max-w-3xl text-2xl font-black leading-[1.1] tracking-tight text-text-primary md:text-3xl">{title}</h2>
           {description ? <p className="max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">{description}</p> : null}
+          </div>
+          {action ? <div className="shrink-0 motion-control md:pt-1">{action}</div> : null}
         </div>
-        {action ? <div className="shrink-0 motion-control md:pt-1">{action}</div> : null}
       </div>
       <div className="decorative-divider" aria-hidden="true" />
     </div>
@@ -83,10 +90,17 @@ const editorialCardVariantClasses: Record<EditorialCardVariant, string> = {
   media: "min-h-[18rem]"
 };
 
-export function EditorialCard({ children, className = "", variant = "standard" }: EditorialCardProps) {
+const editorialCardToneClasses: Record<EditorialCardTone, string> = {
+  editorial: "semear-card-editorial",
+  featured: "semear-card-featured",
+  tecnico: "semear-card-tecnico",
+  documental: "semear-card-documental"
+};
+
+export function EditorialCard({ children, className = "", variant = "standard", tone = "editorial" }: EditorialCardProps) {
   return (
     <article
-      className={`signature-surface motion-surface motion-surface-hover flex h-full flex-col overflow-hidden ${editorialCardVariantClasses[variant]} ${className}`.trim()}
+      className={`semear-card ${editorialCardToneClasses[tone]} motion-surface motion-surface-hover flex h-full flex-col overflow-hidden ${editorialCardVariantClasses[variant]} ${className}`.trim()}
     >
       {children}
     </article>
@@ -98,7 +112,7 @@ export function EditorialCardBody({ children, className = "" }: { children: Reac
 }
 
 export function EditorialCardEyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <span className={`section-badge w-fit ${className}`.trim()}>{children}</span>;
+  return <span className={`ui-chip-editorial w-fit ${className}`.trim()}>{children}</span>;
 }
 
 export function EditorialCardTitle({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -110,9 +124,9 @@ export function EditorialCardExcerpt({ children, className = "" }: { children: R
 }
 
 export function EditorialCardMeta({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-text-secondary ${className}`.trim()}>{children}</div>;
+  return <div className={`flex flex-wrap items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.13em] text-text-secondary ${className}`.trim()}>{children}</div>;
 }
 
 export function EditorialCardActions({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`mt-auto flex flex-wrap items-center gap-3 ${className}`.trim()}>{children}</div>;
+  return <div className={`mt-auto flex flex-wrap items-center gap-2.5 pt-1 ${className}`.trim()}>{children}</div>;
 }

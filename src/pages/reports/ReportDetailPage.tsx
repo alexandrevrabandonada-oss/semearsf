@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { SurfaceCard } from "../../components/BrandSystem";
+import { BrandIllustratedEmptyState, BrandRadialDivider, BrandTextureSkeleton } from "../../components/BrandMicro";
 import { OfflineBanner } from "../../components/OfflineBanner";
 import { getReportBySlug, type ReportDocument } from "../../lib/api";
 import { trackShare } from "../../lib/observability";
@@ -105,7 +107,7 @@ export function ReportDetailPage() {
   }, [isViewerOpen]);
 
   if (loading) {
-    return <p aria-live="polite" className="text-base text-text-secondary" role="status">Carregando relatório...</p>;
+    return <BrandTextureSkeleton className="rounded-[1.75rem]" lines={5} />;
   }
 
   if (error) {
@@ -118,9 +120,11 @@ export function ReportDetailPage() {
 
   if (!report) {
     return (
-      <div className="rounded-2xl border border-border-subtle bg-white p-8 text-center">
-        <p className="text-sm text-text-secondary">Relatório não encontrado.</p>
-      </div>
+      <BrandIllustratedEmptyState
+        title="Relatório não encontrado"
+        description="O documento solicitado pode ter sido removido ou ainda não disponibilizado."
+        icon={<span className="text-2xl" aria-hidden="true">📄</span>}
+      />
     );
   }
 
@@ -171,7 +175,7 @@ export function ReportDetailPage() {
         />
       )}
 
-      <article className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
+      <SurfaceCard className="signature-shell logo-watermark-soft p-5 md:p-8">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Documento oficial</p>
         <h1 className="mt-2 text-2xl font-black text-text-primary md:text-4xl">{report.title}</h1>
         {report.summary && <p className="mt-3 text-base leading-relaxed text-text-secondary">{report.summary}</p>}
@@ -184,19 +188,21 @@ export function ReportDetailPage() {
         {report.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1">
             {report.tags.map((tag) => (
-              <span key={tag} className="rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary">
+              <span key={tag} className="ui-tag-signature">
                 {tag}
               </span>
             ))}
           </div>
         )}
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <BrandRadialDivider className="radial-divider-subtle mt-4" />
+
+        <div className="mt-6 flex flex-wrap gap-2.5 md:gap-3">
           <button
             type="button"
             disabled={!hasPdf || !canOpenOffline}
             onClick={handleOpenPdf}
-            className="ui-btn-primary motion-focus px-5 disabled:cursor-not-allowed disabled:opacity-60"
+            className="ui-btn-primary motion-focus px-5 max-sm:w-full max-sm:justify-center disabled:cursor-not-allowed disabled:opacity-60"
           >
             Abrir PDF
           </button>
@@ -204,7 +210,7 @@ export function ReportDetailPage() {
           <button
             type="button"
             onClick={() => { void handleShare(); }}
-            className="ui-btn-secondary motion-focus px-5"
+            className="ui-btn-secondary motion-focus px-5 max-sm:w-full max-sm:justify-center"
           >
             Copiar ou compartilhar
           </button>
@@ -215,7 +221,7 @@ export function ReportDetailPage() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={markAsOpened}
-              className="ui-btn-secondary motion-focus px-5"
+              className="ui-btn-secondary motion-focus px-5 max-sm:w-full max-sm:justify-center"
             >
               Abrir em nova aba
             </a>
@@ -230,7 +236,7 @@ export function ReportDetailPage() {
             </a>
           )}
         </div>
-      </article>
+      </SurfaceCard>
 
       {isViewerOpen && hasPdf && (
         <div

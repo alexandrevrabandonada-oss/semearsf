@@ -4,6 +4,7 @@ import { listCollections, type AcervoCollection } from "../../lib/api";
 import { getOptimizedCover } from "../../lib/imageOptimization";
 import { trackShare } from "../../lib/observability";
 import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
+import { BrandIllustratedEmptyState, BrandTextureSkeleton } from "../../components/BrandMicro";
 
 export function CollectionsListPage() {
   const [collections, setCollections] = useState<AcervoCollection[]>([]);
@@ -37,22 +38,23 @@ export function CollectionsListPage() {
       </SurfaceCard>
 
       {loading ? (
-        <p className="text-sm text-text-secondary" aria-live="polite" aria-busy="true">Carregando coleções...</p>
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-live="polite" aria-busy="true">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <BrandTextureSkeleton key={index} className="h-72 rounded-[1.75rem]" lines={4} />
+          ))}
+        </div>
       ) : error ? (
         <p className="rounded-md border border-accent/70 bg-accent/15 p-3 text-sm text-text-primary" aria-live="assertive">{error}</p>
       ) : collections.length === 0 ? (
-        <div className="document-placeholder p-6 text-center" aria-live="polite">
-          <div className="mx-auto mb-4 flex max-w-xs items-center gap-3">
-            <div className="seed-radial-divider flex-1" aria-hidden="true" />
-            <span className="section-badge">Dossiês</span>
-            <div className="seed-radial-divider flex-1" aria-hidden="true" />
-          </div>
-          <p className="text-sm text-text-secondary">Nenhum dossiê publicado ainda.</p>
-        </div>
+        <BrandIllustratedEmptyState
+          title="Nenhum dossiê publicado ainda"
+          description="Os dossiês curados do SEMEAR serão exibidos aqui com destaque temático e documentação associada."
+          icon={<span className="text-2xl" aria-hidden="true">📚</span>}
+        />
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-live="polite">
           {collections.map((col) => (
-            <EditorialCard key={col.id} variant={col.cover_url ? "featured" : "text"}>
+            <EditorialCard key={col.id} variant={col.cover_url ? "featured" : "text"} tone="featured">
               <Link to={`/dossies/${col.slug}`} className="block">
                 {col.cover_url ? (
                   <div className="relative h-48 w-full overflow-hidden bg-surface-2">
@@ -67,7 +69,7 @@ export function CollectionsListPage() {
                   </div>
                 ) : (
                   <div className="document-placeholder flex h-48 flex-col justify-between p-5">
-                    <span className="section-badge w-fit">SEMEAR</span>
+                    <span className="ui-seal w-fit">SEMEAR</span>
                     <span className="max-w-[12rem] text-lg font-black leading-tight text-text-primary">Dossiê sem capa</span>
                   </div>
                 )}
@@ -75,20 +77,20 @@ export function CollectionsListPage() {
 
               <EditorialCardBody>
                 <EditorialCardMeta>
-                  <Chip tone="seed">Dossiê</Chip>
-                  <Chip tone="active">Curadoria</Chip>
+                  <span className="ui-tag-signature">Dossiê</span>
+                  <span className="ui-tag-signature-editorial">Curadoria</span>
                 </EditorialCardMeta>
                 <EditorialCardTitle className="line-clamp-2">{col.title}</EditorialCardTitle>
                 {col.excerpt ? <EditorialCardExcerpt className="line-clamp-3">{col.excerpt}</EditorialCardExcerpt> : null}
                 <div className="mt-1 flex flex-wrap gap-2">
                   {col.tags.slice(0, 4).map((tag) => (
-                    <span key={tag} className="ui-chip">
+                    <span key={tag} className="ui-tag-signature-editorial">
                       {tag}
                     </span>
                   ))}
                 </div>
                 <EditorialCardActions className="pt-1">
-                  <Link to={`/dossies/${col.slug}`} className="ui-btn-primary px-4 text-xs">
+                  <Link to={`/dossies/${col.slug}`} className="semear-card-cta px-4">
                     Abrir dossiê
                   </Link>
                   <button

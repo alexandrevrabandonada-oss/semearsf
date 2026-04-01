@@ -81,6 +81,68 @@ select {
 }
 
 @layer components {
+  .semear-core-disc {
+    @apply relative overflow-hidden rounded-full border border-brand-primary/25 bg-gradient-to-br from-brand-primary-soft via-surface-1 to-accent-seed/20;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45), 0 10px 24px rgba(17, 38, 59, 0.08);
+  }
+
+  .semear-core-disc::before {
+    content: "";
+    @apply pointer-events-none absolute inset-[21%] rounded-full;
+    background:
+      radial-gradient(circle at 44% 45%, rgba(0, 93, 170, 0.32), rgba(0, 93, 170, 0) 64%),
+      radial-gradient(circle at 66% 62%, rgba(163, 216, 50, 0.34), rgba(163, 216, 50, 0) 62%),
+      repeating-radial-gradient(circle at center, rgba(17, 38, 59, 0.12) 0 1px, transparent 1px 4px);
+    opacity: 0.8;
+  }
+
+  .semear-core-disc::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0 rounded-full;
+    background:
+      radial-gradient(circle at center, transparent 58%, rgba(0, 93, 170, 0.16) 60%, transparent 63%),
+      radial-gradient(circle at center, transparent 72%, rgba(163, 216, 50, 0.24) 74%, transparent 76%);
+    opacity: 0.9;
+  }
+
+  .semear-seed-wave {
+    @apply relative overflow-hidden;
+  }
+
+  .semear-seed-wave::before {
+    content: "";
+    @apply pointer-events-none absolute inset-0;
+    background-image:
+      radial-gradient(circle at 8% 36%, rgba(0, 93, 170, 0.18) 0 1.2px, transparent 1.3px),
+      radial-gradient(circle at 23% 42%, rgba(0, 183, 177, 0.14) 0 1px, transparent 1.1px),
+      radial-gradient(circle at 38% 49%, rgba(0, 93, 170, 0.16) 0 1.2px, transparent 1.3px),
+      radial-gradient(circle at 54% 56%, rgba(163, 216, 50, 0.16) 0 1.3px, transparent 1.4px),
+      radial-gradient(circle at 70% 63%, rgba(0, 93, 170, 0.14) 0 1px, transparent 1.1px),
+      radial-gradient(circle at 86% 70%, rgba(0, 183, 177, 0.14) 0 1.1px, transparent 1.2px);
+    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.85) 16%, rgba(0, 0, 0, 0.85) 84%, transparent 100%);
+  }
+
+  .semear-petal-divider {
+    @apply relative h-7 w-full overflow-hidden;
+  }
+
+  .semear-petal-divider::before {
+    content: "";
+    @apply absolute inset-x-0 top-1/2 h-px -translate-y-1/2;
+    background: linear-gradient(90deg, transparent, rgba(0, 93, 170, 0.22), rgba(0, 183, 177, 0.2), transparent);
+  }
+
+  .semear-petal-divider::after {
+    content: "";
+    @apply absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full;
+    background:
+      radial-gradient(circle at center, rgba(0, 93, 170, 0.24) 0 2px, transparent 3px),
+      repeating-radial-gradient(circle at center, rgba(17, 38, 59, 0.1) 0 1px, transparent 1px 3px),
+      linear-gradient(140deg, rgba(255, 255, 255, 0.9), rgba(229, 240, 250, 0.95));
+    border: 1px solid rgba(0, 93, 170, 0.18);
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.72);
+  }
+
   .motion-control {
     @apply transition duration-200 ease-out;
   }
@@ -135,19 +197,28 @@ select {
   }
 
   .ui-segment-tab {
-    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-3.5 py-2 text-[13px] font-semibold leading-none text-text-secondary hover:border-brand-primary/20 hover:bg-brand-primary-soft hover:text-brand-primary-dark;
+    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-xl border border-border-subtle bg-surface-1 px-3.5 py-2 text-[13px] font-semibold leading-none text-text-secondary hover:border-brand-primary/20 hover:bg-brand-primary-soft hover:text-brand-primary-dark;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
   }
 
   .ui-segment-tab-active {
-    @apply border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_22px_rgba(0,93,170,0.12)];
+    @apply border-brand-primary/25 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_22px_rgba(0,93,170,0.12)];
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.66), rgba(229, 240, 250, 0.55)),
+      linear-gradient(115deg, rgba(0, 93, 170, 0.08), rgba(0, 183, 177, 0.05));
   }
 
   .ui-nav-pill {
-    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-transparent bg-transparent px-3.5 py-2 text-[13px] font-semibold leading-none text-text-secondary hover:border-border-subtle hover:bg-surface-2 hover:text-text-primary;
+    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-transparent bg-transparent px-3.5 py-2 text-[13px] font-semibold uppercase tracking-[0.09em] leading-none text-text-secondary hover:border-border-subtle hover:bg-surface-2 hover:text-text-primary;
   }
 
   .ui-nav-pill-active {
     @apply border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_22px_rgba(0,93,170,0.12)];
+  }
+
+  .ui-pill-institutional {
+    @apply inline-flex min-h-[32px] items-center rounded-full border border-brand-primary/20 bg-brand-primary-soft px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] leading-none text-brand-primary-dark;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.62);
   }
 
   .motion-dialog {
@@ -173,15 +244,32 @@ select {
   }
 
   .ui-btn-primary {
-    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full bg-brand-primary px-4 py-2 text-[13px] font-semibold leading-none text-white shadow-[0_8px_24px_rgba(0,93,170,0.16)] hover:bg-brand-primary-dark hover:shadow-[0_12px_28px_rgba(0,93,170,0.22)];
+    @apply motion-action inline-flex min-h-[42px] items-center justify-center rounded-full bg-brand-primary px-4 py-2 text-[13px] font-semibold leading-none text-white shadow-[0_8px_24px_rgba(0,93,170,0.16)] hover:bg-brand-primary-dark hover:shadow-[0_12px_28px_rgba(0,93,170,0.22)];
+  }
+
+  .ui-cta-primary {
+    @apply ui-btn-primary relative overflow-hidden border border-brand-primary/20 px-5;
+    background-image: linear-gradient(110deg, #005daa, #0a6bbd 48%, #009aa3 100%);
+    box-shadow: 0 14px 30px rgba(0, 93, 170, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+
+  .ui-cta-primary::before {
+    content: "";
+    @apply pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full;
+    background:
+      radial-gradient(circle at center, rgba(255, 255, 255, 0.35), transparent 66%),
+      repeating-radial-gradient(circle at center, rgba(255, 255, 255, 0.22) 0 1px, transparent 1px 3px);
+    opacity: 0.9;
   }
 
   .ui-btn-secondary {
     @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-4 py-2 text-[13px] font-semibold leading-none text-text-primary shadow-sm hover:border-brand-primary/40 hover:bg-brand-primary-soft;
+    @apply focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-page;
   }
 
   .ui-btn-ghost {
     @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-border-subtle bg-surface-1/75 px-4 py-2 text-[13px] font-semibold leading-none text-brand-primary shadow-[0_1px_2px_rgba(17,38,59,0.03)] hover:border-brand-primary/20 hover:bg-brand-primary-soft hover:text-brand-primary-dark;
+    @apply focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-page;
   }
 
   .ui-cta-secondary {
@@ -189,11 +277,52 @@ select {
   }
 
   .ui-chip {
-    @apply motion-chip-action inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-border-subtle bg-surface-2 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] leading-none text-text-secondary;
+    @apply motion-chip-action inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-border-subtle bg-surface-2 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] leading-none text-text-primary;
   }
 
   .ui-chip-active {
     @apply border-brand-primary/20 bg-brand-primary-soft text-brand-primary-dark;
+  }
+
+  .ui-chip-editorial {
+    @apply ui-chip relative border-brand-primary/20 bg-gradient-to-r from-surface-1 to-brand-primary-soft/65 text-brand-primary-dark;
+    padding-left: 2.1rem;
+  }
+
+  .ui-chip-editorial::before {
+    content: "";
+    @apply absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full;
+    background:
+      radial-gradient(circle at center, rgba(0, 93, 170, 0.24) 0 2px, transparent 3px),
+      repeating-radial-gradient(circle at center, rgba(17, 38, 59, 0.15) 0 1px, transparent 1px 2px),
+      linear-gradient(140deg, rgba(229, 240, 250, 0.98), rgba(255, 255, 255, 0.95));
+    border: 1px solid rgba(0, 93, 170, 0.2);
+  }
+
+  .ui-tag-signature {
+    @apply inline-flex items-center rounded-full border border-brand-primary/30 bg-surface-1 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-primary-dark;
+    @apply transition-colors duration-200;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.62), 0 1px 0 rgba(17, 38, 59, 0.04);
+  }
+
+  .ui-tag-signature:hover {
+    @apply border-brand-primary/40 bg-brand-primary-soft;
+  }
+
+  .ui-tag-signature:focus-visible {
+    @apply outline-none ring-2 ring-brand-primary ring-offset-2 ring-offset-bg-page;
+  }
+
+  .ui-tag-signature-editorial {
+    @apply ui-tag-signature bg-gradient-to-r from-surface-1 to-brand-primary-soft/80;
+  }
+
+  .radial-divider-subtle {
+    @apply h-5 opacity-60;
+  }
+
+  .ui-seal {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-brand-primary/30 bg-white/90 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-primary-dark;
   }
 
   .ui-icon-shell {
@@ -201,11 +330,11 @@ select {
   }
 
   .section-badge {
-    @apply inline-flex min-h-[32px] items-center rounded-full border border-brand-primary/15 bg-brand-primary-soft px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] leading-none text-brand-primary-dark;
+    @apply ui-pill-institutional;
   }
 
   .decorative-divider {
-    @apply h-px w-full bg-gradient-to-r from-transparent via-divider-subtle to-transparent;
+    @apply semear-petal-divider;
   }
 
   .seed-radial-divider {
@@ -218,6 +347,12 @@ select {
     background:
       radial-gradient(circle at center, rgba(0, 93, 170, 0.3) 0 2px, transparent 3px) center/1rem 1px repeat-x,
       linear-gradient(90deg, transparent, rgba(0, 93, 170, 0.14), transparent);
+  }
+
+  .seed-radial-divider::after {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-full;
+    background-image: radial-gradient(circle at 15% 62%, rgba(0, 183, 177, 0.14) 0 1px, transparent 1.2px), radial-gradient(circle at 72% 40%, rgba(163, 216, 50, 0.12) 0 1px, transparent 1.2px);
   }
 
   .seed-placeholder {
@@ -243,12 +378,24 @@ select {
     mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent 88%);
   }
 
+  .seed-placeholder-miolo {
+    @apply seed-placeholder semear-seed-wave;
+  }
+
+  .seed-placeholder-miolo::before {
+    @apply -right-12 -top-12 h-44 w-44 opacity-70;
+    background:
+      radial-gradient(circle at center, rgba(0, 93, 170, 0.16) 0%, rgba(0, 93, 170, 0.03) 40%, transparent 72%),
+      repeating-radial-gradient(circle at center, rgba(17, 38, 59, 0.09) 0 1px, transparent 1px 4px),
+      radial-gradient(circle at 70% 30%, rgba(163, 216, 50, 0.14), transparent 36%);
+  }
+
   .seed-badge {
     @apply inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-brand-primary/15 bg-brand-primary-soft px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] leading-none text-brand-primary-dark;
   }
 
   .floral-placeholder {
-    @apply seed-placeholder;
+    @apply seed-placeholder-miolo;
   }
 
   .floral-placeholder::before {
@@ -259,7 +406,7 @@ select {
   }
 
   .document-placeholder {
-    @apply seed-placeholder bg-gradient-to-br from-surface-1 via-surface-2 to-brand-primary-soft/40;
+    @apply seed-placeholder-miolo bg-gradient-to-br from-surface-1 via-surface-2 to-brand-primary-soft/40;
   }
 
   .document-placeholder::after {
@@ -270,7 +417,7 @@ select {
   }
 
   .report-placeholder {
-    @apply seed-placeholder bg-gradient-to-br from-brand-primary-soft/45 via-surface-1 to-surface-2;
+    @apply seed-placeholder-miolo bg-gradient-to-br from-brand-primary-soft/45 via-surface-1 to-surface-2;
   }
 
   .report-placeholder::before {
@@ -296,6 +443,130 @@ select {
       radial-gradient(circle at 78% 84%, rgba(0, 183, 177, 0.06), transparent 18%);
   }
 
+  .section-header-shell {
+    @apply relative overflow-hidden rounded-2xl border border-border-subtle/80 bg-gradient-to-r from-surface-1 via-surface-1 to-surface-2/75 p-3.5 md:p-4;
+  }
+
+  .section-header-shell::before {
+    content: "";
+    @apply pointer-events-none absolute right-4 top-2 h-14 w-14 rounded-full opacity-70;
+    background:
+      radial-gradient(circle at center, rgba(0, 93, 170, 0.16) 0 2px, transparent 3px),
+      repeating-radial-gradient(circle at center, rgba(17, 38, 59, 0.1) 0 1px, transparent 1px 3px),
+      linear-gradient(135deg, rgba(229, 240, 250, 0.95), rgba(255, 255, 255, 0.6));
+    border: 1px solid rgba(0, 93, 170, 0.16);
+  }
+
+  .hero-semear-shell {
+    @apply relative overflow-hidden;
+  }
+
+  .hero-semear-shell::after {
+    content: "";
+    @apply pointer-events-none absolute -right-16 top-8 h-64 w-64 rounded-full opacity-60;
+    background:
+      radial-gradient(circle at center, rgba(0, 93, 170, 0.12) 0%, rgba(0, 93, 170, 0.03) 38%, transparent 72%),
+      repeating-radial-gradient(circle at center, rgba(17, 38, 59, 0.08) 0 1px, transparent 1px 4px),
+      radial-gradient(circle at 28% 72%, rgba(163, 216, 50, 0.1), transparent 42%);
+  }
+
+  .hero-title-shell {
+    @apply relative inline-flex flex-wrap items-center gap-3;
+  }
+
+  .hero-title-shell::after {
+    content: "";
+    @apply pointer-events-none absolute -bottom-2 left-0 h-1.5 w-40 rounded-full;
+    background: linear-gradient(90deg, rgba(163, 216, 50, 0.9), rgba(0, 93, 170, 0.92), rgba(0, 183, 177, 0.85));
+  }
+
+  .hero-search-shell {
+    @apply relative overflow-hidden rounded-[1.6rem] border border-brand-primary/15 bg-gradient-to-br from-surface-1 via-surface-1 to-brand-primary-soft/35 p-4 md:p-5;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7), 0 16px 38px rgba(17, 38, 59, 0.08);
+  }
+
+  .hero-search-shell::before {
+    content: "";
+    @apply pointer-events-none absolute right-2 top-2 h-20 w-20 rounded-full;
+    background:
+      radial-gradient(circle at center, rgba(0, 93, 170, 0.2) 0 2px, transparent 3px),
+      repeating-radial-gradient(circle at center, rgba(17, 38, 59, 0.1) 0 1px, transparent 1px 3px),
+      linear-gradient(140deg, rgba(255, 255, 255, 0.92), rgba(229, 240, 250, 0.78));
+    border: 1px solid rgba(0, 93, 170, 0.16);
+  }
+
+  .hero-shortcut-chip {
+    @apply ui-chip-editorial text-[10px] tracking-[0.14em];
+  }
+
+  .home-section-data {
+    @apply relative overflow-hidden border-brand-primary/15 bg-gradient-to-br from-surface-1 via-surface-1 to-brand-primary-soft/30;
+  }
+
+  .home-section-data::before {
+    content: "";
+    @apply pointer-events-none absolute -right-8 top-8 h-40 w-40 rounded-full opacity-65;
+    background:
+      radial-gradient(circle at center, rgba(0, 93, 170, 0.14), transparent 64%),
+      repeating-radial-gradient(circle at center, rgba(17, 38, 59, 0.1) 0 1px, transparent 1px 4px);
+  }
+
+  .home-section-dossies {
+    @apply relative overflow-hidden border-accent-seed/20 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-seed/10;
+  }
+
+  .home-section-dossies::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-1;
+    background: linear-gradient(90deg, rgba(163, 216, 50, 0.05), rgba(163, 216, 50, 0.45), rgba(0, 93, 170, 0.35), rgba(0, 93, 170, 0.05));
+  }
+
+  .home-section-corredores {
+    @apply relative overflow-hidden border-success/25 bg-gradient-to-br from-surface-1 via-surface-1 to-success/10;
+  }
+
+  .home-section-corredores::before {
+    content: "";
+    @apply pointer-events-none absolute inset-0 opacity-40;
+    background-image: linear-gradient(130deg, rgba(21, 128, 61, 0.06) 12%, transparent 12% 50%, rgba(0, 93, 170, 0.05) 50% 62%, transparent 62%);
+    background-size: 220px 220px;
+  }
+
+  .home-section-novidades {
+    @apply relative overflow-hidden border-accent-lab/25 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-lab/10;
+  }
+
+  .home-section-novidades::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 bottom-0 h-16;
+    background: linear-gradient(180deg, transparent, rgba(0, 183, 177, 0.08));
+  }
+
+  .home-section-relatorios {
+    @apply relative overflow-hidden border-accent-yellow/30 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-yellow/10;
+  }
+
+  .home-section-relatorios::before {
+    content: "";
+    @apply pointer-events-none absolute -left-10 top-8 h-32 w-32 rounded-full opacity-50;
+    background:
+      radial-gradient(circle at center, rgba(212, 165, 20, 0.3), transparent 64%),
+      radial-gradient(circle at 68% 32%, rgba(0, 93, 170, 0.2), transparent 42%);
+  }
+
+  .data-now-panel {
+    @apply relative overflow-hidden rounded-[1.45rem] border border-brand-primary/15 bg-gradient-to-br from-surface-1 via-surface-1 to-brand-primary-soft/35 p-4;
+  }
+
+  .data-now-panel::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0 opacity-45;
+    background-image:
+      radial-gradient(circle at 84% 20%, rgba(0, 93, 170, 0.12) 0 1.3px, transparent 1.4px),
+      radial-gradient(circle at 72% 38%, rgba(0, 183, 177, 0.1) 0 1.1px, transparent 1.2px),
+      radial-gradient(circle at 62% 54%, rgba(163, 216, 50, 0.12) 0 1.3px, transparent 1.4px);
+  }
+
   .signature-surface {
     @apply relative overflow-hidden rounded-[1.75rem] border border-border-subtle bg-surface-1;
     box-shadow:
@@ -306,6 +577,75 @@ select {
   .signature-surface::after {
     content: "";
     @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-primary/25 to-transparent;
+  }
+
+  .semear-card {
+    @apply signature-surface;
+  }
+
+  .semear-card-editorial {
+    @apply border-brand-primary/15 bg-gradient-to-br from-surface-1 via-surface-1 to-brand-primary-soft/30;
+  }
+
+  .semear-card-editorial::before {
+    content: "";
+    @apply pointer-events-none absolute -right-8 top-6 h-24 w-24 rounded-full opacity-50;
+    background:
+      radial-gradient(circle at center, rgba(0, 93, 170, 0.18), transparent 62%),
+      repeating-radial-gradient(circle at center, rgba(17, 38, 59, 0.08) 0 1px, transparent 1px 3px);
+  }
+
+  .semear-card-featured {
+    @apply border-accent-seed/20 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-seed/15;
+    box-shadow:
+      0 1px 2px rgba(17, 38, 59, 0.04),
+      0 18px 40px rgba(17, 38, 59, 0.1);
+  }
+
+  .semear-card-featured::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-1;
+    background: linear-gradient(90deg, rgba(163, 216, 50, 0.1), rgba(163, 216, 50, 0.48), rgba(0, 93, 170, 0.32), rgba(0, 93, 170, 0.06));
+  }
+
+  .semear-card-tecnico {
+    @apply border-accent-lab/20 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-lab/10;
+  }
+
+  .semear-card-tecnico::before {
+    content: "";
+    @apply pointer-events-none absolute inset-0 opacity-35;
+    background-image: linear-gradient(135deg, rgba(0, 183, 177, 0.08) 12%, transparent 12% 55%, rgba(0, 93, 170, 0.08) 55% 64%, transparent 64%);
+    background-size: 220px 220px;
+  }
+
+  .semear-card-documental {
+    @apply border-accent-yellow/25 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-yellow/10;
+  }
+
+  .semear-card-documental::before {
+    content: "";
+    @apply pointer-events-none absolute inset-y-0 left-0 w-1.5;
+    background: linear-gradient(180deg, rgba(212, 165, 20, 0.75), rgba(0, 93, 170, 0.35));
+  }
+
+  .semear-card-media {
+    @apply relative overflow-hidden;
+  }
+
+  .semear-card-media::after {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 bottom-0 h-20;
+    background: linear-gradient(180deg, transparent, rgba(17, 38, 59, 0.24));
+  }
+
+  .semear-card-cta {
+    @apply inline-flex min-h-[36px] items-center gap-2 rounded-full border border-brand-primary/20 bg-white/85 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-brand-primary transition-all duration-200;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-page;
+  }
+
+  .group:hover .semear-card-cta {
+    @apply border-brand-primary/35 bg-brand-primary-soft text-brand-primary-dark;
   }
 
   .seed-loading-panel {

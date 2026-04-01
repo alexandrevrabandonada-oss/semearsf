@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, IconShell, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
+import { BrandIllustratedEmptyState, BrandTextureSkeleton } from "../../components/BrandMicro";
 import { listAcervoItems, type AcervoItem, type AcervoKind } from "../../lib/api";
 import { type AcervoArea, AREA_KINDS } from "../../lib/acervo";
 import { getOptimizedCover } from "../../lib/imageOptimization";
@@ -190,16 +191,18 @@ export function AcervoListPage() {
 
       <SurfaceCard className="p-6">
         {loading ? (
-          <p aria-live="polite" className="text-base text-text-secondary" role="status">Carregando {meta.label.toLowerCase()}...</p>
+          <div className="grid gap-5 lg:grid-cols-2" aria-live="polite" aria-busy="true">
+            <BrandTextureSkeleton className="h-56 rounded-[1.6rem]" lines={4} />
+            <BrandTextureSkeleton className="h-56 rounded-[1.6rem]" lines={4} />
+          </div>
         ) : error ? (
           <p aria-live="assertive" className="rounded-md border border-error bg-error/10 p-3 text-base text-error" role="alert">{error}</p>
         ) : filtered.length === 0 ? (
-          <div className="document-placeholder py-8 text-center">
-            <p className="text-4xl">📭</p>
-            <p aria-live="polite" className="mt-3 text-base font-semibold text-text-secondary" role="status">
-              {items.length === 0 ? `Nenhum item publicado em ${meta.label} ainda.` : "Nenhum resultado para os filtros aplicados."}
-            </p>
-          </div>
+          <BrandIllustratedEmptyState
+            title={items.length === 0 ? `Nenhum item publicado em ${meta.label} ainda.` : "Nenhum resultado para os filtros aplicados."}
+            description="Ajuste os filtros ou volte depois para acompanhar novas entradas da biblioteca viva do SEMEAR."
+            icon={<span className="text-2xl" aria-hidden="true">📭</span>}
+          />
         ) : (
           <ul className="grid gap-5 lg:grid-cols-2">
             {filtered.map((item) => (
@@ -208,9 +211,9 @@ export function AcervoListPage() {
                   className="group motion-list-item block h-full"
                   to={`/acervo/item/${item.slug}`}
                 >
-                  <EditorialCard variant={item.cover_url ? "media" : "compact"}>
+                  <EditorialCard variant={item.cover_url ? "media" : "compact"} tone="featured">
                     {item.cover_url ? (
-                      <div className="relative h-40 overflow-hidden bg-surface-2">
+                      <div className="semear-card-media relative h-40 overflow-hidden bg-surface-2">
                         <img
                           src={getOptimizedCover(item, "thumb") || ""}
                           alt={item.title}
@@ -221,16 +224,16 @@ export function AcervoListPage() {
                       </div>
                     ) : (
                       <div className="document-placeholder flex h-40 flex-col justify-between p-5">
-                        <span className="section-badge w-fit">SEMEAR</span>
+                        <span className="ui-seal w-fit">SEMEAR</span>
                         <span className="max-w-[12rem] text-lg font-black leading-tight text-text-primary">Item do acervo</span>
                       </div>
                     )}
                     <EditorialCardBody>
                       <EditorialCardMeta className="justify-between gap-3">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="rounded-full border border-border-subtle bg-surface-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">{KIND_LABELS[item.kind]}</span>
-                          {item.source_type && <Chip tone="active">{SOURCE_TYPE_LABELS[item.source_type] || item.source_type}</Chip>}
-                          {item.featured ? <Chip tone="seed">Destaque</Chip> : null}
+                          <span className="ui-tag-signature">{KIND_LABELS[item.kind]}</span>
+                          {item.source_type && <span className="ui-tag-signature-editorial">{SOURCE_TYPE_LABELS[item.source_type] || item.source_type}</span>}
+                          {item.featured ? <span className="ui-tag-signature">Destaque</span> : null}
                         </div>
                         {item.published_at && <span className="shrink-0 text-sm text-text-secondary">{new Date(item.published_at).toLocaleDateString("pt-BR")}</span>}
                       </EditorialCardMeta>
@@ -241,14 +244,14 @@ export function AcervoListPage() {
                       {item.tags.length > 0 ? (
                         <div className="mt-1 flex flex-wrap gap-1">
                           {item.tags.slice(0, 5).map((itemTag) => (
-                            <span key={itemTag} className="ui-chip">
+                            <span key={itemTag} className="ui-tag-signature-editorial">
                               {itemTag}
                             </span>
                           ))}
                         </div>
                       ) : null}
                       <EditorialCardActions className="pt-1">
-                        <span className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary">
+                        <span className="semear-card-cta">
                           Abrir item
                           <span aria-hidden="true">→</span>
                         </span>

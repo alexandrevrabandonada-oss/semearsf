@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, SectionHeader, SurfaceCard } from "../components/BrandSystem";
+import { BrandIllustratedEmptyState, BrandTextureSkeleton } from "../components/BrandMicro";
 import { listBlogPosts, type BlogPost } from "../lib/api";
 import { getOptimizedCover } from "../lib/imageOptimization";
 
@@ -53,7 +54,7 @@ export function BlogListPage() {
             {loading ? (
                 <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="seed-skeleton h-72 rounded-[1.75rem]" />
+                        <BrandTextureSkeleton key={i} className="h-72 rounded-[1.75rem]" lines={4} />
                     ))}
                 </div>
             ) : error ? (
@@ -61,15 +62,11 @@ export function BlogListPage() {
                     {error}
                 </p>
             ) : posts.length === 0 ? (
-                <div className="floral-placeholder py-12 text-center text-text-secondary">
-                    <div className="mx-auto mb-5 flex max-w-xs items-center gap-3 px-6">
-                        <div className="seed-radial-divider flex-1" aria-hidden="true" />
-                        <span className="section-badge">Blog</span>
-                        <div className="seed-radial-divider flex-1" aria-hidden="true" />
-                    </div>
-                    <p className="text-4xl">✍️</p>
-                    <p className="mt-4 text-base font-semibold">Nenhum post publicado no momento.</p>
-                </div>
+                <BrandIllustratedEmptyState
+                    title="Nenhum post publicado no momento"
+                    description="As novas publicações editoriais do SEMEAR aparecerão aqui assim que forem aprovadas."
+                    icon={<span className="text-2xl" aria-hidden="true">✍️</span>}
+                />
             ) : (
                 <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {posts.map((post) => (
@@ -78,9 +75,9 @@ export function BlogListPage() {
                             key={post.id}
                             to={`/blog/${post.slug}`}
                         >
-                            <EditorialCard variant={post.cover_url ? "media" : "text"}>
+                            <EditorialCard variant={post.cover_url ? "media" : "text"} tone="editorial">
                                 {post.cover_url ? (
-                                    <div className="h-44 w-full overflow-hidden bg-bg-surface relative">
+                                    <div className="semear-card-media h-44 w-full overflow-hidden bg-bg-surface relative">
                                         <img
                                             alt={post.title}
                                             className="h-full w-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105"
@@ -100,24 +97,21 @@ export function BlogListPage() {
                                 <EditorialCardBody>
                                     <EditorialCardMeta className="justify-between">
                                         <span>{(post.publish_at || post.published_at) ? new Date((post.publish_at || post.published_at) as string).toLocaleDateString("pt-BR") : "Draft"}</span>
-                                        {demoOrAdminMode && isScheduled(post) ? <Chip tone="active">Agendado</Chip> : null}
+                                        {demoOrAdminMode && isScheduled(post) ? <span className="ui-tag-signature">Agendado</span> : null}
                                     </EditorialCardMeta>
                                     <EditorialCardTitle className="line-clamp-2 md:text-xl">{post.title}</EditorialCardTitle>
                                     {post.excerpt ? <EditorialCardExcerpt className="line-clamp-3">{post.excerpt}</EditorialCardExcerpt> : null}
                                     {post.tags.length > 0 && (
                                         <div className="flex flex-wrap gap-1">
                                             {post.tags.slice(0, 3).map((tag) => (
-                                                <span
-                                                    className="rounded-full bg-brand-primary-soft px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-brand-primary-dark"
-                                                    key={tag}
-                                                >
+                                                <span className="ui-tag-signature-editorial" key={tag}>
                                                     {tag}
                                                 </span>
                                             ))}
                                         </div>
                                     )}
                                     <EditorialCardActions>
-                                        <span className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary transition-transform group-hover:translate-x-0.5">
+                                        <span className="semear-card-cta">
                                             Ler post
                                             <span aria-hidden="true">→</span>
                                         </span>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
+import { BrandIllustratedEmptyState, BrandTextureSkeleton } from "../../components/BrandMicro";
 import { getOptimizedCover } from "../../lib/imageOptimization";
 import { listReports, type ReportDocument, type ReportKind } from "../../lib/api";
 
@@ -172,7 +173,7 @@ export function ReportsListPage() {
                   to={`/relatorios/${item.slug}`}
                   className="group motion-list-item block h-full"
                 >
-                  <EditorialCard variant="featured">
+                  <EditorialCard variant="featured" tone="documental">
                     {thumbUrl ? (
                       <img
                         src={thumbUrl}
@@ -188,13 +189,13 @@ export function ReportsListPage() {
                     )}
                     <EditorialCardBody>
                       <EditorialCardMeta>
-                        <Chip tone="active">Destaque</Chip>
-                        <Chip tone="default">{KIND_LABEL[item.kind]}</Chip>
+                        <span className="ui-tag-signature">Destaque</span>
+                        <span className="ui-tag-signature">{KIND_LABEL[item.kind]}</span>
                       </EditorialCardMeta>
                       <EditorialCardTitle className="line-clamp-2">{item.title}</EditorialCardTitle>
                       {item.summary ? <EditorialCardExcerpt className="line-clamp-3">{item.summary}</EditorialCardExcerpt> : null}
                       <EditorialCardActions className="pt-1">
-                        <span className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary">
+                        <span className="semear-card-cta">
                           Abrir PDF
                           <span aria-hidden="true">→</span>
                         </span>
@@ -210,24 +211,21 @@ export function ReportsListPage() {
 
       <SurfaceCard className="p-6">
         {loading ? (
-          <p aria-live="polite" className="text-base text-text-secondary" role="status">Carregando relatórios...</p>
+          <div className="grid gap-4 md:grid-cols-2" aria-live="polite" aria-busy="true">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <BrandTextureSkeleton key={index} className="h-52 rounded-[1.5rem]" lines={4} />
+            ))}
+          </div>
         ) : error ? (
           <p aria-live="assertive" className="rounded-md border border-error bg-error/10 p-3 text-base text-error" role="alert">
             {error}
           </p>
         ) : reports.length === 0 ? (
-          <div className="report-placeholder p-10 text-center">
-            <div className="mx-auto mb-5 flex max-w-xs items-center gap-3">
-              <div className="seed-radial-divider flex-1" aria-hidden="true" />
-              <span className="section-badge">Relatórios</span>
-              <div className="seed-radial-divider flex-1" aria-hidden="true" />
-            </div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">Biblioteca institucional</p>
-            <h2 className="mt-2 text-xl font-black leading-tight text-text-primary">Nenhum documento encontrado para os filtros aplicados</h2>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-text-secondary">
-              Ajuste ano, tipo, tag ou termo de busca para localizar relatórios oficiais. Este acervo é atualizado de forma contínua pela equipe técnica.
-            </p>
-          </div>
+          <BrandIllustratedEmptyState
+            title="Nenhum documento encontrado para os filtros aplicados"
+            description="Ajuste ano, tipo, tag ou termo de busca para localizar relatórios oficiais do SEMEAR."
+            icon={<span className="text-2xl" aria-hidden="true">📄</span>}
+          />
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {regularReports.map((item) => {
@@ -238,7 +236,7 @@ export function ReportsListPage() {
                   to={`/relatorios/${item.slug}`}
                   className="group motion-list-item block h-full"
                 >
-                  <EditorialCard variant="compact">
+                  <EditorialCard variant="compact" tone="documental">
                     {thumbUrl ? (
                       <div className="h-36 overflow-hidden bg-surface-2">
                         <img
@@ -256,7 +254,7 @@ export function ReportsListPage() {
                     )}
                     <EditorialCardBody className="gap-2">
                       <EditorialCardMeta className="justify-between">
-                        <span className="rounded-full border border-border-subtle bg-surface-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
+                        <span className="ui-tag-signature">
                           {KIND_LABEL[item.kind]}
                         </span>
                         <span>{item.published_at ? new Date(item.published_at).toLocaleDateString("pt-BR") : "Sem data"}</span>
@@ -274,7 +272,7 @@ export function ReportsListPage() {
                                 event.stopPropagation();
                                 setTag(itemTag);
                               }}
-                              className="motion-control rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary hover:border-brand-primary hover:bg-brand-primary/5"
+                              className="motion-control ui-tag-signature"
                               aria-label={`Filtrar relatórios pela tag ${itemTag}`}
                             >
                               {itemTag}
@@ -283,7 +281,7 @@ export function ReportsListPage() {
                         </div>
                       )}
                       <EditorialCardActions className="pt-1">
-                        <span className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary transition-transform group-hover:translate-x-0.5">
+                        <span className="semear-card-cta">
                           Abrir PDF
                           <span aria-hidden="true">→</span>
                         </span>

@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import changelogRaw from "../../data/changelog.md?raw";
 
 import { INSTITUTIONAL_CITATION, INSTITUTIONAL_COORDINATION, INSTITUTIONAL_FUNDING, INSTITUTIONAL_SUMMARY, INSTITUTIONAL_TAGLINE } from "../content/institucional";
+import { SectionHeader, SurfaceCard } from "../components/BrandSystem";
+import { BrandRadialDivider, BrandWatermarkPanel } from "../components/BrandMicro";
 
 function getLatestChangelogEntries(markdown: string, limit = 10): string[] {
   return markdown
@@ -24,15 +26,17 @@ const governanceLinks = [
 
 export function GovernancaPage() {
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm md:p-8">
-        <h1 className="text-2xl font-black text-text-primary md:text-3xl">Governança e Publicação</h1>
-        <p className="mt-3 text-sm text-text-secondary md:text-base">
-          {INSTITUTIONAL_TAGLINE}. Regras públicas de publicação, correção, privacidade e transparência técnica do portal SEMEAR.
-        </p>
-      </section>
+    <section className="space-y-6">
+      <SurfaceCard className="signature-shell logo-watermark-soft p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Governança"
+          title="Governança e Publicação"
+          description={`${INSTITUTIONAL_TAGLINE}. Regras públicas de publicação, correção, privacidade e transparência técnica do portal SEMEAR.`}
+        />
+      </SurfaceCard>
 
-      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+      <SurfaceCard className="p-6">
+        <BrandWatermarkPanel>
         <h2 className="text-lg font-black text-text-primary">Política de publicação</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-text-secondary md:text-base">
           <li>{INSTITUTIONAL_SUMMARY} Blog, acervo e relatórios são publicados somente após revisão editorial mínima e checagem institucional.</li>
@@ -40,9 +44,10 @@ export function GovernancaPage() {
           <li>Relatórios e notas técnicas entram na biblioteca pública com título, resumo, ano e arquivo PDF quando disponível.</li>
           <li>Itens sem comprovação mínima de origem, contexto ou autoria não devem ser publicados em área pública.</li>
         </ul>
-      </section>
+        </BrandWatermarkPanel>
+      </SurfaceCard>
 
-      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+      <SurfaceCard className="p-6">
         <h2 className="text-lg font-black text-text-primary">Critérios de correção</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-text-secondary md:text-base">
           <li>Correções editoriais simples podem ser aplicadas sem republicação quando não alteram o sentido do conteúdo.</li>
@@ -50,9 +55,10 @@ export function GovernancaPage() {
           <li>Quando uma publicação for materialmente corrigida, a equipe deve priorizar clareza sobre o que mudou e por quê.</li>
           <li>Em caso de erro crítico, o conteúdo pode ser temporariamente retirado até revisão completa.</li>
         </ul>
-      </section>
+        <BrandRadialDivider className="radial-divider-subtle mt-4" />
+      </SurfaceCard>
 
-      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+      <SurfaceCard className="p-6">
         <h2 className="text-lg font-black text-text-primary">Privacidade e transparência técnica</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-text-secondary md:text-base">
           <li>Direitos de privacidade, dados pessoais e canais de contato estão descritos em <Link className="font-semibold text-brand-primary underline" to="/privacidade-lgpd">/privacidade-lgpd</Link>.</li>
@@ -62,9 +68,9 @@ export function GovernancaPage() {
           <li>{INSTITUTIONAL_FUNDING} e {INSTITUTIONAL_COORDINATION} compõem a identidade institucional exibida ao público.</li>
           <li>Eventos de compartilhamento são registrados com minimização de dados e hash de IP para análise agregada.</li>
         </ul>
-      </section>
+      </SurfaceCard>
 
-      <section className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+      <SurfaceCard className="p-6">
         <h2 className="text-lg font-black text-text-primary">Atalhos institucionais</h2>
         <ul className="mt-3 flex flex-wrap gap-2">
           {governanceLinks.map((item) => (
@@ -78,9 +84,9 @@ export function GovernancaPage() {
             </li>
           ))}
         </ul>
-      </section>
+      </SurfaceCard>
 
-      <section className="rounded-2xl border border-border-subtle bg-brand-primary-soft p-6 shadow-sm">
+      <SurfaceCard className="logo-watermark-soft border-brand-primary/15 bg-brand-primary-soft p-6">
         <h2 className="text-lg font-black text-brand-primary">Changelog público (últimos 10 itens)</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-text-primary md:text-base">
           {latestEntries.map((entry) => (
@@ -90,7 +96,7 @@ export function GovernancaPage() {
         <p className="mt-4 text-xs text-text-secondary">
           Arquivo versionado em <code>data/changelog.md</code>.
         </p>
-      </section>
-    </div>
+      </SurfaceCard>
+    </section>
   );
 }

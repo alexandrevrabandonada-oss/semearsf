@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { IconShell, SectionHeader, SurfaceCard, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, Chip } from "../../components/BrandSystem";
+import { BrandIllustratedEmptyState, BrandTextureSkeleton } from "../../components/BrandMicro";
 import { ClimateCorridor, listCorridors } from "../../lib/api";
 import { getOptimizedCover } from "../../lib/imageOptimization";
 
@@ -31,8 +32,10 @@ export function CorredoresListPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-live="polite" aria-busy="true">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <BrandTextureSkeleton key={index} className="h-72 rounded-[1.75rem]" lines={4} />
+        ))}
       </div>
     );
   }
@@ -64,17 +67,17 @@ export function CorredoresListPage() {
       </SurfaceCard>
 
       {corridors.length === 0 ? (
-        <div className="floral-placeholder flex flex-col items-center justify-center p-12 text-center">
-          <span className="mb-4 text-4xl">🗺️</span>
-          <h2 className="text-xl font-bold text-text-primary">Nenhum corredor mapeado</h2>
-          <p className="mt-2 text-text-secondary">Em breve novos recortes territoriais estarão disponíveis.</p>
-        </div>
+        <BrandIllustratedEmptyState
+          title="Nenhum corredor mapeado"
+          description="Novos recortes territoriais monitorados serão publicados nesta seção assim que finalizados."
+          icon={<span className="text-2xl" aria-hidden="true">🗺️</span>}
+        />
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {corridors.map((c) => (
             <Link key={c.id} to={`/corredores/${c.slug}`} className="group motion-list-item block h-full">
-              <EditorialCard variant="standard">
-                <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-brand-primary-soft/40 to-surface-2">
+              <EditorialCard variant="standard" tone="tecnico">
+                <div className="semear-card-media relative h-48 w-full overflow-hidden bg-gradient-to-br from-brand-primary-soft/40 to-surface-2">
                   {c.featured && (
                     <div className="absolute right-0 top-0 z-10 rounded-bl-xl bg-brand-primary px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
                       Destaque
@@ -99,13 +102,13 @@ export function CorredoresListPage() {
 
                 <EditorialCardBody>
                   <EditorialCardMeta>
-                    <Chip tone="seed">Corredor</Chip>
-                    {c.featured ? <Chip tone="active">Destaque</Chip> : null}
+                    <span className="ui-tag-signature">Corredor</span>
+                    {c.featured ? <span className="ui-tag-signature-editorial">Destaque</span> : null}
                   </EditorialCardMeta>
                   <EditorialCardTitle className="line-clamp-2">{c.title}</EditorialCardTitle>
                   {c.excerpt ? <EditorialCardExcerpt className="line-clamp-3">{c.excerpt}</EditorialCardExcerpt> : null}
                   <EditorialCardActions>
-                    <span className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary transition-transform group-hover:translate-x-0.5">
+                    <span className="semear-card-cta">
                       Explorar rota
                       <span aria-hidden="true">→</span>
                     </span>

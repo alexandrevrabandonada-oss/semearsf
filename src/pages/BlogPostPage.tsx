@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { SurfaceCard } from "../components/BrandSystem";
+import { BrandIllustratedEmptyState, BrandRadialDivider, BrandTextureSkeleton, BrandWatermarkPanel } from "../components/BrandMicro";
 import { getBlogPostBySlug, type BlogPost } from "../lib/api";
 import { trackShare } from "../lib/observability";
 
@@ -13,7 +15,7 @@ function SimpleMarkdown({ text }: { text: string }) {
         .replace(/\*(.+?)\*/g, "<em>$1</em>")
         .replace(/\n/g, "<br />");
     // eslint-disable-next-line react/no-danger
-    return <div className="text-base leading-relaxed text-text-primary space-y-4" dangerouslySetInnerHTML={{ __html: html }} />;
+    return <div className="space-y-4 text-[15px] leading-relaxed text-text-primary md:text-base" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export function BlogPostPage() {
@@ -45,7 +47,7 @@ export function BlogPostPage() {
     }, [slug]);
 
     if (loading) {
-        return <p aria-live="polite" className="text-base text-text-secondary" role="status">Carregando post...</p>;
+        return <BrandTextureSkeleton className="mx-auto max-w-4xl rounded-[1.75rem]" lines={5} />;
     }
 
     if (error) {
@@ -58,20 +60,17 @@ export function BlogPostPage() {
 
     if (!post) {
         return (
-            <div className="rounded-2xl border border-border-subtle bg-white p-10 text-center shadow-sm">
-                <p className="text-4xl">🔍</p>
-                <p aria-live="polite" className="mt-3 text-base font-semibold text-text-secondary" role="status">
-                    Post não encontrado.
-                </p>
-                <Link className="mt-4 inline-block text-sm font-bold text-brand-primary hover:underline" to="/blog">
-                    Voltar ao Blog
-                </Link>
-            </div>
+            <BrandIllustratedEmptyState
+                title="Post não encontrado"
+                description="O conteúdo solicitado pode ter sido movido, removido ou ainda não publicado."
+                icon={<span className="text-2xl" aria-hidden="true">🔍</span>}
+                action={<Link className="ui-btn-secondary" to="/blog">Voltar ao Blog</Link>}
+            />
         );
     }
 
     return (
-        <article className="mx-auto max-w-4xl space-y-6">
+        <article className="mx-auto max-w-4xl space-y-6 px-1 md:px-0">
             <Link
                 className="inline-flex items-center gap-1 text-sm font-semibold text-brand-primary hover:underline"
                 to="/blog"
@@ -79,7 +78,7 @@ export function BlogPostPage() {
                 ← Voltar ao Blog
             </Link>
 
-            <div className="overflow-hidden rounded-2xl border border-border-subtle bg-white shadow-sm">
+            <SurfaceCard className="signature-shell logo-watermark-soft overflow-hidden p-0">
                 {post.cover_url && (
                     <img
                         alt={post.title}
@@ -87,21 +86,21 @@ export function BlogPostPage() {
                         src={post.cover_url}
                     />
                 )}
-                <div className="p-6 md:p-10">
-                    <div className="mb-4 flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                <div className="p-5 md:p-10">
+                    <div className="mb-4 flex flex-wrap items-center gap-2.5 text-xs font-semibold uppercase tracking-wider text-text-secondary md:gap-3">
                         <span>{post.published_at ? new Date(post.published_at).toLocaleDateString("pt-BR") : "Draft"}</span>
                         {post.tags.length > 0 && (
                             <>
                                 <span className="h-1 w-1 rounded-full bg-border-subtle" />
                                 <div className="flex flex-wrap gap-2">
                                     {post.tags.map((tag) => (
-                                        <span className="text-brand-primary" key={tag}>#{tag}</span>
+                                        <span className="ui-tag-signature-editorial" key={tag}>{tag}</span>
                                     ))}
                                 </div>
                             </>
                         )}
                         <button
-                            className="ml-auto inline-flex items-center gap-1 rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-primary hover:bg-brand-primary/20"
+                            className="ui-btn-secondary ml-auto max-sm:w-full max-sm:justify-center"
                             onClick={() => {
                                 const url = `${window.location.origin}/s/blog/${post.slug}`;
                                 trackShare("blog", post.slug, "post");
@@ -119,21 +118,23 @@ export function BlogPostPage() {
                             }}
                             type="button"
                         >
-                            🔗 Compartilhar
+                            Compartilhar
                         </button>
                     </div>
 
-                    <h1 className="mb-6 text-3xl font-black leading-tight text-text-primary md:text-5xl">
+                    <h1 className="mb-6 text-2xl font-black leading-tight text-text-primary md:text-5xl">
                         {post.title}
                     </h1>
 
                     {post.excerpt && (
-                        <p className="mb-8 text-lg font-semibold leading-relaxed text-text-secondary border-l-4 border-brand-primary/30 pl-4 italic">
+                        <p className="mb-8 border-l-4 border-brand-primary/30 pl-3 text-base font-semibold italic leading-relaxed text-text-secondary md:pl-4 md:text-lg">
                             {post.excerpt}
                         </p>
                     )}
 
-                    <hr className="my-8 border-border-subtle" />
+                    <BrandWatermarkPanel>
+                        <BrandRadialDivider className="radial-divider-subtle my-6" />
+                    </BrandWatermarkPanel>
 
                     {post.content_md ? (
                         <SimpleMarkdown text={post.content_md} />
@@ -141,7 +142,7 @@ export function BlogPostPage() {
                         <p className="text-center italic text-text-secondary/50">Este post ainda não possui conteúdo.</p>
                     )}
                 </div>
-            </div>
+            </SurfaceCard>
         </article>
     );
 }

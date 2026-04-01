@@ -13,6 +13,7 @@ import {
     SectionHeader,
     SurfaceCard,
 } from "../../components/BrandSystem";
+import { BrandRadialDivider, BrandTextureSkeleton, BrandWatermarkPanel } from "../../components/BrandMicro";
 import { listFeaturedAcervo, type AcervoItem } from "../../lib/api";
 
 const areas = [
@@ -82,7 +83,7 @@ export function AcervoPage() {
             {/* Linha do Tempo — destaque */}
             <Link to="/acervo/linha" className="group motion-list-item block">
                 <SurfaceCard className="border-accent-lab/25 bg-gradient-to-r from-accent-lab/8 via-surface-1 to-surface-1 p-5 md:p-6">
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                    <BrandWatermarkPanel className="flex flex-col gap-4 md:flex-row md:items-center">
                         <IconShell tone="lab" className="h-14 w-14 shrink-0 rounded-full">
                             <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -98,7 +99,7 @@ export function AcervoPage() {
                             </p>
                         </div>
                         <span className="ui-btn-ghost shrink-0">Explorar história →</span>
-                    </div>
+                    </BrandWatermarkPanel>
                 </SurfaceCard>
             </Link>
 
@@ -138,10 +139,10 @@ export function AcervoPage() {
                     />
                     {loading ? (
                         <div className="mt-5 grid gap-4 md:grid-cols-2">
-                            <div className="seed-skeleton h-36 rounded-[1.5rem]" />
-                            <div className="seed-skeleton h-36 rounded-[1.5rem]" />
-                            <div className="seed-skeleton h-36 rounded-[1.5rem]" />
-                            <div className="seed-skeleton h-36 rounded-[1.5rem]" />
+                            <BrandTextureSkeleton className="h-36 rounded-[1.5rem]" lines={3} />
+                            <BrandTextureSkeleton className="h-36 rounded-[1.5rem]" lines={3} />
+                            <BrandTextureSkeleton className="h-36 rounded-[1.5rem]" lines={3} />
+                            <BrandTextureSkeleton className="h-36 rounded-[1.5rem]" lines={3} />
                         </div>
                     ) : (
                         <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -179,6 +180,7 @@ export function AcervoPage() {
                             ))}
                         </div>
                     )}
+                    <BrandRadialDivider className="mt-5" />
                 </SurfaceCard>
             )}
         </section>

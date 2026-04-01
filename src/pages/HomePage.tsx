@@ -14,6 +14,7 @@ import {
   SectionHeader,
   SurfaceCard
 } from "../components/BrandSystem";
+import { BrandRadialDivider } from "../components/BrandMicro";
 import type {
   AcervoCollection,
   AcervoItem,
@@ -118,23 +119,31 @@ export function HomePage() {
 
   return (
     <section className="space-y-10 md:space-y-12">
-      <SurfaceCard className="signature-shell logo-watermark-soft overflow-hidden border-brand-primary/12 bg-gradient-to-br from-surface-1 via-surface-1 to-surface-2 p-5 shadow-[0_20px_60px_rgba(17,38,59,0.08)] md:p-6">
+      <SurfaceCard className="hero-semear-shell signature-shell logo-watermark-soft semear-seed-wave overflow-hidden border-brand-primary/12 bg-gradient-to-br from-surface-1 via-surface-1 to-surface-2 p-5 shadow-[0_20px_60px_rgba(17,38,59,0.08)] md:p-6">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.08fr)_minmax(300px,0.92fr)] lg:items-center">
           <div className="relative space-y-4">
             <div className="flex flex-wrap items-center gap-2.5">
-              <span className="section-badge">Selo institucional</span>
-              <span className="ui-chip">PWA público-universitário</span>
-              <span className="ui-chip ui-chip-active">UFF</span>
+              <span className="ui-pill-institutional">Selo institucional</span>
+              <span className="ui-chip-editorial">PWA público-universitário</span>
+              <span className="ui-pill-institutional">UFF</span>
             </div>
 
-            <div className="seed-radial-divider max-w-sm" aria-hidden="true" />
+            <BrandRadialDivider className="max-w-sm" />
+
+            <div className="flex items-center gap-3" aria-hidden="true">
+              <span className="semear-core-disc h-11 w-11" />
+              <span className="semear-core-disc h-7 w-7 opacity-80" />
+              <div className="semear-seed-wave h-7 w-28" />
+            </div>
 
             <div className="space-y-1.5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">{INSTITUTIONAL_COORDINATION}</p>
-              <h1 className="max-w-3xl text-4xl font-black leading-[0.94] tracking-[-0.04em] text-text-primary md:text-5xl lg:text-[4.25rem]">
-                SEMEAR
-              </h1>
-              <div className="h-1 w-24 rounded-full bg-gradient-to-r from-accent-seed via-brand-primary to-accent-lab" aria-hidden="true" />
+              <div className="hero-title-shell">
+                <img src="/brand/semear-logo.svg" alt="" aria-hidden="true" className="h-12 w-12 rounded-2xl border border-border-subtle bg-surface-1 p-1.5 shadow-[0_10px_24px_rgba(17,38,59,0.08)] md:h-14 md:w-14" />
+                <h1 className="max-w-3xl text-5xl font-black leading-[0.9] tracking-[-0.045em] text-text-primary md:text-6xl lg:text-[5rem]">
+                  SEMEAR
+                </h1>
+              </div>
             </div>
 
             <div className="max-w-3xl space-y-2.5">
@@ -146,18 +155,18 @@ export function HomePage() {
               </p>
             </div>
 
-            <div className="signature-surface motion-list-item max-w-3xl p-4">
+            <div className="hero-search-shell motion-list-item max-w-3xl">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <label htmlFor="home-search" className="text-sm font-semibold text-text-primary">
-                  Buscar no portal
+                  Busca inteligente do portal
                 </label>
-                <span className="section-badge">Busca integrada</span>
+                <span className="ui-pill-institutional">Busca integrada</span>
               </div>
               <div className="group relative mt-3">
                 <input
                   id="home-search"
                   type="search"
-                  placeholder="Busque por dados, relatórios, acervo ou atividades..."
+                  placeholder="Busque por relatório, local, tema, corredor ou publicação..."
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       const q = (e.target as HTMLInputElement).value;
@@ -173,17 +182,17 @@ export function HomePage() {
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Link to="/dados" className="ui-chip ui-chip-active">
-                  Dados
+                <Link to="/dados" className="hero-shortcut-chip">
+                  PM2.5 em tempo real
                 </Link>
-                <Link to="/relatorios" className="ui-chip">
-                  Relatórios
+                <Link to="/relatorios" className="hero-shortcut-chip">
+                  Últimos relatórios
                 </Link>
-                <Link to="/acervo" className="ui-chip">
-                  Acervo
+                <Link to="/acervo" className="hero-shortcut-chip">
+                  Acervo curado
                 </Link>
-                <Link to="/mapa" className="ui-chip">
-                  Mapa
+                <Link to="/corredores" className="hero-shortcut-chip">
+                  Corredores climáticos
                 </Link>
               </div>
             </div>
@@ -196,12 +205,12 @@ export function HomePage() {
                     const { outcome } = await prompt.userChoice;
                     if (outcome === "accepted") clearPrompt();
                   }}
-                  className="ui-btn-primary px-6 shadow-[0_12px_30px_rgba(0,93,170,0.18)] hover:shadow-[0_18px_40px_rgba(0,93,170,0.24)]"
+                  className="ui-cta-primary px-6 shadow-[0_12px_30px_rgba(0,93,170,0.18)] hover:shadow-[0_18px_40px_rgba(0,93,170,0.24)]"
                 >
                   Instalar aplicativo
                 </button>
               )}
-              <Link to="/dados" className="ui-btn-primary bg-accent-lab px-6 hover:bg-accent-lab/90">
+              <Link to="/dados" className="ui-cta-primary px-6">
                 Ir para dados
               </Link>
               <Link to="/agenda" className="ui-cta-secondary px-6">
@@ -223,10 +232,10 @@ export function HomePage() {
           </div>
 
           <div className="grid gap-4 lg:pt-2">
-            <div className="signature-surface motion-list-item p-4 motion-surface motion-surface-hover">
+            <div className="data-now-panel signature-surface motion-list-item p-4 motion-surface motion-surface-hover">
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-2">
-                  <span className="section-badge">Painel instantâneo</span>
+                  <span className="ui-pill-institutional">Painel instantâneo</span>
                   <h2 className="text-lg font-black text-text-primary md:text-xl">Dados agora</h2>
                 </div>
                 <IconShell tone="lab" className="h-11 w-11 rounded-full">
@@ -277,7 +286,7 @@ export function HomePage() {
         </div>
       </SurfaceCard>
 
-      <SurfaceCard className="p-5 md:p-6">
+      <SurfaceCard className="home-section-data p-5 md:p-6">
         <SectionHeader
           eyebrow="Agenda"
           title="Próximos eventos"
@@ -301,9 +310,9 @@ export function HomePage() {
         ) : (
           <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
             <Link to="/agenda" className="group block h-full">
-              <EditorialCard variant="featured">
+              <EditorialCard variant="featured" tone="featured">
                 <div className="relative min-h-[18rem] bg-gradient-to-br from-accent-yellow/15 via-surface-1 to-surface-2">
-                  <div className="absolute inset-0 seed-placeholder opacity-45" aria-hidden="true" />
+                  <div className="absolute inset-0 seed-placeholder-miolo opacity-45" aria-hidden="true" />
                   <div className="absolute left-5 top-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border border-border-subtle bg-surface-1/90 shadow-[0_14px_30px_rgba(17,38,59,0.08)]">
                     <div className="text-center">
                       <span className="block text-4xl font-black text-text-primary">{new Date(featuredEvent.start_at).getDate()}</span>
@@ -327,7 +336,7 @@ export function HomePage() {
                     <EditorialCardMeta>
                       <span>{formatDateTime(featuredEvent.start_at)}</span>
                     </EditorialCardMeta>
-                    <span className="ui-btn-ghost">Abrir agenda</span>
+                    <span className="semear-card-cta">Abrir agenda</span>
                   </EditorialCardActions>
                 </EditorialCardBody>
               </EditorialCard>
@@ -339,7 +348,7 @@ export function HomePage() {
                 </div>
               ) : upcomingEvents.map((event) => (
                 <Link key={event.id} to="/agenda" className="group block h-full">
-                  <EditorialCard variant="compact" className="grid grid-cols-[84px_minmax(0,1fr)]">
+                  <EditorialCard variant="compact" tone="editorial" className="grid grid-cols-[84px_minmax(0,1fr)]">
                     <div className="flex items-center justify-center bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2 p-4 text-center">
                       <div>
                         <span className="block text-2xl font-black text-text-primary">{new Date(event.start_at).getDate()}</span>
@@ -365,7 +374,7 @@ export function HomePage() {
         )}
       </SurfaceCard>
 
-      <SurfaceCard className="p-5 md:p-6">
+      <SurfaceCard className="home-section-dossies p-5 md:p-6">
         <SectionHeader
           eyebrow="Dossiês"
           title="Dossiês em destaque"
@@ -387,15 +396,15 @@ export function HomePage() {
         ) : (
           <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
             <Link to={`/dossies/${featuredCollection.slug}`} className="group block h-full">
-              <EditorialCard variant="featured">
+              <EditorialCard variant="featured" tone="featured">
                 <div className="relative min-h-[20rem] bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2">
                   {featuredCollection.cover_url ? (
                     <img src={getOptimizedCover(featuredCollection, "thumb") || ""} alt={featuredCollection.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
                   ) : (
-                    <div className="document-placeholder absolute inset-0" />
+                    <div className="seed-placeholder-miolo absolute inset-0" />
                   )}
                   <div className="absolute left-5 top-5">
-                  <span className="section-badge">Dossiê principal</span>
+                  <span className="ui-seal">Dossiê principal</span>
                   </div>
                 </div>
                 <EditorialCardBody className="justify-between">
@@ -404,8 +413,8 @@ export function HomePage() {
                     {featuredCollection.excerpt ? <EditorialCardExcerpt className="line-clamp-4">{featuredCollection.excerpt}</EditorialCardExcerpt> : null}
                   </div>
                   <EditorialCardActions>
-                    {featuredCollection.tags.slice(0, 3).map((tag) => <Chip key={tag} tone="active">{tag}</Chip>)}
-                    <span className="ui-btn-ghost">Abrir dossiê</span>
+                    {featuredCollection.tags.slice(0, 3).map((tag) => <span key={tag} className="ui-tag-signature-editorial">{tag}</span>)}
+                    <span className="semear-card-cta">Abrir dossiê</span>
                   </EditorialCardActions>
                 </EditorialCardBody>
               </EditorialCard>
@@ -418,12 +427,12 @@ export function HomePage() {
               ) : (
                 secondaryCollections.map((col) => (
                   <Link key={col.id} to={`/dossies/${col.slug}`} className="group block h-full">
-                    <EditorialCard variant="compact" className="grid gap-4 md:grid-cols-[112px_minmax(0,1fr)]">
+                    <EditorialCard variant="compact" tone="featured" className="grid gap-4 md:grid-cols-[112px_minmax(0,1fr)]">
                       <div className="overflow-hidden rounded-[1.35rem] bg-surface-2">
                         {col.cover_url ? (
                           <img src={getOptimizedCover(col, "thumb") || ""} alt={col.title} loading="lazy" className="h-full w-full object-cover" />
                         ) : (
-                          <div className="document-placeholder flex h-full min-h-28 items-center justify-center bg-gradient-to-br from-brand-primary-soft to-surface-2">
+                          <div className="seed-placeholder-miolo flex h-full min-h-28 items-center justify-center bg-gradient-to-br from-brand-primary-soft to-surface-2">
                             <IconShell tone="seed" className="h-11 w-11 rounded-full">
                               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -438,7 +447,7 @@ export function HomePage() {
                           <EditorialCardTitle className="text-lg">{col.title}</EditorialCardTitle>
                           {col.excerpt ? <EditorialCardExcerpt className="line-clamp-2">{col.excerpt}</EditorialCardExcerpt> : null}
                         </div>
-                        <div className="flex flex-wrap gap-2">{col.tags.slice(0, 2).map((tag) => <span key={tag} className="ui-chip">{tag}</span>)}</div>
+                        <div className="flex flex-wrap gap-2">{col.tags.slice(0, 2).map((tag) => <span key={tag} className="ui-tag-signature-editorial">{tag}</span>)}</div>
                       </EditorialCardBody>
                     </EditorialCard>
                   </Link>
@@ -449,7 +458,7 @@ export function HomePage() {
         )}
       </SurfaceCard>
 
-      <SurfaceCard className="p-5 md:p-6">
+      <SurfaceCard className="home-section-corredores p-5 md:p-6">
         <SectionHeader
           eyebrow="Corredores"
           title="Corredores climáticos"
@@ -471,12 +480,12 @@ export function HomePage() {
         ) : (
           <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
             <Link to={`/corredores/${featuredCorridor.slug}`} className="group block h-full">
-              <EditorialCard variant="featured">
+              <EditorialCard variant="featured" tone="tecnico">
                 <div className="relative min-h-[20rem] bg-gradient-to-br from-success/10 via-surface-1 to-surface-2">
                   {featuredCorridor.cover_url ? (
                     <img src={getOptimizedCover(featuredCorridor, "thumb") || featuredCorridor.cover_url} alt={featuredCorridor.title} className="h-full w-full object-cover" />
                   ) : (
-                    <div className="floral-placeholder absolute inset-0" />
+                    <div className="seed-placeholder-miolo absolute inset-0" />
                   )}
                 </div>
                 <EditorialCardBody className="justify-between">
@@ -486,7 +495,7 @@ export function HomePage() {
                     {featuredCorridor.excerpt ? <EditorialCardExcerpt>{featuredCorridor.excerpt}</EditorialCardExcerpt> : null}
                   </div>
                   <EditorialCardActions>
-                    <span className="ui-btn-ghost">Explorar corredor</span>
+                    <span className="semear-card-cta">Explorar corredor</span>
                   </EditorialCardActions>
                 </EditorialCardBody>
               </EditorialCard>
@@ -499,12 +508,12 @@ export function HomePage() {
               ) : (
                 supportingCorridors.map((corridor) => (
                   <Link key={corridor.id} to={`/corredores/${corridor.slug}`} className="group block h-full">
-                    <EditorialCard variant="compact" className="grid gap-4 md:grid-cols-[112px_minmax(0,1fr)]">
+                    <EditorialCard variant="compact" tone="tecnico" className="grid gap-4 md:grid-cols-[112px_minmax(0,1fr)]">
                       <div className="overflow-hidden rounded-[1.35rem] bg-surface-2">
                         {corridor.cover_url ? (
                           <img src={getOptimizedCover(corridor, "thumb") || corridor.cover_url} alt={corridor.title} className="h-full w-full object-cover" />
                         ) : (
-                          <div className="floral-placeholder flex h-full min-h-28 items-center justify-center bg-gradient-to-br from-success/10 to-surface-2">
+                          <div className="seed-placeholder-miolo flex h-full min-h-28 items-center justify-center bg-gradient-to-br from-success/10 to-surface-2">
                             <IconShell tone="seed" className="h-10 w-10 rounded-full">
                               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -532,7 +541,7 @@ export function HomePage() {
         )}
       </SurfaceCard>
 
-      <SurfaceCard className="p-5 md:p-6">
+      <SurfaceCard className="home-section-novidades p-5 md:p-6">
         <SectionHeader
           eyebrow="Novidades"
           title="O que há de novo"
@@ -542,12 +551,12 @@ export function HomePage() {
         <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
           <div className="grid gap-4">
             <Link to={latestBlog ? `/blog/${latestBlog.slug}` : "/blog"} className="group block h-full">
-              <EditorialCard variant="featured">
+              <EditorialCard variant="featured" tone="editorial">
                 <div className="relative min-h-[16rem] bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2">
                   {latestBlog?.cover_url ? (
                     <img src={getOptimizedCover(latestBlog, "thumb") || ""} alt={latestBlog.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
                   ) : (
-                    <div className="floral-placeholder absolute inset-0" />
+                    <div className="seed-placeholder-miolo absolute inset-0" />
                   )}
                 </div>
                 <EditorialCardBody className="justify-between">
@@ -563,13 +572,13 @@ export function HomePage() {
                     )}
                   </div>
                   <EditorialCardActions>
-                    <span className="ui-btn-ghost">Ver todos os posts</span>
+                    <span className="semear-card-cta">Ver todos os posts</span>
                   </EditorialCardActions>
                 </EditorialCardBody>
               </EditorialCard>
             </Link>
             <Link to="/transparencia" className="group block h-full">
-              <EditorialCard variant="compact">
+              <EditorialCard variant="compact" tone="documental">
                 <div className="relative min-h-[11rem] bg-gradient-to-br from-brand-primary-soft/70 via-surface-1 to-surface-2">
                   <div className="brand-watermark absolute inset-0 opacity-30" aria-hidden="true" />
                 </div>
@@ -580,14 +589,14 @@ export function HomePage() {
                     <EditorialCardExcerpt>Recursos investidos no projeto.</EditorialCardExcerpt>
                   </div>
                   <EditorialCardActions>
-                    <span className="ui-btn-ghost">Acessar prestação de contas</span>
+                    <span className="semear-card-cta">Acessar prestação de contas</span>
                   </EditorialCardActions>
                 </EditorialCardBody>
               </EditorialCard>
             </Link>
           </div>
           <div className="grid gap-4">
-            <EditorialCard variant="compact">
+            <EditorialCard variant="compact" tone="tecnico">
               <EditorialCardBody className="justify-between">
                 <div className="space-y-3">
                   <EditorialCardEyebrow>Resumo do sistema</EditorialCardEyebrow>
@@ -608,7 +617,7 @@ export function HomePage() {
                 </div>
               </EditorialCardBody>
             </EditorialCard>
-            <EditorialCard variant="text">
+            <EditorialCard variant="text" tone="editorial">
               <EditorialCardBody className="justify-between">
                 <div className="space-y-3">
                   <EditorialCardEyebrow>Chamada editorial</EditorialCardEyebrow>
@@ -622,7 +631,7 @@ export function HomePage() {
         </div>
       </SurfaceCard>
 
-      <SurfaceCard className="p-5 md:p-6">
+      <SurfaceCard className="home-section-relatorios p-5 md:p-6">
         <SectionHeader
           eyebrow="Relatórios"
           title="Relatórios e notas técnicas"
@@ -644,12 +653,12 @@ export function HomePage() {
         ) : (
           <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
             <Link to={`/relatorios/${featuredReport.slug}`} className="group block h-full">
-              <EditorialCard variant="featured">
+              <EditorialCard variant="featured" tone="documental">
                 <div className="relative min-h-[18rem] bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2">
                   {getOptimizedCover(featuredReport, "thumb") ? (
                     <img src={getOptimizedCover(featuredReport, "thumb") || ""} alt={`Capa de ${featuredReport.title}`} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
                   ) : (
-                    <div className="report-placeholder absolute inset-0 flex flex-col justify-between bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2 p-6">
+                    <div className="seed-placeholder-miolo absolute inset-0 flex flex-col justify-between bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2 p-6">
                       <span className="section-badge w-fit">SEMEAR</span>
                       <span className="max-w-md text-2xl font-black uppercase leading-tight text-text-primary">Relatórios e notas técnicas</span>
                     </div>
@@ -658,14 +667,14 @@ export function HomePage() {
                 <EditorialCardBody className="justify-between">
                   <div className="space-y-4">
                     <EditorialCardMeta>
-                      <Chip tone="active">Destaque</Chip>
-                      <Chip tone="default">{REPORT_KIND_LABEL[featuredReport.kind]}</Chip>
+                      <span className="ui-tag-signature">Destaque</span>
+                      <span className="ui-tag-signature">{REPORT_KIND_LABEL[featuredReport.kind]}</span>
                     </EditorialCardMeta>
                     <EditorialCardTitle className="text-2xl md:text-[1.95rem]">{featuredReport.title}</EditorialCardTitle>
                     <EditorialCardExcerpt>{featuredReport.summary || "Documento oficial com leitura editorial e dados complementares."}</EditorialCardExcerpt>
                   </div>
                   <EditorialCardActions>
-                    <span className="ui-btn-ghost">Abrir PDF</span>
+                    <span className="semear-card-cta">Abrir PDF</span>
                   </EditorialCardActions>
                 </EditorialCardBody>
               </EditorialCard>
@@ -680,7 +689,7 @@ export function HomePage() {
                   const thumbUrl = getOptimizedCover(report, "thumb");
                   return (
                     <Link key={report.id} to={`/relatorios/${report.slug}`} className="group block h-full">
-                      <EditorialCard variant="compact" className="grid gap-4 md:grid-cols-[104px_minmax(0,1fr)]">
+                      <EditorialCard variant="compact" tone="documental" className="grid gap-4 md:grid-cols-[104px_minmax(0,1fr)]">
                         <div className="overflow-hidden rounded-[1.35rem] bg-surface-2">
                           {thumbUrl ? (
                             <img src={thumbUrl} alt={`Capa de ${report.title}`} className="h-full w-full object-cover" loading="lazy" />
@@ -693,7 +702,7 @@ export function HomePage() {
                         <EditorialCardBody className="justify-between p-4 md:p-5">
                           <div className="space-y-2">
                             <EditorialCardMeta>
-                              <span className="ui-chip">{REPORT_KIND_LABEL[report.kind]}</span>
+                              <span className="ui-tag-signature">{REPORT_KIND_LABEL[report.kind]}</span>
                               <span>{report.published_at ? new Date(report.published_at).toLocaleDateString("pt-BR") : "Sem data"}</span>
                             </EditorialCardMeta>
                             <EditorialCardTitle className="text-lg">{report.title}</EditorialCardTitle>
