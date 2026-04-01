@@ -10,10 +10,10 @@ import {
     EditorialCardMeta,
     EditorialCardTitle,
     IconShell,
-    SectionHeader,
     SurfaceCard,
 } from "../../components/BrandSystem";
 import { BrandRadialDivider, BrandTextureSkeleton, BrandWatermarkPanel } from "../../components/BrandMicro";
+import { AxisSectionHeader, AxisEyebrow } from "../../components/AxisSystem";
 import { listFeaturedAcervo, type AcervoItem } from "../../lib/api";
 
 const areas = [
@@ -72,26 +72,25 @@ export function AcervoPage() {
 
     return (
         <section className="space-y-10 md:space-y-12">
-            <SurfaceCard className="signature-shell logo-watermark-soft p-6 md:p-8">
-                <SectionHeader
-                    eyebrow="Acervo Vivo"
-                    title="Curadoria de conteúdo"
-                    description="Ciência aberta e memória pública. O Acervo SEMEAR reúne artigos, notícias e mídias selecionados para transparência, educação ambiental e engajamento comunitário."
-                />
-            </SurfaceCard>
+            <AxisSectionHeader
+                axis="acervo"
+                eyebrow="Acervo Vivo"
+                title="Curadoria de conteúdo"
+                description="Ciência aberta e memória pública. O Acervo SEMEAR reúne artigos, notícias e mídias selecionados para transparência, educação ambiental e engajamento comunitário."
+            />
 
             {/* Linha do Tempo — destaque */}
             <Link to="/acervo/linha" className="group motion-list-item block">
-                <SurfaceCard className="border-accent-lab/25 bg-gradient-to-r from-accent-lab/8 via-surface-1 to-surface-1 p-5 md:p-6">
+                <SurfaceCard className="border-accent-brown/20 bg-gradient-to-r from-accent-yellow/10 via-surface-1 to-surface-1 p-5 md:p-6">
                     <BrandWatermarkPanel className="flex flex-col gap-4 md:flex-row md:items-center">
-                        <IconShell tone="lab" className="h-14 w-14 shrink-0 rounded-full">
+                        <IconShell tone="warm" className="h-14 w-14 shrink-0 rounded-full">
                             <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </IconShell>
                         <div className="min-w-0 flex-1">
-                            <span className="section-badge">Linha do Tempo</span>
-                            <h2 className="mt-2 text-xl font-black leading-tight text-text-primary md:text-2xl">
+                            <AxisEyebrow axis="timeline">Linha do Tempo</AxisEyebrow>
+                            <h2 className="axis-heading-timeline mt-2 text-xl md:text-2xl">
                                 Navegue pelo acervo histórico
                             </h2>
                             <p className="mt-1 text-sm text-text-secondary">
@@ -107,7 +106,7 @@ export function AcervoPage() {
             <div className="grid gap-5 md:grid-cols-3">
                 {areas.map((area) => (
                     <Link key={area.href} to={area.href} className="group motion-list-item block h-full">
-                        <EditorialCard variant="standard">
+                        <EditorialCard variant="standard" tone="acervo">
                             <div className="flex items-start gap-4 p-5 md:p-6">
                                 <IconShell tone={area.tone} className="h-12 w-12 shrink-0 rounded-full">
                                     <span className="text-xl leading-none" role="img" aria-label={area.label}>
@@ -133,10 +132,10 @@ export function AcervoPage() {
             {/* Destaques */}
             {(loading || featured.length > 0) && (
                 <SurfaceCard className="p-5 md:p-6">
-                    <SectionHeader
-                        eyebrow="Destaques"
-                        title="Em destaque no acervo"
-                    />
+                    <div className="mb-2 flex flex-wrap items-center gap-2.5">
+                      <AxisEyebrow axis="acervo">Destaques</AxisEyebrow>
+                      <h2 className="axis-heading-acervo text-xl md:text-2xl">Em destaque no acervo</h2>
+                    </div>
                     {loading ? (
                         <div className="mt-5 grid gap-4 md:grid-cols-2">
                             <BrandTextureSkeleton className="h-36 rounded-[1.5rem]" lines={3} />
@@ -152,7 +151,7 @@ export function AcervoPage() {
                                     to={`/acervo/item/${item.slug}`}
                                     className="group motion-list-item block h-full"
                                 >
-                                    <EditorialCard variant="compact">
+                                    <EditorialCard variant="compact" tone="acervo">
                                         <EditorialCardBody className="justify-between">
                                             <div className="space-y-2">
                                                 <EditorialCardMeta className="justify-between">

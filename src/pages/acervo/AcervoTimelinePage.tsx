@@ -4,7 +4,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { getAcervoByYear, getAcervoYearIndex, type AcervoItem, type AcervoYearIndex } from "../../lib/api";
 import { type AcervoArea, AREA_KINDS } from "../../lib/acervo";
 import { getOptimizedCover } from "../../lib/imageOptimization";
-import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, IconShell, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
+import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, IconShell, SurfaceCard } from "../../components/BrandSystem";
+import { AxisSectionHeader, AxisEyebrow, AxisDivider } from "../../components/AxisSystem";
 
 const AREA_META: Record<AcervoArea, { label: string; emoji: string; description: string; color: string }> = {
   artigos: {
@@ -110,18 +111,17 @@ export function AcervoTimelinePage() {
 
   return (
     <section className="space-y-10 md:space-y-12">
-      <SurfaceCard className="signature-shell logo-watermark-soft p-6 md:p-8">
-        <SectionHeader
-          eyebrow={`Acervo / ${meta.label}`}
-          title={`${meta.emoji} ${meta.label}`}
-          description={meta.description}
-        />
-      </SurfaceCard>
+      <AxisSectionHeader
+        axis="timeline"
+        eyebrow={`Acervo / ${meta.label}`}
+        title={`${meta.emoji} ${meta.label}`}
+        description={meta.description}
+      />
 
       <div className="grid gap-6 md:grid-cols-[minmax(240px,280px)_minmax(0,1fr)]">
         <aside className="space-y-4 md:sticky md:top-24 md:self-start">
           <SurfaceCard className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-primary">Linha do tempo</p>
+            <AxisEyebrow axis="timeline">Linha do tempo</AxisEyebrow>
             <p className="mt-2 text-sm text-text-secondary">Navegue pelo acervo histórico por ano de publicação.</p>
           </SurfaceCard>
           <SurfaceCard className="p-4">
@@ -134,8 +134,8 @@ export function AcervoTimelinePage() {
                     key={entry.year}
                     onClick={() => handleSelectYear(entry.year)}
                     className={`motion-control motion-focus flex items-center justify-between rounded-2xl border px-4 py-3 text-left ${selectedYear === entry.year
-                      ? "border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark"
-                      : "border-border-subtle bg-surface-1 text-text-secondary hover:border-brand-primary/20 hover:bg-surface-2 hover:text-text-primary"
+                      ? "border-accent-brown/20 bg-accent-yellow/15 text-accent-brown"
+                      : "border-border-subtle bg-surface-1 text-text-secondary hover:border-accent-brown/15 hover:bg-accent-yellow/10 hover:text-accent-brown"
                     }`}
                   >
                     <span className="font-mono text-lg font-black">{entry.year}</span>
@@ -157,10 +157,10 @@ export function AcervoTimelinePage() {
           )}
 
           {selectedYear && (
-            <SurfaceCard className="signature-surface p-5 md:p-6">
-              <div className="flex items-end gap-3 border-b border-divider-subtle pb-4">
-                <h2 className="text-4xl font-black text-brand-primary-dark">{selectedYear}</h2>
-                <span className="mb-1 text-xs font-bold uppercase tracking-widest text-text-secondary">Documentos preservados</span>
+            <SurfaceCard className="axis-section-header-timeline p-5 md:p-6">
+              <div className="flex items-end gap-3 border-b border-accent-brown/15 pb-4">
+                <h2 className="axis-heading-timeline text-4xl">{selectedYear}</h2>
+                <span className="mb-1 text-xs font-bold uppercase tracking-widest text-accent-brown">Documentos preservados</span>
               </div>
             </SurfaceCard>
           )}
@@ -177,7 +177,7 @@ export function AcervoTimelinePage() {
               <div className="grid gap-5 lg:grid-cols-2">
                 {items.map((item) => (
                   <Link key={item.slug} to={`/acervo/item/${item.slug}`} className="group motion-list-item block h-full">
-                    <EditorialCard variant={getOptimizedCover(item, "thumb") ? "media" : "compact"}>
+                    <EditorialCard variant={getOptimizedCover(item, "thumb") ? "media" : "compact"} tone="timeline">
                       {getOptimizedCover(item, "thumb") ? (
                         <div className="h-32 w-full overflow-hidden bg-surface-2 md:h-36">
                           <img
@@ -188,8 +188,8 @@ export function AcervoTimelinePage() {
                           />
                         </div>
                       ) : (
-                        <div className="document-placeholder flex h-32 w-full flex-col justify-between p-4">
-                          <span className="section-badge w-fit">SEMEAR</span>
+                        <div className="axis-placeholder-timeline flex h-32 w-full flex-col justify-between p-4">
+                          <AxisEyebrow axis="timeline" className="w-fit">SEMEAR</AxisEyebrow>
                           <span className="text-xs font-black uppercase leading-tight text-text-primary">Item do acervo</span>
                         </div>
                       )}

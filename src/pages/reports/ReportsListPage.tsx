@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
+import { Chip, SurfaceCard } from "../../components/BrandSystem";
 import { BrandIllustratedEmptyState, BrandTextureSkeleton } from "../../components/BrandMicro";
+import { AxisSectionHeader, AxisEyebrow } from "../../components/AxisSystem";
+import { DocumentalCard } from "../../components/CardFamilies";
 import { getOptimizedCover } from "../../lib/imageOptimization";
 import { listReports, type ReportDocument, type ReportKind } from "../../lib/api";
 
@@ -84,13 +86,12 @@ export function ReportsListPage() {
 
   return (
     <section className="space-y-10 md:space-y-12">
-      <SurfaceCard className="signature-shell logo-watermark-soft p-6 md:p-8">
-        <SectionHeader
-          eyebrow="Biblioteca oficial"
-          title="Relatórios"
-          description="Relatórios, notas técnicas, boletins e anexos oficiais em PDF para consulta pública e controle social."
-        />
-      </SurfaceCard>
+      <AxisSectionHeader
+        axis="relatorio"
+        eyebrow="Biblioteca oficial"
+        title="Relatórios"
+        description="Relatórios, notas técnicas, boletins e anexos oficiais em PDF para consulta pública e controle social."
+      />
 
       <SurfaceCard className="p-5 md:p-6">
         <div className="grid gap-5 md:grid-cols-4">
@@ -159,49 +160,36 @@ export function ReportsListPage() {
         <SurfaceCard className="signature-shell border-brand-primary/15 bg-gradient-to-br from-brand-primary-soft/60 via-surface-1 to-surface-1 p-6">
           <div className="mb-5 flex items-end justify-between gap-3">
             <div className="space-y-2">
-              <span className="section-badge">Destaques</span>
-              <h2 className="text-xl font-black leading-tight text-text-primary md:text-2xl">Relatórios editoriais em evidência</h2>
+              <AxisEyebrow axis="relatorio">Destaques</AxisEyebrow>
+              <h2 className="axis-heading-relatorio text-xl md:text-2xl">Relatórios editoriais em evidência</h2>
             </div>
             <Chip tone="active">{featuredReports.length} selecionado(s)</Chip>
           </div>
           <div className="grid gap-5 lg:grid-cols-3">
             {featuredReports.map((item) => {
               const thumbUrl = getOptimizedCover(item, "thumb");
+              const dateStr = item.published_at
+                ? new Date(item.published_at).toLocaleDateString("pt-BR")
+                : item.year ? String(item.year) : undefined;
               return (
                 <Link
                   key={item.id}
                   to={`/relatorios/${item.slug}`}
                   className="group motion-list-item block h-full"
                 >
-                  <EditorialCard variant="featured" tone="documental">
-                    {thumbUrl ? (
-                      <img
-                        src={thumbUrl}
-                        alt={`Capa de ${item.title}`}
-                        loading="lazy"
-                        className="h-48 w-full object-cover"
-                      />
-                    ) : (
-                      <div className="report-placeholder flex h-48 flex-col justify-between p-5">
-                        <span className="section-badge w-fit">SEMEAR</span>
-                        <span className="text-base font-black uppercase leading-tight text-text-primary">Destaque editorial</span>
-                      </div>
-                    )}
-                    <EditorialCardBody>
-                      <EditorialCardMeta>
-                        <span className="ui-tag-signature">Destaque</span>
-                        <span className="ui-tag-signature">{KIND_LABEL[item.kind]}</span>
-                      </EditorialCardMeta>
-                      <EditorialCardTitle className="line-clamp-2">{item.title}</EditorialCardTitle>
-                      {item.summary ? <EditorialCardExcerpt className="line-clamp-3">{item.summary}</EditorialCardExcerpt> : null}
-                      <EditorialCardActions className="pt-1">
-                        <span className="semear-card-cta">
-                          Abrir PDF
-                          <span aria-hidden="true">→</span>
-                        </span>
-                      </EditorialCardActions>
-                    </EditorialCardBody>
-                  </EditorialCard>
+                  <DocumentalCard
+                    variant="featured"
+                    thumbUrl={thumbUrl}
+                    thumbAlt={`Capa de ${item.title}`}
+                    kindLabel={KIND_LABEL[item.kind]}
+                    date={dateStr}
+                    title={item.title}
+                    summary={item.summary}
+                    tags={item.tags}
+                    featured={true}
+                    onTagClick={(t) => setTag(t)}
+                    cta="Abrir PDF"
+                  />
                 </Link>
               );
             })}
@@ -229,65 +217,25 @@ export function ReportsListPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {regularReports.map((item) => {
-              const thumbUrl = getOptimizedCover(item, "thumb");
+              const dateStr = item.published_at
+                ? new Date(item.published_at).toLocaleDateString("pt-BR")
+                : item.year ? String(item.year) : undefined;
               return (
                 <Link
                   key={item.id}
                   to={`/relatorios/${item.slug}`}
                   className="group motion-list-item block h-full"
                 >
-                  <EditorialCard variant="compact" tone="documental">
-                    {thumbUrl ? (
-                      <div className="h-36 overflow-hidden bg-surface-2">
-                        <img
-                          src={thumbUrl}
-                          alt={`Capa de ${item.title}`}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                    ) : (
-                      <div className="document-placeholder flex h-36 w-full flex-col justify-between p-4">
-                        <span className="section-badge w-fit">SEMEAR</span>
-                        <span className="text-xs font-black uppercase leading-tight text-text-primary">Documento oficial</span>
-                      </div>
-                    )}
-                    <EditorialCardBody className="gap-2">
-                      <EditorialCardMeta className="justify-between">
-                        <span className="ui-tag-signature">
-                          {KIND_LABEL[item.kind]}
-                        </span>
-                        <span>{item.published_at ? new Date(item.published_at).toLocaleDateString("pt-BR") : "Sem data"}</span>
-                      </EditorialCardMeta>
-                      <EditorialCardTitle className="text-base line-clamp-2 md:text-lg">{item.title}</EditorialCardTitle>
-                      {item.summary ? <EditorialCardExcerpt className="line-clamp-2 text-sm">{item.summary}</EditorialCardExcerpt> : null}
-                      {item.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {item.tags.slice(0, 4).map((itemTag) => (
-                            <button
-                              key={itemTag}
-                              type="button"
-                              onClick={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                setTag(itemTag);
-                              }}
-                              className="motion-control ui-tag-signature"
-                              aria-label={`Filtrar relatórios pela tag ${itemTag}`}
-                            >
-                              {itemTag}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      <EditorialCardActions className="pt-1">
-                        <span className="semear-card-cta">
-                          Abrir PDF
-                          <span aria-hidden="true">→</span>
-                        </span>
-                      </EditorialCardActions>
-                    </EditorialCardBody>
-                  </EditorialCard>
+                  <DocumentalCard
+                    variant="compact"
+                    kindLabel={KIND_LABEL[item.kind]}
+                    date={dateStr}
+                    title={item.title}
+                    summary={item.summary}
+                    tags={item.tags}
+                    onTagClick={(t) => setTag(t)}
+                    cta="Abrir PDF"
+                  />
                 </Link>
               );
             })}

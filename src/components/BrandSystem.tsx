@@ -25,7 +25,7 @@ type ChipProps = {
 };
 
 type EditorialCardVariant = "standard" | "featured" | "compact" | "text" | "media";
-type EditorialCardTone = "editorial" | "featured" | "tecnico" | "documental";
+type EditorialCardTone = "editorial" | "featured" | "tecnico" | "documental" | "dados" | "acervo" | "timeline" | "dossie" | "corredor" | "blog" | "relatorio";
 
 type EditorialCardProps = {
   children: ReactNode;
@@ -94,7 +94,14 @@ const editorialCardToneClasses: Record<EditorialCardTone, string> = {
   editorial: "semear-card-editorial",
   featured: "semear-card-featured",
   tecnico: "semear-card-tecnico",
-  documental: "semear-card-documental"
+  documental: "semear-card-documental",
+  dados:      "axis-card-dados",
+  acervo:     "axis-card-acervo",
+  timeline:   "axis-card-timeline",
+  dossie:     "axis-card-dossie",
+  corredor:   "axis-card-corredor",
+  blog:       "axis-card-blog",
+  relatorio:  "axis-card-relatorio",
 };
 
 export function EditorialCard({ children, className = "", variant = "standard", tone = "editorial" }: EditorialCardProps) {

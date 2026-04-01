@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { EmptyState } from "../components/EmptyState";
 import { ErrorState } from "../components/ErrorState";
 import { SkeletonCard } from "../components/SkeletonCard";
+import { AxisEyebrow, AxisDivider } from "../components/AxisSystem";
 import {
   getTransparencySummary,
   listExpenses,
@@ -267,27 +268,28 @@ export function TransparenciaPage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-border-subtle bg-white p-8 shadow-sm md:p-12">
+      <section className="axis-section-header-dados rounded-2xl border p-8 shadow-sm md:p-12">
         <div className="mb-6 flex items-center justify-between gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-success/10 text-success">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent-lab/15 text-accent-lab">
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
           <div>
-            <h1 className="text-3xl font-black text-text-primary md:text-4xl">Transparência e prestação de contas</h1>
+            <AxisEyebrow axis="dados">Governança financeira</AxisEyebrow>
+            <h1 className="axis-heading-dados text-3xl md:text-4xl">Transparência e prestação de contas</h1>
             <p className="mt-2 text-base text-text-secondary">Acompanhamento financeiro público e auditável do projeto SEMEAR</p>
           </div>
         </div>
 
-        <div className="mt-6 rounded-lg border border-brand-primary/30 bg-brand-primary-soft p-4">
-          <p className="text-sm font-semibold text-brand-primary">{INSTITUTIONAL_FUNDING} · todos os recursos são públicos</p>
+        <div className="mt-6 rounded-lg border border-accent-lab/30 bg-accent-lab/10 p-4">
+          <p className="text-sm font-semibold text-accent-lab">{INSTITUTIONAL_FUNDING} · todos os recursos são públicos</p>
           <p className="mt-1 text-sm text-text-secondary">Prestação de contas permanente e acessível à população</p>
         </div>
       </section>
 
       <section className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-2xl border border-border-subtle bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-accent-lab/20 bg-accent-lab/5 p-6 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Total histórico</p>
           <p className="mt-2 text-3xl font-black text-success">{summary ? formatBRL(summary.total_cents) : "R$ 0,00"}</p>
           <p className="mt-1 text-xs text-text-secondary">{INSTITUTIONAL_FUNDING}</p>

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, IconShell, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
+import { IconShell, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
 import { BrandIllustratedEmptyState, BrandTextureSkeleton } from "../../components/BrandMicro";
+import { DocumentalCard } from "../../components/CardFamilies";
 import { listAcervoItems, type AcervoItem, type AcervoKind } from "../../lib/api";
 import { type AcervoArea, AREA_KINDS } from "../../lib/acervo";
-import { getOptimizedCover } from "../../lib/imageOptimization";
 
 const AREA_META: Record<AcervoArea, { label: string; emoji: string; description: string; color: string }> = {
   artigos: {
@@ -204,63 +204,37 @@ export function AcervoListPage() {
             icon={<span className="text-2xl" aria-hidden="true">📭</span>}
           />
         ) : (
-          <ul className="grid gap-5 lg:grid-cols-2">
-            {filtered.map((item) => (
-              <li key={item.slug}>
-                <Link
-                  className="group motion-list-item block h-full"
-                  to={`/acervo/item/${item.slug}`}
-                >
-                  <EditorialCard variant={item.cover_url ? "media" : "compact"} tone="featured">
-                    {item.cover_url ? (
-                      <div className="semear-card-media relative h-40 overflow-hidden bg-surface-2">
-                        <img
-                          src={getOptimizedCover(item, "thumb") || ""}
-                          alt={item.title}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-                          style={(!item.cover_small_url && !item.cover_thumb_url) ? {} : { filter: "blur(0)" }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="document-placeholder flex h-40 flex-col justify-between p-5">
-                        <span className="ui-seal w-fit">SEMEAR</span>
-                        <span className="max-w-[12rem] text-lg font-black leading-tight text-text-primary">Item do acervo</span>
-                      </div>
-                    )}
-                    <EditorialCardBody>
-                      <EditorialCardMeta className="justify-between gap-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="ui-tag-signature">{KIND_LABELS[item.kind]}</span>
-                          {item.source_type && <span className="ui-tag-signature-editorial">{SOURCE_TYPE_LABELS[item.source_type] || item.source_type}</span>}
-                          {item.featured ? <span className="ui-tag-signature">Destaque</span> : null}
-                        </div>
-                        {item.published_at && <span className="shrink-0 text-sm text-text-secondary">{new Date(item.published_at).toLocaleDateString("pt-BR")}</span>}
-                      </EditorialCardMeta>
-                      <EditorialCardTitle className="line-clamp-2">{item.title}</EditorialCardTitle>
-                      {item.authors ? <p className="text-xs font-semibold italic text-text-secondary">Por: {item.authors}</p> : null}
-                      {item.excerpt ? <EditorialCardExcerpt className="line-clamp-2 text-sm">{item.excerpt}</EditorialCardExcerpt> : null}
-                      {item.source_name ? <p className="text-xs text-text-secondary">Fonte: {item.source_name}</p> : null}
-                      {item.tags.length > 0 ? (
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {item.tags.slice(0, 5).map((itemTag) => (
-                            <span key={itemTag} className="ui-tag-signature-editorial">
-                              {itemTag}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
-                      <EditorialCardActions className="pt-1">
-                        <span className="semear-card-cta">
-                          Abrir item
-                          <span aria-hidden="true">→</span>
-                        </span>
-                      </EditorialCardActions>
-                    </EditorialCardBody>
-                  </EditorialCard>
-                </Link>
-              </li>
-            ))}
+          <ul className="grid gap-4 lg:grid-cols-2">
+            {filtered.map((item) => {
+              const dateStr = item.published_at
+                ? new Date(item.published_at).toLocaleDateString("pt-BR")
+                : item.year ? String(item.year) : undefined;
+              const summary = [
+                item.authors ? `Por: ${item.authors}` : null,
+                item.excerpt,
+                item.source_name ? `Fonte: ${item.source_name}` : null,
+              ].filter(Boolean).join(" · ") || undefined;
+              return (
+                <li key={item.slug}>
+                  <Link
+                    className="group motion-list-item block h-full"
+                    to={`/acervo/item/${item.slug}`}
+                  >
+                    <DocumentalCard
+                      variant="compact"
+                      kindLabel={KIND_LABELS[item.kind]}
+                      date={dateStr}
+                      title={item.title}
+                      summary={summary}
+                      tags={item.tags}
+                      featured={item.featured}
+                      onTagClick={(t) => setTagFilter(t)}
+                      cta="Abrir item"
+                    />
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </SurfaceCard>

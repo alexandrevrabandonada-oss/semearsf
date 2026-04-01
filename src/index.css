@@ -703,6 +703,570 @@ select {
   .ui-link {
     @apply text-brand-primary underline-offset-2 hover:text-brand-primary-dark hover:underline;
   }
+
+  /* ══════════════════════════════════════════════
+     CARD FAMILIES — 4 famílias com papel editorial
+     Completamente distintas em composição, peso de
+     título, área de imagem, metadados, CTA e tags.
+     ══════════════════════════════════════════════ */
+
+  /* ── FEATURED — Dossiês / highlight content ───
+     Capa alta (56), título extragrande, tags verdes,
+     CTA sólido largo. */
+  .cf-featured {
+    @apply relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-accent-seed/25 bg-surface-1;
+    background-image: linear-gradient(180deg, rgba(163,216,50,0.04) 0%, transparent 40%);
+    box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 18px 44px rgba(17,38,59,0.08);
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  }
+  .cf-featured:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 24px 52px rgba(17,38,59,0.12); }
+  .cf-featured::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-1 z-10;
+    background: linear-gradient(90deg, rgba(163,216,50,0.2), rgba(163,216,50,0.65), rgba(21,128,61,0.4), rgba(0,93,170,0.08));
+  }
+  .cf-featured-image {
+    @apply relative h-56 w-full overflow-hidden bg-surface-2;
+  }
+  .cf-featured-image::after {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 bottom-0 h-20;
+    background: linear-gradient(180deg, transparent, rgba(17,38,59,0.18));
+  }
+  .cf-featured-body {
+    @apply flex flex-1 flex-col gap-3 p-5 md:p-6;
+  }
+  .cf-featured-tag {
+    @apply inline-flex items-center rounded-full border border-accent-seed/35 bg-accent-seed/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-accent-green;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+  }
+  .cf-featured-cta {
+    @apply mt-auto flex w-full items-center justify-center gap-2 rounded-2xl border border-accent-seed/30 bg-gradient-to-r from-accent-seed/20 to-accent-green/15 py-3 text-[13px] font-black uppercase tracking-[0.1em] text-accent-green transition-all duration-200;
+    @apply hover:border-accent-seed/50 hover:bg-gradient-to-r hover:from-accent-seed/30 hover:to-accent-green/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-seed focus-visible:ring-offset-2;
+  }
+  .cf-featured-title {
+    @apply text-[1.3rem] font-black leading-[1.1] tracking-tight text-text-primary md:text-2xl;
+  }
+  .cf-featured-eyebrow {
+    @apply inline-flex items-center rounded-full border border-accent-seed/35 bg-surface-1 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-accent-green;
+  }
+
+  /* ── EDITORIAL — Blog ─────────────────────────
+     Imagem média (44), date como byline, título
+     itálico-bold, tags como texto inline, CTA ghost  */
+  .cf-editorial {
+    @apply relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-brand-primary/15 bg-surface-1;
+    box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 14px 36px rgba(17,38,59,0.07);
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
+  }
+  .cf-editorial:hover { transform: translateY(-2px); border-color: rgba(0,93,170,0.22); box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 20px 44px rgba(17,38,59,0.1); }
+  .cf-editorial::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-[3px] z-10;
+    background: linear-gradient(90deg, rgba(0,93,170,0.85), rgba(0,183,177,0.6), transparent);
+  }
+  .cf-editorial-image {
+    @apply relative h-44 w-full overflow-hidden bg-surface-2;
+  }
+  .cf-editorial-image::after {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-8;
+    background: linear-gradient(180deg, rgba(17,38,59,0.06), transparent);
+  }
+  .cf-editorial-body {
+    @apply flex flex-1 flex-col gap-2.5 p-4 md:p-5;
+  }
+  .cf-editorial-byline {
+    @apply flex items-center gap-1.5 text-[11px] font-semibold italic tracking-[0.08em] text-text-secondary;
+  }
+  .cf-editorial-title {
+    @apply font-black leading-[1.1] tracking-tight text-text-primary;
+    font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+    font-style: italic;
+  }
+  .cf-editorial-inline-tags {
+    @apply flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-text-secondary;
+  }
+  .cf-editorial-inline-tag {
+    @apply transition-colors duration-150 hover:text-brand-primary;
+  }
+  .cf-editorial-inline-tag::before { content: "#"; @apply opacity-50; }
+  .cf-editorial-cta {
+    @apply mt-auto inline-flex items-center gap-1.5 pt-1 text-xs font-bold text-brand-primary underline-offset-2 transition-all duration-150 hover:underline hover:text-brand-primary-dark;
+  }
+  .cf-editorial-scheduled {
+    @apply inline-flex items-center rounded-full border border-accent-yellow/35 bg-accent-yellow/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.15em] text-warning;
+  }
+
+  /* ── DOCUMENTAL — Relatórios / Acervo ─────────
+     Featured: capa + cabeçalho de documento.
+     Compact: strip âmbar esquerdo + corpo denso. */
+  .cf-documental-featured {
+    @apply relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-accent-yellow/25 bg-surface-1;
+    box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 16px 40px rgba(17,38,59,0.08);
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  }
+  .cf-documental-featured:hover { transform: translateY(-2px); box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 22px 48px rgba(17,38,59,0.11); }
+  .cf-documental-featured::before {
+    content: "";
+    @apply pointer-events-none absolute inset-y-0 left-0 w-1.5;
+    background: linear-gradient(180deg, rgba(212,165,20,0.80), rgba(0,93,170,0.35));
+  }
+  .cf-documental-compact {
+    @apply relative flex h-full flex-row overflow-hidden rounded-[1.35rem] border border-accent-yellow/20 bg-surface-1;
+    box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 10px 26px rgba(17,38,59,0.06);
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out, background-color 200ms ease-out;
+  }
+  .cf-documental-compact:hover { transform: translateY(-1px); background-color: #fefaf3; box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 14px 32px rgba(17,38,59,0.09); }
+  .cf-documental-compact::before {
+    content: "";
+    @apply pointer-events-none absolute inset-y-0 left-0 w-1;
+    background: linear-gradient(180deg, rgba(212,165,20,0.7), rgba(0,93,170,0.3));
+  }
+  .cf-documental-compact-body {
+    @apply flex flex-1 flex-col gap-2 py-4 pl-5 pr-4;
+  }
+  .cf-documental-featured-image {
+    @apply relative h-44 w-full overflow-hidden bg-surface-2;
+  }
+  .cf-documental-featured-body {
+    @apply flex flex-1 flex-col gap-2.5 p-4 md:p-5;
+  }
+  .cf-documental-kind {
+    @apply inline-flex items-center rounded-md border border-accent-yellow/35 bg-accent-yellow/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-warning;
+  }
+  .cf-documental-title {
+    @apply font-bold leading-[1.15] tracking-[0.01em] text-text-primary;
+    font-size: clamp(0.9rem, 2vw, 1.05rem);
+  }
+  .cf-documental-featured-title {
+    @apply text-lg font-bold leading-[1.1] tracking-[0.01em] text-text-primary md:text-xl;
+  }
+  .cf-documental-date {
+    @apply text-[10px] font-semibold tabular-nums text-text-secondary;
+  }
+  .cf-documental-tag {
+    @apply inline-flex cursor-pointer items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-text-secondary transition-colors duration-150 hover:bg-accent-yellow/15 hover:text-warning;
+  }
+  .cf-documental-cta {
+    @apply mt-auto inline-flex items-center gap-2 rounded-lg border border-accent-yellow/30 bg-transparent px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-warning transition-all duration-200;
+    @apply hover:border-accent-yellow/50 hover:bg-accent-yellow/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-yellow focus-visible:ring-offset-2;
+  }
+
+  /* ── TERRITORIAL — Corredores ─────────────────
+     Imagem full-bleed (mín 240px), título + CTA
+     dentro do overlay. Nenhum corpo abaixo. */
+  .cf-territorial {
+    @apply relative block overflow-hidden rounded-[1.75rem] border border-accent-green/25 bg-surface-2;
+    min-height: 280px;
+    box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 18px 44px rgba(17,38,59,0.1);
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  }
+  .cf-territorial:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 26px 56px rgba(17,38,59,0.14); }
+  .cf-territorial-image {
+    @apply absolute inset-0 h-full w-full object-cover;
+    transition: transform 600ms ease-out;
+  }
+  .cf-territorial:hover .cf-territorial-image { transform: scale(1.04); }
+  .cf-territorial-gradient {
+    @apply pointer-events-none absolute inset-0;
+    background: linear-gradient(
+      180deg,
+      rgba(17,38,59,0.06) 0%,
+      rgba(17,38,59,0.1) 30%,
+      rgba(17,38,59,0.55) 65%,
+      rgba(17,38,59,0.84) 100%
+    );
+  }
+  .cf-territorial-placeholder {
+    @apply absolute inset-0 flex items-center justify-center;
+    background: linear-gradient(140deg, rgba(21,128,61,0.18) 0%, rgba(0,93,170,0.14) 60%, rgba(163,216,50,0.1) 100%);
+  }
+  .cf-territorial-top {
+    @apply absolute left-0 right-0 top-0 flex items-start justify-between p-4;
+  }
+  .cf-territorial-badge {
+    @apply inline-flex items-center rounded-full border border-white/25 bg-black/35 px-3 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-white backdrop-blur-sm;
+  }
+  .cf-territorial-featured-ribbon {
+    @apply inline-flex items-center rounded-full border border-accent-green/40 bg-accent-green px-3 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-white;
+    box-shadow: 0 2px 8px rgba(21,128,61,0.4);
+  }
+  .cf-territorial-bottom {
+    @apply absolute inset-x-0 bottom-0 px-5 pb-5 pt-12;
+  }
+  .cf-territorial-title {
+    @apply text-xl font-black uppercase leading-[1.05] tracking-[0.04em] text-white md:text-2xl;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  }
+  .cf-territorial-excerpt {
+    @apply mt-1.5 line-clamp-2 text-sm leading-relaxed text-white/75;
+  }
+  .cf-territorial-cta {
+    @apply mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-accent-green/60 bg-accent-green py-2.5 text-[12px] font-black uppercase tracking-[0.12em] text-white transition-all duration-200;
+    @apply hover:bg-accent-green/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-green focus-visible:ring-offset-2 focus-visible:ring-offset-surface-1;
+    box-shadow: 0 4px 14px rgba(21,128,61,0.35);
+  }
+  .cf-territorial-map-icon {
+    @apply absolute bottom-16 right-5 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur-sm;
+  }
+
+  /* ══════════════════════════════════════════════
+     AXIS IDENTITY SYSTEM
+     Sub-identidade visual por eixo do portal.
+     Shell institucional (header/navbar/footer) não
+     é afetado — apenas o miolo de conteúdo por seção.
+     ══════════════════════════════════════════════ */
+
+  /* ── Shared axis primitives ── */
+  .axis-card {
+    @apply semear-card motion-surface motion-surface-hover flex h-full flex-col overflow-hidden;
+  }
+  .axis-section-header {
+    @apply relative overflow-hidden rounded-2xl border p-5 md:p-7;
+  }
+  .axis-section-header::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px;
+    background: var(--axis-stripe, linear-gradient(90deg, transparent, rgba(0,93,170,0.2), transparent));
+  }
+  .axis-eyebrow {
+    @apply inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] leading-none;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55);
+  }
+  .axis-divider {
+    @apply relative h-6 w-full overflow-hidden;
+  }
+  .axis-divider::before {
+    content: "";
+    @apply absolute inset-x-0 top-1/2 h-px -translate-y-1/2;
+    background: var(--axis-rule, linear-gradient(90deg, transparent, rgba(0,93,170,0.2), transparent));
+  }
+
+  /* ────────────────────────────────────────────────
+     DADOS — analytical blue × teal precision
+     Accent: brand-primary + accent-lab
+     ──────────────────────────────────────────────── */
+  .axis-card-dados {
+    @apply axis-card border-accent-lab/20 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-lab/10;
+  }
+  .axis-card-dados::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px;
+    background: linear-gradient(90deg, rgba(0,93,170,0.6), rgba(0,183,177,0.7), transparent);
+  }
+  .axis-card-dados::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0 opacity-25;
+    background-image:
+      radial-gradient(circle at 78% 22%, rgba(0,183,177,0.14) 0 1.3px, transparent 1.4px),
+      radial-gradient(circle at 66% 44%, rgba(0,93,170,0.12) 0 1.1px, transparent 1.2px),
+      radial-gradient(circle at 44% 72%, rgba(163,216,50,0.10) 0 1.1px, transparent 1.2px);
+    background-size: 1.5rem 1.5rem;
+  }
+  .axis-section-header-dados {
+    @apply axis-section-header border-accent-lab/20 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-lab/10;
+    --axis-stripe: linear-gradient(90deg, transparent, rgba(0,93,170,0.3), rgba(0,183,177,0.4), transparent);
+  }
+  .axis-eyebrow-dados {
+    @apply axis-eyebrow border-accent-lab/35 bg-accent-lab/10 text-accent-lab;
+  }
+  .axis-divider-dados {
+    @apply axis-divider;
+    --axis-rule: linear-gradient(90deg, transparent, rgba(0,93,170,0.22), rgba(0,183,177,0.28), transparent);
+  }
+  .axis-divider-dados::before {
+    background: linear-gradient(90deg, transparent, rgba(0,93,170,0.22), rgba(0,183,177,0.28), transparent);
+  }
+  .axis-placeholder-dados {
+    @apply seed-placeholder-miolo;
+  }
+  .axis-placeholder-dados::before {
+    background:
+      radial-gradient(circle at center, rgba(0,183,177,0.2) 0%, rgba(0,93,170,0.08) 40%, transparent 72%),
+      repeating-radial-gradient(circle at center, rgba(0,183,177,0.14) 0 1px, transparent 1px 4px);
+  }
+  .axis-heading-dados {
+    @apply font-black leading-[1.05] tracking-tight text-text-primary;
+    text-shadow: 0 1px 0 rgba(0,183,177,0.08);
+  }
+
+  /* ────────────────────────────────────────────────
+     ACERVO — archival terra cotta × warm amber
+     Accent: accent-brown (#6B3E2E) + accent-yellow
+     ──────────────────────────────────────────────── */
+  .axis-card-acervo {
+    @apply axis-card border-accent-brown/20 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-yellow/10;
+  }
+  .axis-card-acervo::before {
+    content: "";
+    @apply pointer-events-none absolute inset-y-0 left-0 w-1;
+    background: linear-gradient(180deg, rgba(107,62,46,0.65), rgba(212,165,20,0.55), rgba(107,62,46,0.3));
+  }
+  .axis-card-acervo::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0 opacity-15;
+    background-image: linear-gradient(transparent 49%, rgba(107,62,46,0.08) 50%, transparent 51%);
+    background-size: 100% 1.6rem;
+  }
+  .axis-section-header-acervo {
+    @apply axis-section-header border-accent-brown/20 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-yellow/10;
+    --axis-stripe: linear-gradient(90deg, transparent, rgba(107,62,46,0.3), rgba(212,165,20,0.25), transparent);
+  }
+  .axis-section-header-acervo::before {
+    background: linear-gradient(90deg, transparent, rgba(107,62,46,0.3), rgba(212,165,20,0.25), transparent);
+  }
+  .axis-eyebrow-acervo {
+    @apply axis-eyebrow border-accent-brown/30 bg-accent-brown/10 text-accent-brown;
+  }
+  .axis-divider-acervo {
+    @apply axis-divider;
+  }
+  .axis-divider-acervo::before {
+    background: linear-gradient(90deg, transparent, rgba(107,62,46,0.28), rgba(212,165,20,0.22), transparent);
+  }
+  .axis-placeholder-acervo {
+    @apply seed-placeholder-miolo bg-gradient-to-br from-accent-brown/5 via-surface-1 to-accent-yellow/10;
+  }
+  .axis-placeholder-acervo::before {
+    background:
+      radial-gradient(circle at center, rgba(107,62,46,0.14) 0%, rgba(212,165,20,0.1) 42%, transparent 72%),
+      repeating-radial-gradient(circle at center, rgba(107,62,46,0.1) 0 1px, transparent 1px 4px);
+  }
+  .axis-heading-acervo {
+    @apply font-black leading-[1.05] tracking-tight text-text-primary;
+    text-decoration-color: rgba(107,62,46,0.35);
+  }
+
+  /* ────────────────────────────────────────────────
+     LINHA DO TEMPO — sepia historical
+     Accent: accent-brown sepia gradient × amber
+     ──────────────────────────────────────────────── */
+  .axis-card-timeline {
+    @apply axis-card border-accent-brown/15 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-yellow/5;
+  }
+  .axis-card-timeline::before {
+    content: "";
+    @apply pointer-events-none absolute inset-y-0 left-0 w-0.5;
+    background: linear-gradient(180deg, rgba(107,62,46,0.4), rgba(107,62,46,0.8) 50%, rgba(107,62,46,0.4));
+  }
+  .axis-card-timeline::after {
+    content: "";
+    @apply pointer-events-none absolute -right-8 top-4 h-20 w-20 rounded-full opacity-20;
+    background:
+      radial-gradient(circle at center, rgba(107,62,46,0.3) 0 2px, transparent 3px),
+      repeating-radial-gradient(circle at center, rgba(107,62,46,0.14) 0 1px, transparent 1px 3px),
+      linear-gradient(140deg, rgba(255,255,255,0.9), rgba(248,240,225,0.95));
+    border: 1px solid rgba(107,62,46,0.22);
+  }
+  .axis-section-header-timeline {
+    @apply axis-section-header border-accent-brown/15 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-yellow/5;
+  }
+  .axis-section-header-timeline::before {
+    background: linear-gradient(90deg, transparent, rgba(107,62,46,0.35), rgba(212,165,20,0.2), transparent);
+  }
+  .axis-eyebrow-timeline {
+    @apply axis-eyebrow border-accent-brown/25 bg-accent-yellow/15 text-accent-brown;
+  }
+  .axis-divider-timeline {
+    @apply axis-divider;
+  }
+  .axis-divider-timeline::before {
+    background: linear-gradient(90deg, transparent,
+      rgba(107,62,46,0.3) 30%,
+      rgba(212,165,20,0.22) 60%,
+      transparent);
+  }
+  .axis-placeholder-timeline {
+    @apply seed-placeholder-miolo bg-gradient-to-br from-surface-1 via-accent-yellow/5 to-accent-brown/5;
+  }
+  .axis-heading-timeline {
+    @apply font-black leading-[1.05] tracking-tight text-text-primary;
+  }
+
+  /* ────────────────────────────────────────────────
+     DOSSIÊ — botanical seed green × organic
+     Accent: accent-seed (#A3D832) green
+     ──────────────────────────────────────────────── */
+  .axis-card-dossie {
+    @apply axis-card border-accent-seed/25 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-seed/10;
+  }
+  .axis-card-dossie::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-1;
+    background: linear-gradient(90deg, rgba(163,216,50,0.15), rgba(163,216,50,0.55), rgba(21,128,61,0.35), rgba(0,93,170,0.05));
+  }
+  .axis-card-dossie::after {
+    content: "";
+    @apply pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-30;
+    background:
+      radial-gradient(circle at center, rgba(163,216,50,0.22), transparent 64%),
+      repeating-radial-gradient(circle at center, rgba(163,216,50,0.16) 0 1px, transparent 1px 3px);
+  }
+  .axis-section-header-dossie {
+    @apply axis-section-header border-accent-seed/25 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-seed/10;
+  }
+  .axis-section-header-dossie::before {
+    background: linear-gradient(90deg, rgba(163,216,50,0.1), rgba(163,216,50,0.45), rgba(21,128,61,0.3), rgba(21,128,61,0.05));
+  }
+  .axis-eyebrow-dossie {
+    @apply axis-eyebrow border-accent-seed/35 bg-accent-seed/15 text-accent-green;
+  }
+  .axis-divider-dossie {
+    @apply axis-divider;
+  }
+  .axis-divider-dossie::before {
+    background: linear-gradient(90deg, transparent, rgba(163,216,50,0.42), rgba(21,128,61,0.28), transparent);
+  }
+  .axis-placeholder-dossie {
+    @apply seed-placeholder-miolo bg-gradient-to-br from-accent-seed/10 via-surface-1 to-surface-2;
+  }
+  .axis-placeholder-dossie::before {
+    background:
+      radial-gradient(circle at center, rgba(163,216,50,0.2) 0%, rgba(21,128,61,0.1) 40%, transparent 72%),
+      repeating-radial-gradient(circle at center, rgba(163,216,50,0.15) 0 1px, transparent 1px 4px);
+  }
+  .axis-heading-dossie {
+    @apply font-black leading-[1.05] tracking-tight text-text-primary;
+    text-shadow: 0 1px 0 rgba(163,216,50,0.1);
+  }
+
+  /* ────────────────────────────────────────────────
+     CORREDOR — forest green × territorial
+     Accent: accent-green (#15803D)
+     ──────────────────────────────────────────────── */
+  .axis-card-corredor {
+    @apply axis-card border-accent-green/25 bg-gradient-to-br from-surface-1 via-surface-1 to-success/10;
+  }
+  .axis-card-corredor::before {
+    content: "";
+    @apply pointer-events-none absolute inset-y-0 left-0 w-1;
+    background: linear-gradient(180deg, rgba(21,128,61,0.8), rgba(21,128,61,0.55), rgba(163,216,50,0.4));
+  }
+  .axis-card-corredor::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0 opacity-25;
+    background-image: linear-gradient(130deg, rgba(21,128,61,0.07) 12%, transparent 12% 50%, rgba(0,93,170,0.05) 50% 62%, transparent 62%);
+    background-size: 220px 220px;
+  }
+  .axis-section-header-corredor {
+    @apply axis-section-header border-accent-green/20 bg-gradient-to-br from-surface-1 via-surface-1 to-success/10;
+  }
+  .axis-section-header-corredor::before {
+    background: linear-gradient(90deg, rgba(21,128,61,0.06), rgba(21,128,61,0.45), rgba(163,216,50,0.3), rgba(163,216,50,0.05));
+  }
+  .axis-eyebrow-corredor {
+    @apply axis-eyebrow border-accent-green/30 bg-accent-green/10 text-accent-green;
+  }
+  .axis-divider-corredor {
+    @apply axis-divider;
+  }
+  .axis-divider-corredor::before {
+    background: linear-gradient(90deg, transparent, rgba(21,128,61,0.42), rgba(163,216,50,0.32), transparent);
+  }
+  .axis-placeholder-corredor {
+    @apply seed-placeholder-miolo bg-gradient-to-br from-accent-green/10 via-surface-1 to-surface-2;
+  }
+  .axis-placeholder-corredor::before {
+    background:
+      radial-gradient(circle at center, rgba(21,128,61,0.18) 0%, rgba(163,216,50,0.1) 40%, transparent 72%),
+      repeating-radial-gradient(circle at center, rgba(21,128,61,0.12) 0 1px, transparent 1px 4px);
+  }
+  .axis-heading-corredor {
+    @apply font-black leading-[1.05] tracking-[0.01em] text-text-primary uppercase;
+    letter-spacing: 0.015em;
+  }
+
+  /* ────────────────────────────────────────────────
+     BLOG — editorial publishing blue
+     Accent: brand-primary × accent-lab highlight
+     ──────────────────────────────────────────────── */
+  .axis-card-blog {
+    @apply axis-card border-brand-primary/20 bg-gradient-to-br from-surface-1 via-surface-1 to-brand-primary-soft/30;
+  }
+  .axis-card-blog::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-1;
+    background: linear-gradient(90deg, rgba(0,93,170,0.8), rgba(0,183,177,0.55), transparent);
+  }
+  .axis-card-blog::after {
+    content: "";
+    @apply pointer-events-none absolute -right-8 top-6 h-24 w-24 rounded-full opacity-35;
+    background:
+      radial-gradient(circle at center, rgba(0,93,170,0.18), transparent 62%),
+      repeating-radial-gradient(circle at center, rgba(17,38,59,0.08) 0 1px, transparent 1px 3px);
+  }
+  .axis-section-header-blog {
+    @apply axis-section-header border-brand-primary/15 bg-gradient-to-br from-surface-1 via-surface-1 to-brand-primary-soft/30;
+  }
+  .axis-section-header-blog::before {
+    background: linear-gradient(90deg, transparent, rgba(0,93,170,0.3), rgba(0,183,177,0.2), transparent);
+  }
+  .axis-eyebrow-blog {
+    @apply axis-eyebrow border-brand-primary/25 bg-brand-primary-soft text-brand-primary-dark;
+  }
+  .axis-divider-blog {
+    @apply axis-divider;
+  }
+  .axis-divider-blog::before {
+    background: linear-gradient(90deg, transparent, rgba(0,93,170,0.28), rgba(0,183,177,0.18), transparent);
+  }
+  .axis-placeholder-blog {
+    @apply seed-placeholder-miolo bg-gradient-to-br from-brand-primary-soft/30 via-surface-1 to-surface-2;
+  }
+  .axis-heading-blog {
+    @apply font-black leading-[1.05] tracking-tight text-text-primary;
+    text-decoration-color: rgba(0,93,170,0.4);
+  }
+  .axis-heading-blog-editorial {
+    @apply axis-heading-blog italic;
+  }
+
+  /* ────────────────────────────────────────────────
+     RELATÓRIO — institutional amber × governance
+     Accent: accent-yellow (#D4A514)
+     ──────────────────────────────────────────────── */
+  .axis-card-relatorio {
+    @apply axis-card border-accent-yellow/25 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-yellow/10;
+  }
+  .axis-card-relatorio::before {
+    content: "";
+    @apply pointer-events-none absolute inset-y-0 left-0 w-1.5;
+    background: linear-gradient(180deg, rgba(212,165,20,0.7), rgba(0,93,170,0.35));
+  }
+  .axis-card-relatorio::after {
+    content: "";
+    @apply pointer-events-none absolute -left-10 top-8 h-32 w-32 rounded-full opacity-35;
+    background:
+      radial-gradient(circle at center, rgba(212,165,20,0.28), transparent 64%),
+      radial-gradient(circle at 68% 32%, rgba(0,93,170,0.18), transparent 42%);
+  }
+  .axis-section-header-relatorio {
+    @apply axis-section-header border-accent-yellow/25 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-yellow/10;
+  }
+  .axis-section-header-relatorio::before {
+    background: linear-gradient(90deg, transparent, rgba(212,165,20,0.4), rgba(0,93,170,0.2), transparent);
+  }
+  .axis-eyebrow-relatorio {
+    @apply axis-eyebrow border-accent-yellow/35 bg-accent-yellow/10 text-warning;
+  }
+  .axis-divider-relatorio {
+    @apply axis-divider;
+  }
+  .axis-divider-relatorio::before {
+    background: linear-gradient(90deg, transparent, rgba(212,165,20,0.42), rgba(0,93,170,0.22), transparent);
+  }
+  .axis-placeholder-relatorio {
+    @apply seed-placeholder-miolo bg-gradient-to-br from-accent-yellow/10 via-surface-1 to-surface-2;
+  }
+  .axis-placeholder-relatorio::before {
+    background:
+      radial-gradient(circle at 60% 30%, rgba(212,165,20,0.2), transparent 22%),
+      radial-gradient(circle at 26% 70%, rgba(0,93,170,0.14), transparent 24%);
+  }
+  .axis-heading-relatorio {
+    @apply font-black leading-[1.05] tracking-[0.015em] text-text-primary;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

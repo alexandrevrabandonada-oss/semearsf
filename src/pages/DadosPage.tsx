@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react
 import { useSearchParams } from "react-router-dom";
 
 import { Chip, IconShell, SectionHeader, SurfaceCard } from "../components/BrandSystem";
+import { AxisEyebrow, AxisDivider } from "../components/AxisSystem";
 import { LoadingCard } from "../components/LoadingCard";
 import { OfflineBanner } from "../components/OfflineBanner";
 import { EmptyState } from "../components/EmptyState";
@@ -279,18 +280,18 @@ export function DadosPage() {
         />
       )}
 
-      <SurfaceCard className="signature-shell logo-watermark-soft overflow-hidden p-5 md:p-6">
+      <SurfaceCard className="axis-section-header-dados overflow-hidden p-5 md:p-6">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-end">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <IconShell tone="brand" className="rounded-full">
+              <IconShell tone="lab" className="rounded-full">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </IconShell>
               <div className="space-y-1">
-                <p className="section-badge">Painel ambiental</p>
-                <h1 className="text-2xl font-black leading-tight text-text-primary md:text-4xl">Dados ao vivo</h1>
+                <AxisEyebrow axis="dados">Painel ambiental</AxisEyebrow>
+                <h1 className="axis-heading-dados text-2xl md:text-4xl">Dados ao vivo</h1>
               </div>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">

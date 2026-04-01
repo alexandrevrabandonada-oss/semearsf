@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, SectionHeader, SurfaceCard } from "../components/BrandSystem";
 import { BrandIllustratedEmptyState, BrandTextureSkeleton } from "../components/BrandMicro";
+import { AxisSectionHeader } from "../components/AxisSystem";
+import { EditorialFamilyCard } from "../components/CardFamilies";
 import { listBlogPosts, type BlogPost } from "../lib/api";
 import { getOptimizedCover } from "../lib/imageOptimization";
 
@@ -43,13 +44,12 @@ export function BlogListPage() {
 
     return (
         <section className="space-y-10 md:space-y-12">
-            <SurfaceCard className="signature-shell logo-watermark-soft p-6 md:p-8">
-                <SectionHeader
-                    eyebrow="Comunicação"
-                    title="Blog da Emenda"
-                    description="Acompanhe as últimas atualizações, notícias institucionais e artigos sobre o monitoramento do ar."
-                />
-            </SurfaceCard>
+            <AxisSectionHeader
+                axis="blog"
+                eyebrow="Comunicação"
+                title="Blog da Emenda"
+                description="Acompanhe as últimas atualizações, notícias institucionais e artigos sobre o monitoramento do ar."
+            />
 
             {loading ? (
                 <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -69,57 +69,29 @@ export function BlogListPage() {
                 />
             ) : (
                 <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                    {posts.map((post) => (
-                        <Link
-                            className="group motion-list-item block h-full"
-                            key={post.id}
-                            to={`/blog/${post.slug}`}
-                        >
-                            <EditorialCard variant={post.cover_url ? "media" : "text"} tone="editorial">
-                                {post.cover_url ? (
-                                    <div className="semear-card-media h-44 w-full overflow-hidden bg-bg-surface relative">
-                                        <img
-                                            alt={post.title}
-                                            className="h-full w-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105"
-                                            src={getOptimizedCover(post, "thumb") || ""}
-                                        loading="lazy"
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="floral-placeholder flex h-44 w-full flex-col justify-between p-5">
-                                        <span className="section-badge w-fit">SEMEAR</span>
-                                        <span className="max-w-[12rem] text-lg font-black leading-tight text-text-primary">
-                                            Conteúdo editorial
-                                        </span>
-                                    </div>
-                                )}
-                                <EditorialCardBody>
-                                    <EditorialCardMeta className="justify-between">
-                                        <span>{(post.publish_at || post.published_at) ? new Date((post.publish_at || post.published_at) as string).toLocaleDateString("pt-BR") : "Draft"}</span>
-                                        {demoOrAdminMode && isScheduled(post) ? <span className="ui-tag-signature">Agendado</span> : null}
-                                    </EditorialCardMeta>
-                                    <EditorialCardTitle className="line-clamp-2 md:text-xl">{post.title}</EditorialCardTitle>
-                                    {post.excerpt ? <EditorialCardExcerpt className="line-clamp-3">{post.excerpt}</EditorialCardExcerpt> : null}
-                                    {post.tags.length > 0 && (
-                                        <div className="flex flex-wrap gap-1">
-                                            {post.tags.slice(0, 3).map((tag) => (
-                                                <span className="ui-tag-signature-editorial" key={tag}>
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    )}
-                                    <EditorialCardActions>
-                                        <span className="semear-card-cta">
-                                            Ler post
-                                            <span aria-hidden="true">→</span>
-                                        </span>
-                                    </EditorialCardActions>
-                                </EditorialCardBody>
-                            </EditorialCard>
-                        </Link>
-                    ))}
+                    {posts.map((post) => {
+                        const dateStr = (post.publish_at || post.published_at)
+                            ? new Date((post.publish_at || post.published_at) as string).toLocaleDateString("pt-BR")
+                            : undefined;
+                        return (
+                            <Link
+                                key={post.id}
+                                to={`/blog/${post.slug}`}
+                                className="group motion-list-item block h-full"
+                            >
+                                <EditorialFamilyCard
+                                    coverUrl={getOptimizedCover(post, "thumb")}
+                                    coverAlt={post.title}
+                                    date={dateStr}
+                                    title={post.title}
+                                    excerpt={post.excerpt}
+                                    tags={post.tags}
+                                    scheduled={demoOrAdminMode && isScheduled(post)}
+                                    cta="Ler artigo"
+                                />
+                            </Link>
+                        );
+                    })}
                 </div>
             )}
         </section>
