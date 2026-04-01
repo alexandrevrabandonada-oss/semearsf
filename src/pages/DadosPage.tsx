@@ -279,135 +279,110 @@ export function DadosPage() {
         />
       )}
 
-      <SurfaceCard className="signature-shell logo-watermark-soft overflow-hidden p-6 md:p-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div className="max-w-3xl space-y-4">
+      <SurfaceCard className="signature-shell logo-watermark-soft overflow-hidden p-5 md:p-6">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-end">
+          <div className="space-y-3">
             <div className="flex items-center gap-3">
               <IconShell tone="brand" className="rounded-full">
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </IconShell>
-              <div>
+              <div className="space-y-1">
                 <p className="section-badge">Painel ambiental</p>
-                <h1 className="mt-2 text-2xl font-black leading-tight text-text-primary md:text-4xl">Dados ao vivo</h1>
+                <h1 className="text-2xl font-black leading-tight text-text-primary md:text-4xl">Dados ao vivo</h1>
               </div>
             </div>
-            <p className="max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg">
-              Acompanhe as leituras das estações públicas de Volta Redonda e do Sul Fluminense. Leia agora, compare períodos e exporte o recorte em CSV.
+            <p className="max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">
+              Veja a estação, acompanhe o estado atual e exporte o recorte em CSV.
             </p>
           </div>
 
-          <div className="grid w-full gap-3 sm:grid-cols-3 lg:max-w-[34rem] lg:grid-cols-1">
-            <div className="signature-surface p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Status</p>
-              <p className={`mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-bold ${selectedStationId ? (isOnline ? "border-emerald-500/20 bg-emerald-50 text-emerald-800" : "border-red-500/20 bg-red-50 text-red-900") : "border-slate-300 bg-slate-50 text-slate-700"}`}>
-                {selectedStationId ? (isOnline ? "● Online" : "● Offline") : "Selecione uma estação"}
-              </p>
+          <div className="space-y-3">
+            <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+              <label className="block">
+                <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-text-secondary">Estação</span>
+                <select
+                  className="motion-input motion-focus w-full rounded-full border border-border-subtle bg-surface-1 px-4 py-2.5 text-sm text-text-primary"
+                  disabled={!stations.length}
+                  onChange={(e) => setSelectedStationId(e.target.value || null)}
+                  value={selectedStationId ?? ""}
+                >
+                  {!selectedStationId ? <option value="">Selecione uma estação</option> : null}
+                  {stations.map((station) => (
+                    <option key={station.station_id} value={station.station_id}>
+                      {String(station.name ?? station.station_id)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                className="ui-btn-primary px-4"
+                disabled={!selectedStationId || loadingMeasurements}
+                onClick={() => selectedStationId && void loadMeasurements(selectedStationId)}
+                type="button"
+              >
+                Recarregar
+              </button>
             </div>
-            <div className="signature-surface p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Qualidade</p>
-              <p className="mt-2 text-sm font-semibold text-text-primary">
-                {selectedStationId && stationHealth.has(selectedStationId)
-                  ? getHealthBadgeInfo(stationHealth.get(selectedStationId)!.health_status).label
-                  : "Sem leitura ainda"}
-              </p>
-            </div>
-            <div className="signature-surface p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Atualização</p>
-              <p className="mt-2 text-sm font-semibold text-text-primary">{stats.lastTime ? formatDate(stats.lastTime) : "Aguardando dados"}</p>
+
+            <div className="grid gap-2 sm:grid-cols-3">
+              <div className="rounded-2xl border border-border-subtle bg-surface-2 px-3.5 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-text-secondary">Status</p>
+                <p className={`mt-1.5 inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold ${selectedStationId ? (isOnline ? "border-emerald-500/20 bg-emerald-50 text-emerald-800" : "border-red-500/20 bg-red-50 text-red-900") : "border-slate-300 bg-slate-50 text-slate-700"}`}>
+                  {selectedStationId ? (isOnline ? "Online" : "Offline") : "Sem estação"}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-border-subtle bg-surface-2 px-3.5 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-text-secondary">Qualidade</p>
+                <p className="mt-1.5 text-sm font-semibold text-text-primary">
+                  {selectedStationId && stationHealth.has(selectedStationId)
+                    ? getHealthBadgeInfo(stationHealth.get(selectedStationId)!.health_status).label
+                    : "Sem leitura"}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-border-subtle bg-surface-2 px-3.5 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-text-secondary">Atualização</p>
+                <p className="mt-1.5 text-sm font-semibold text-text-primary">{stats.lastTime ? formatDate(stats.lastTime) : "Aguardando"}</p>
+              </div>
             </div>
           </div>
         </div>
       </SurfaceCard>
 
-      <SurfaceCard className="p-6 md:p-8">
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] xl:items-start">
-          <div className="space-y-6">
-            <SectionHeader
-              eyebrow="Leitura pública"
-              title="Selecionar estação e acompanhar leituras"
-              description="Escolha a estação, confira a situação atual e atualize a leitura quando precisar."
-            />
-
-            <div className="signature-surface p-5 md:p-6">
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-                <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-text-primary">Estação monitorada</span>
-                  <select
-                    className="w-full rounded-full border border-border-subtle bg-surface-1 px-4 py-3 text-text-primary outline-none transition focus:border-brand-primary focus:ring-4 focus:ring-focus-ring/30"
-                    disabled={!stations.length}
-                    onChange={(e) => setSelectedStationId(e.target.value || null)}
-                    value={selectedStationId ?? ""}
-                  >
-                    {!selectedStationId ? <option value="">Selecione uma estação</option> : null}
-                    {stations.map((station) => (
-                      <option key={station.station_id} value={station.station_id}>
-                        {String(station.name ?? station.station_id)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <button
-                  className="ui-btn-primary px-5 shadow-[0_12px_30px_rgba(0,93,170,0.18)]"
-                  disabled={!selectedStationId || loadingMeasurements}
-                  onClick={() => selectedStationId && void loadMeasurements(selectedStationId)}
-                  type="button"
-                >
-                  Atualizar leitura
-                </button>
-              </div>
-
-              <div className="mt-5 grid gap-3 md:grid-cols-3">
-                <div className="rounded-2xl border border-border-subtle bg-surface-2 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Status da estação</p>
-                  <p className={`mt-2 inline-flex items-center rounded-full border px-3 py-1 text-sm font-bold ${selectedStationId ? (isOnline ? "border-emerald-500/20 bg-emerald-50 text-emerald-800" : "border-red-500/20 bg-red-50 text-red-900") : "border-slate-300 bg-slate-50 text-slate-700"}`}>
-                    {selectedStationId ? (isOnline ? "● Online" : "● Offline") : "Selecione uma estação"}
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-border-subtle bg-surface-2 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Última atualização</p>
-                  <p className="mt-2 text-sm font-bold text-text-primary">{stats.lastTime ? formatDate(stats.lastTime) : "Aguardando dados"}</p>
-                </div>
-                <div className="rounded-2xl border border-border-subtle bg-surface-2 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Qualidade dos dados</p>
-                  {selectedStationId && stationHealth.has(selectedStationId) ? (
-                    (() => {
-                      const health = stationHealth.get(selectedStationId)!;
-                      const info = getHealthBadgeInfo(health.health_status);
-                      return (
-                        <div className={`mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-bold ${info.color}`} aria-label={`Qualidade do dado: ${info.label}`} title={`Status: ${info.label} - ${health.health_status === 'ok' ? 'Medições confiáveis' : health.health_status === 'degraded' ? 'Qualidade comprometida' : health.health_status === 'offline' ? 'Sem comunicação' : 'Dados não disponíveis'}`}>
-                          <span aria-hidden="true">{info.icon}</span>
-                          <span>{info.label}</span>
-                        </div>
-                      );
-                    })()
-                  ) : (
-                    <p className="mt-2 text-sm text-text-secondary">Selecione uma estação para ver a qualidade.</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
+      <SurfaceCard className="p-5 md:p-6">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] lg:items-start">
           <div className="space-y-4">
             <SectionHeader
-              eyebrow="Guia rápido"
-              title="Como ler os dados"
-              description="O painel foi organizado para leitura rápida e segura em uso público."
+              eyebrow="Leitura pública"
+              title="Como ler"
+              description="PM2.5 e PM10 medem partículas; use 24h e 7 dias para contexto."
             />
-            <div className="signature-surface p-5">
-              <ul className="space-y-3 text-sm leading-relaxed text-text-secondary">
-                <li><span className="font-semibold text-text-primary">1.</span> PM2.5 e PM10 medem material particulado no ar em µg/m³.</li>
-                <li><span className="font-semibold text-text-primary">2.</span> A classificação OMS resume o nível atual: bom, moderado, alto ou muito alto.</li>
-                <li><span className="font-semibold text-text-primary">3.</span> Use 24h e 7 dias para contexto. Uma leitura isolada pode enganar.</li>
-                <li><span className="font-semibold text-text-primary">4.</span> Quando houver indisponibilidade, recarregue os dados ou troque de estação.</li>
-              </ul>
-            </div>
-            <div className="signature-surface p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Exportação</p>
-              <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                Baixe o recorte em CSV para análise externa. O botão fica visível nos períodos com dados carregados.
+            <ul className="grid gap-2 text-sm leading-relaxed text-text-secondary md:grid-cols-2">
+              <li>
+                <span className="font-semibold text-text-primary">1.</span> PM2.5 e PM10 medem partículas no ar.
+              </li>
+              <li>
+                <span className="font-semibold text-text-primary">2.</span> A OMS resume o estado em bom, moderado, alto ou muito alto.
+              </li>
+              <li>
+                <span className="font-semibold text-text-primary">3.</span> Use 24h e 7 dias para contexto.
+              </li>
+              <li>
+                <span className="font-semibold text-text-primary">4.</span> Se faltar dado, recarregue ou troque de estação.
+              </li>
+            </ul>
+          </div>
+
+          <div className="signature-surface p-4 md:p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">CSV</p>
+            <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+              Baixe o recorte do período visível quando houver leitura disponível.
+            </p>
+            <div className="mt-4 rounded-2xl border border-border-subtle bg-surface-2 p-3.5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-secondary">Legenda</p>
+              <p className="mt-1.5 text-sm text-text-primary">
+                Mais recente, mais claro, mais fácil de comparar.
               </p>
             </div>
           </div>
@@ -415,14 +390,14 @@ export function DadosPage() {
       </SurfaceCard>
 
       {selectedStationId && (
-        <SurfaceCard className="p-6 md:p-8">
-          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Período de visualização">
+        <SurfaceCard className="p-4 md:p-5">
+          <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Período de visualização">
             <button
               id="tab-now"
               role="tab"
               aria-selected={activeTab === "now"}
               aria-controls="panel-now"
-              className={activeTab === "now" ? "motion-tab motion-tab-active" : "motion-tab"}
+              className={activeTab === "now" ? "ui-segment-tab ui-segment-tab-active" : "ui-segment-tab"}
               onClick={() => setActiveTab("now")}
               type="button"
             >
@@ -433,7 +408,7 @@ export function DadosPage() {
               role="tab"
               aria-selected={activeTab === "24h"}
               aria-controls="panel-24h"
-              className={activeTab === "24h" ? "motion-tab motion-tab-active" : "motion-tab"}
+              className={activeTab === "24h" ? "ui-segment-tab ui-segment-tab-active" : "ui-segment-tab"}
               onClick={() => setActiveTab("24h")}
               type="button"
             >
@@ -444,7 +419,7 @@ export function DadosPage() {
               role="tab"
               aria-selected={activeTab === "7d"}
               aria-controls="panel-7d"
-              className={activeTab === "7d" ? "motion-tab motion-tab-active" : "motion-tab"}
+              className={activeTab === "7d" ? "ui-segment-tab ui-segment-tab-active" : "ui-segment-tab"}
               onClick={() => setActiveTab("7d")}
               type="button"
             >
@@ -454,42 +429,42 @@ export function DadosPage() {
 
           {activeTab === "now" && (
             <div role="tabpanel" id="panel-now" aria-labelledby="tab-now">
-              <h2 className="mt-6 text-lg font-bold text-brand-primary">Leitura atual</h2>
+              <h2 className="mt-5 text-base font-bold text-brand-primary">Agora</h2>
               {stats.lastValue ? (
-                <div className="mt-4 grid gap-5 md:grid-cols-2">
-                  <div className="signature-surface p-5">
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <div className="signature-surface p-4 md:p-5">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM2.5</p>
-                    <p className="mt-2 text-4xl font-black leading-none text-text-primary">{stats.lastValue.pm25?.toFixed(1) ?? "-"}</p>
-                    <div className={`mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${getOmsLevelStyle(pm25NowClassification.level)}`}>
+                    <p className="mt-2 text-3xl font-black leading-none text-text-primary md:text-[2.65rem]">{stats.lastValue.pm25?.toFixed(1) ?? "-"}</p>
+                    <div className={`mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${getOmsLevelStyle(pm25NowClassification.level)}`}>
                       <span aria-hidden="true">{pm25NowClassification.icon}</span>
-                      <span>Classificação: {pm25NowClassification.level}</span>
+                      <span>{pm25NowClassification.level}</span>
                     </div>
-                    <p className="mt-3 text-xs leading-relaxed text-text-secondary">{pm25NowClassification.summary}</p>
-                    <p className="mt-1 text-xs font-medium text-text-secondary">Cuidado: {pm25NowClassification.recommendation}</p>
+                    <p className="mt-2 text-xs leading-relaxed text-text-secondary">{pm25NowClassification.summary}</p>
+                    <p className="mt-1 text-xs font-medium text-text-secondary">{pm25NowClassification.recommendation}</p>
                   </div>
-                  <div className="signature-surface p-5">
+                  <div className="signature-surface p-4 md:p-5">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM10</p>
-                    <p className="mt-2 text-4xl font-black leading-none text-text-primary">{stats.lastValue.pm10?.toFixed(1) ?? "-"}</p>
-                    <div className={`mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${getOmsLevelStyle(pm10NowClassification.level)}`}>
+                    <p className="mt-2 text-3xl font-black leading-none text-text-primary md:text-[2.65rem]">{stats.lastValue.pm10?.toFixed(1) ?? "-"}</p>
+                    <div className={`mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${getOmsLevelStyle(pm10NowClassification.level)}`}>
                       <span aria-hidden="true">{pm10NowClassification.icon}</span>
-                      <span>Classificação: {pm10NowClassification.level}</span>
+                      <span>{pm10NowClassification.level}</span>
                     </div>
-                    <p className="mt-3 text-xs leading-relaxed text-text-secondary">{pm10NowClassification.summary}</p>
-                    <p className="mt-1 text-xs font-medium text-text-secondary">Cuidado: {pm10NowClassification.recommendation}</p>
+                    <p className="mt-2 text-xs leading-relaxed text-text-secondary">{pm10NowClassification.summary}</p>
+                    <p className="mt-1 text-xs font-medium text-text-secondary">{pm10NowClassification.recommendation}</p>
                   </div>
-                  <div className="signature-surface p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Temperatura</p>
-                    <p className="mt-2 text-3xl font-black text-text-primary">{stats.lastValue.temp?.toFixed(1) ?? "-"}</p>
+                  <div className="signature-surface p-4 md:p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Temp.</p>
+                    <p className="mt-2 text-2xl font-black text-text-primary md:text-3xl">{stats.lastValue.temp?.toFixed(1) ?? "-"}</p>
                     <p className="mt-1 text-xs text-text-secondary">°C</p>
                   </div>
-                  <div className="signature-surface p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Umidade</p>
-                    <p className="mt-2 text-3xl font-black text-text-primary">{stats.lastValue.humidity?.toFixed(0) ?? "-"}</p>
+                  <div className="signature-surface p-4 md:p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Umid.</p>
+                    <p className="mt-2 text-2xl font-black text-text-primary md:text-3xl">{stats.lastValue.humidity?.toFixed(0) ?? "-"}</p>
                     <p className="mt-1 text-xs text-text-secondary">%</p>
                   </div>
                 </div>
               ) : (
-                <EmptyState title="Sem leitura disponível agora" description="Escolha outra estação ou aguarde o próximo envio de dados." />
+                <EmptyState title="Sem leitura agora" description="Troque de estação ou aguarde o próximo envio." />
               )}
             </div>
           )}
@@ -498,57 +473,57 @@ export function DadosPage() {
             <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
               {loadingMeasurements ? (
                 <p aria-live="polite" className="mt-6 text-sm text-text-secondary" role="status">
-                  Carregando medições do período...
+                  Carregando dados...
                 </p>
               ) : currentMeasurements.length === 0 ? (
-                <EmptyState title="Sem medições para este intervalo" description="Troque para outro intervalo ou aguarde o próximo ciclo de coleta." />
+                <EmptyState title="Sem dados neste intervalo" description="Troque de período ou aguarde a próxima coleta." />
               ) : (
                 <>
                   <div className="sr-only" aria-live="polite" role="status">
                     {textualSummary}
                   </div>
 
-                  <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,0.82fr)]">
-                    <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-                      <div className="signature-surface p-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM2.5 média</p>
-                        <p className="mt-2 text-3xl font-black text-text-primary">{stats.pm25Avg !== null ? stats.pm25Avg.toFixed(1) : "-"}</p>
+                  <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(280px,0.82fr)]">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                      <div className="signature-surface p-3.5 md:p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM2.5 méd.</p>
+                        <p className="mt-2 text-2xl font-black text-text-primary md:text-3xl">{stats.pm25Avg !== null ? stats.pm25Avg.toFixed(1) : "-"}</p>
                         <p className="mt-1 text-xs text-text-secondary">µg/m³</p>
                       </div>
-                      <div className="signature-surface p-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM2.5 máximo</p>
-                        <p className="mt-2 text-3xl font-black text-text-primary">{stats.pm25Max !== null ? stats.pm25Max.toFixed(1) : "-"}</p>
+                      <div className="signature-surface p-3.5 md:p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM2.5 máx.</p>
+                        <p className="mt-2 text-2xl font-black text-text-primary md:text-3xl">{stats.pm25Max !== null ? stats.pm25Max.toFixed(1) : "-"}</p>
                         <p className="mt-1 text-xs text-text-secondary">µg/m³</p>
                       </div>
-                      <div className="signature-surface p-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM10 média</p>
-                        <p className="mt-2 text-3xl font-black text-text-primary">{stats.pm10Avg !== null ? stats.pm10Avg.toFixed(1) : "-"}</p>
+                      <div className="signature-surface p-3.5 md:p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM10 méd.</p>
+                        <p className="mt-2 text-2xl font-black text-text-primary md:text-3xl">{stats.pm10Avg !== null ? stats.pm10Avg.toFixed(1) : "-"}</p>
                         <p className="mt-1 text-xs text-text-secondary">µg/m³</p>
                       </div>
-                      <div className="signature-surface p-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM10 máximo</p>
-                        <p className="mt-2 text-3xl font-black text-text-primary">{stats.pm10Max !== null ? stats.pm10Max.toFixed(1) : "-"}</p>
+                      <div className="signature-surface p-3.5 md:p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM10 máx.</p>
+                        <p className="mt-2 text-2xl font-black text-text-primary md:text-3xl">{stats.pm10Max !== null ? stats.pm10Max.toFixed(1) : "-"}</p>
                         <p className="mt-1 text-xs text-text-secondary">µg/m³</p>
                       </div>
                     </div>
 
-                    <div className="signature-surface p-5">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Resumo operacional</p>
-                      <p className="mt-3 text-sm leading-relaxed text-text-secondary">{textualSummary}</p>
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                        <div className="rounded-2xl bg-surface-2 p-4">
-                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Leitura</p>
-                          <p className="mt-2 text-base font-bold text-text-primary">{activeTab === "24h" ? "Últimas 24 horas" : "Últimos 7 dias"}</p>
+                    <div className="signature-surface p-4 md:p-5">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Resumo</p>
+                      <p className="mt-2 text-sm leading-relaxed text-text-secondary">{textualSummary}</p>
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-2xl bg-surface-2 p-3.5">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Período</p>
+                          <p className="mt-1.5 text-sm font-bold text-text-primary">{activeTab === "24h" ? "24 horas" : "7 dias"}</p>
                         </div>
-                        <div className="rounded-2xl bg-surface-2 p-4">
+                        <div className="rounded-2xl bg-surface-2 p-3.5">
                           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Exportação</p>
-                          <p className="mt-2 text-base font-bold text-text-primary">CSV disponível</p>
+                          <p className="mt-1.5 text-sm font-bold text-text-primary">Pronto para CSV</p>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+                  <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
                     <div className="flex flex-wrap gap-3">
                       <label className="flex cursor-pointer items-center gap-2">
                         <input
@@ -574,14 +549,14 @@ export function DadosPage() {
                       disabled={currentMeasurements.length === 0}
                       onClick={handleExportCSV}
                       type="button"
-                      aria-label="Baixar dados em formato CSV"
+                      aria-label="CSV"
                     >
-                      Baixar CSV
+                      CSV
                     </button>
                   </div>
 
                   <div className="signature-surface mt-5 p-4 md:p-5">
-                    <h3 className="mb-4 text-sm font-bold text-brand-primary">Evolução temporal</h3>
+                    <h3 className="mb-3 text-sm font-bold text-brand-primary">Gráfico</h3>
                     <Suspense fallback={<LoadingCard message="Carregando gráfico histórico..." />}>
                       <MeasurementsChart data={chartData} showPM25={showPM25} showPM10={showPM10} />
                     </Suspense>
@@ -589,7 +564,7 @@ export function DadosPage() {
 
                   <details className="signature-surface mt-5 p-4">
                     <summary className="cursor-pointer text-sm font-bold text-brand-primary">
-                      Abrir tabela em texto
+                      Abrir tabela
                     </summary>
                     <div className="mt-4 overflow-x-auto">
                       <table className="min-w-full border-collapse text-sm">
@@ -599,7 +574,7 @@ export function DadosPage() {
                             <th className="px-3 py-2 font-bold">PM2.5 (µg/m³)</th>
                             <th className="px-3 py-2 font-bold">PM10 (µg/m³)</th>
                             <th className="px-3 py-2 font-bold">Temp (°C)</th>
-                            <th className="px-3 py-2 font-bold">Umidade (%)</th>
+                            <th className="px-3 py-2 font-bold">Umid. (%)</th>
                             <th className="px-3 py-2 font-bold">Qualidade</th>
                           </tr>
                         </thead>
@@ -634,6 +609,7 @@ export function DadosPage() {
     </section>
   );
 }
+
 
 
 

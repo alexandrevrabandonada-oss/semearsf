@@ -209,17 +209,15 @@ export function SearchPage() {
               <button
                 key={t}
                 onClick={() => handleTipoChange(t)}
-                className={`motion-tab motion-chip-action inline-flex min-h-[44px] items-center gap-2 px-4 py-2 ${
-                  tipo === t
-                    ? "motion-tab-active"
-                    : ""
+                className={`ui-segment-tab motion-chip-action inline-flex min-h-[40px] items-center gap-2 px-3.5 py-2 ${
+                  tipo === t ? "ui-segment-tab-active" : ""
                 }`}
                 aria-pressed={tipo === t}
               >
                 <span>{TYPE_LABEL[t]}</span>
                 {query.trim().length >= 2 && !loading && (
                   <span
-                    className={`flex h-5 items-center justify-center rounded-full px-2 text-xs font-bold ${
+                    className={`inline-flex min-h-5 items-center justify-center rounded-full px-2 text-[10px] font-semibold leading-none ${
                       tipo === t ? "bg-white/20 text-white" : "bg-brand-primary/10 text-brand-primary"
                     }`}
                     aria-label={`${countByType[t]} resultados`}

@@ -122,7 +122,7 @@ export function AcervoListPage() {
   const meta = AREA_META[area];
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-10 md:space-y-12">
       <SurfaceCard className="signature-shell document-placeholder p-6 md:p-8">
         <SectionHeader
           eyebrow={`Acervo / ${meta.label}`}
@@ -201,7 +201,7 @@ export function AcervoListPage() {
             </p>
           </div>
         ) : (
-          <ul className="grid gap-4 lg:grid-cols-2">
+          <ul className="grid gap-5 lg:grid-cols-2">
             {filtered.map((item) => (
               <li key={item.slug}>
                 <Link

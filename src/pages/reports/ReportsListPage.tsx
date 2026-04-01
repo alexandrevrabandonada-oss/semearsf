@@ -82,7 +82,7 @@ export function ReportsListPage() {
   const regularReports = useMemo(() => reports.filter((item) => !featuredIds.has(item.id)), [featuredIds, reports]);
 
   return (
-    <section className="space-y-12">
+    <section className="space-y-10 md:space-y-12">
       <SurfaceCard className="signature-shell logo-watermark-soft p-6 md:p-8">
         <SectionHeader
           eyebrow="Biblioteca oficial"
@@ -118,7 +118,7 @@ export function ReportsListPage() {
                     key={value}
                     type="button"
                     onClick={() => setKind(value)}
-                    className={`motion-tab ${isActive ? "motion-tab-active" : ""}`}
+                    className={`ui-segment-tab ${isActive ? "ui-segment-tab-active" : ""}`}
                   >
                     {label}
                   </button>
@@ -229,68 +229,75 @@ export function ReportsListPage() {
             </p>
           </div>
         ) : (
-          <ul className="space-y-3">
+          <div className="grid gap-4 md:grid-cols-2">
             {regularReports.map((item) => {
               const thumbUrl = getOptimizedCover(item, "thumb");
               return (
-                <li key={item.id}>
-                  <Link
-                    to={`/relatorios/${item.slug}`}
-                    className="group motion-list-item block h-full"
-                  >
-                    <EditorialCard variant="compact" className="p-0">
-                      {thumbUrl ? (
-                        <div className="overflow-hidden bg-surface-2">
-                          <img
-                            src={thumbUrl}
-                            alt={`Capa de ${item.title}`}
-                            loading="lazy"
-                            className="h-32 w-full object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="document-placeholder flex h-32 w-full flex-col justify-between p-3">
-                          <span className="section-badge w-fit">SEMEAR</span>
-                          <span className="text-xs font-black uppercase leading-tight text-text-primary">Documento oficial</span>
+                <Link
+                  key={item.id}
+                  to={`/relatorios/${item.slug}`}
+                  className="group motion-list-item block h-full"
+                >
+                  <EditorialCard variant="compact">
+                    {thumbUrl ? (
+                      <div className="h-36 overflow-hidden bg-surface-2">
+                        <img
+                          src={thumbUrl}
+                          alt={`Capa de ${item.title}`}
+                          loading="lazy"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                    ) : (
+                      <div className="document-placeholder flex h-36 w-full flex-col justify-between p-4">
+                        <span className="section-badge w-fit">SEMEAR</span>
+                        <span className="text-xs font-black uppercase leading-tight text-text-primary">Documento oficial</span>
+                      </div>
+                    )}
+                    <EditorialCardBody className="gap-2">
+                      <EditorialCardMeta className="justify-between">
+                        <span className="rounded-full border border-border-subtle bg-surface-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
+                          {KIND_LABEL[item.kind]}
+                        </span>
+                        <span>{item.published_at ? new Date(item.published_at).toLocaleDateString("pt-BR") : "Sem data"}</span>
+                      </EditorialCardMeta>
+                      <EditorialCardTitle className="text-base line-clamp-2 md:text-lg">{item.title}</EditorialCardTitle>
+                      {item.summary ? <EditorialCardExcerpt className="line-clamp-2 text-sm">{item.summary}</EditorialCardExcerpt> : null}
+                      {item.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {item.tags.slice(0, 4).map((itemTag) => (
+                            <button
+                              key={itemTag}
+                              type="button"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                setTag(itemTag);
+                              }}
+                              className="motion-control rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary hover:border-brand-primary hover:bg-brand-primary/5"
+                              aria-label={`Filtrar relatórios pela tag ${itemTag}`}
+                            >
+                              {itemTag}
+                            </button>
+                          ))}
                         </div>
                       )}
-                      <EditorialCardBody className="gap-2">
-                        <EditorialCardMeta className="justify-between">
-                          <span className="rounded-full border border-border-subtle bg-surface-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
-                            {KIND_LABEL[item.kind]}
-                          </span>
-                          <span>{item.published_at ? new Date(item.published_at).toLocaleDateString("pt-BR") : "Sem data"}</span>
-                        </EditorialCardMeta>
-                        <EditorialCardTitle className="text-base md:text-lg">{item.title}</EditorialCardTitle>
-                        {item.summary ? <EditorialCardExcerpt className="line-clamp-2 text-sm">{item.summary}</EditorialCardExcerpt> : null}
-                        {item.tags.length > 0 && (
-                          <div className="mt-2 flex flex-wrap gap-1">
-                            {item.tags.slice(0, 5).map((itemTag) => (
-                              <button
-                                key={itemTag}
-                                type="button"
-                                onClick={(event) => {
-                                  event.preventDefault();
-                                  event.stopPropagation();
-                                  setTag(itemTag);
-                                }}
-                                className="motion-control rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary hover:border-brand-primary hover:bg-brand-primary/5"
-                                aria-label={`Filtrar relatórios pela tag ${itemTag}`}
-                              >
-                                {itemTag}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </EditorialCardBody>
-                    </EditorialCard>
-                  </Link>
-                </li>
+                      <EditorialCardActions className="pt-1">
+                        <span className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary transition-transform group-hover:translate-x-0.5">
+                          Abrir PDF
+                          <span aria-hidden="true">→</span>
+                        </span>
+                      </EditorialCardActions>
+                    </EditorialCardBody>
+                  </EditorialCard>
+                </Link>
               );
             })}
-          </ul>
+          </div>
         )}
       </SurfaceCard>
     </section>
   );
 }
+
+

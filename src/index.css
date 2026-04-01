@@ -127,10 +127,26 @@ select {
   }
 
   .motion-tab {
-    @apply motion-action inline-flex items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-3 py-1 text-sm font-semibold text-text-secondary hover:border-brand-primary/20 hover:bg-brand-primary-soft hover:text-brand-primary-dark;
+    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-3.5 py-2 text-[13px] font-semibold leading-none text-text-secondary hover:border-brand-primary/20 hover:bg-brand-primary-soft hover:text-brand-primary-dark;
   }
 
   .motion-tab-active {
+    @apply border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_22px_rgba(0,93,170,0.12)];
+  }
+
+  .ui-segment-tab {
+    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-3.5 py-2 text-[13px] font-semibold leading-none text-text-secondary hover:border-brand-primary/20 hover:bg-brand-primary-soft hover:text-brand-primary-dark;
+  }
+
+  .ui-segment-tab-active {
+    @apply border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_22px_rgba(0,93,170,0.12)];
+  }
+
+  .ui-nav-pill {
+    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-transparent bg-transparent px-3.5 py-2 text-[13px] font-semibold leading-none text-text-secondary hover:border-border-subtle hover:bg-surface-2 hover:text-text-primary;
+  }
+
+  .ui-nav-pill-active {
     @apply border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_22px_rgba(0,93,170,0.12)];
   }
 
@@ -157,19 +173,23 @@ select {
   }
 
   .ui-btn-primary {
-    @apply motion-action inline-flex min-h-[44px] items-center justify-center rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(0,93,170,0.16)] hover:bg-brand-primary-dark hover:shadow-[0_12px_28px_rgba(0,93,170,0.22)];
+    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full bg-brand-primary px-4 py-2 text-[13px] font-semibold leading-none text-white shadow-[0_8px_24px_rgba(0,93,170,0.16)] hover:bg-brand-primary-dark hover:shadow-[0_12px_28px_rgba(0,93,170,0.22)];
   }
 
   .ui-btn-secondary {
-    @apply motion-action inline-flex min-h-[44px] items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-4 py-2 text-sm font-semibold text-text-primary shadow-sm hover:border-brand-primary/40 hover:bg-brand-primary-soft;
+    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-4 py-2 text-[13px] font-semibold leading-none text-text-primary shadow-sm hover:border-brand-primary/40 hover:bg-brand-primary-soft;
   }
 
   .ui-btn-ghost {
-    @apply motion-action inline-flex min-h-[44px] items-center justify-center rounded-full border border-transparent px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary-soft hover:text-brand-primary-dark;
+    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-border-subtle bg-surface-1/75 px-4 py-2 text-[13px] font-semibold leading-none text-brand-primary shadow-[0_1px_2px_rgba(17,38,59,0.03)] hover:border-brand-primary/20 hover:bg-brand-primary-soft hover:text-brand-primary-dark;
+  }
+
+  .ui-cta-secondary {
+    @apply motion-action inline-flex min-h-[40px] items-center justify-center rounded-full border border-border-subtle bg-surface-1/75 px-4 py-2 text-[13px] font-semibold leading-none text-brand-primary shadow-[0_1px_2px_rgba(17,38,59,0.03)] hover:border-brand-primary/20 hover:bg-brand-primary-soft hover:text-brand-primary-dark;
   }
 
   .ui-chip {
-    @apply motion-chip-action inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface-2 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-secondary;
+    @apply motion-chip-action inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-border-subtle bg-surface-2 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] leading-none text-text-secondary;
   }
 
   .ui-chip-active {
@@ -181,7 +201,7 @@ select {
   }
 
   .section-badge {
-    @apply inline-flex items-center rounded-full border border-brand-primary/15 bg-brand-primary-soft px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-primary-dark;
+    @apply inline-flex min-h-[32px] items-center rounded-full border border-brand-primary/15 bg-brand-primary-soft px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] leading-none text-brand-primary-dark;
   }
 
   .decorative-divider {
@@ -224,7 +244,7 @@ select {
   }
 
   .seed-badge {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-brand-primary/15 bg-brand-primary-soft px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-primary-dark;
+    @apply inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-brand-primary/15 bg-brand-primary-soft px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] leading-none text-brand-primary-dark;
   }
 
   .floral-placeholder {

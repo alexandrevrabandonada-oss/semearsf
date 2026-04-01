@@ -48,19 +48,19 @@ const chipToneClasses: Record<NonNullable<ChipProps["tone"]>, string> = {
 };
 
 export function SurfaceCard({ children, className = "" }: SurfaceCardProps) {
-  return <div className={`surface-card motion-surface motion-surface-hover flex h-full flex-col ${className}`.trim()}>{children}</div>;
+  return <div className={`surface-card motion-surface motion-surface-hover flex flex-col ${className}`.trim()}>{children}</div>;
 }
 
 export function SectionHeader({ eyebrow, title, description, action }: SectionHeaderProps) {
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="space-y-2.5">
+    <div className="space-y-3.5">
+      <div className="flex flex-col gap-2.5 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-2">
           <span className="section-badge">{eyebrow}</span>
           <h2 className="max-w-3xl text-2xl font-black leading-[1.1] tracking-tight text-text-primary md:text-3xl">{title}</h2>
           {description ? <p className="max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">{description}</p> : null}
         </div>
-        {action ? <div className="shrink-0 motion-control md:pt-1.5">{action}</div> : null}
+        {action ? <div className="shrink-0 motion-control md:pt-1">{action}</div> : null}
       </div>
       <div className="decorative-divider" aria-hidden="true" />
     </div>
@@ -76,11 +76,11 @@ export function Chip({ children, tone = "default", className = "" }: ChipProps) 
 }
 
 const editorialCardVariantClasses: Record<EditorialCardVariant, string> = {
-  standard: "min-h-[24rem]",
-  featured: "min-h-[30rem]",
-  compact: "min-h-[14rem]",
-  text: "min-h-[13rem]",
-  media: "min-h-[20rem]"
+  standard: "min-h-[22rem]",
+  featured: "min-h-[28rem]",
+  compact: "min-h-[13rem]",
+  text: "min-h-[12rem]",
+  media: "min-h-[18rem]"
 };
 
 export function EditorialCard({ children, className = "", variant = "standard" }: EditorialCardProps) {
@@ -94,7 +94,7 @@ export function EditorialCard({ children, className = "", variant = "standard" }
 }
 
 export function EditorialCardBody({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`flex flex-1 flex-col gap-4 p-5 md:p-6 ${className}`.trim()}>{children}</div>;
+  return <div className={`flex flex-1 flex-col gap-3.5 p-4 md:p-5 ${className}`.trim()}>{children}</div>;
 }
 
 export function EditorialCardEyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {

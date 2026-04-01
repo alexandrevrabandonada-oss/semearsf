@@ -117,41 +117,41 @@ export function HomePage() {
   );
 
   return (
-    <section className="space-y-12 md:space-y-14">
-      <SurfaceCard className="signature-shell logo-watermark-soft overflow-hidden border-brand-primary/12 bg-gradient-to-br from-surface-1 via-surface-1 to-surface-2 p-6 shadow-[0_20px_60px_rgba(17,38,59,0.08)] md:p-8">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-start">
-          <div className="relative space-y-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="seed-badge">Selo institucional</span>
+    <section className="space-y-10 md:space-y-12">
+      <SurfaceCard className="signature-shell logo-watermark-soft overflow-hidden border-brand-primary/12 bg-gradient-to-br from-surface-1 via-surface-1 to-surface-2 p-5 shadow-[0_20px_60px_rgba(17,38,59,0.08)] md:p-6">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.08fr)_minmax(300px,0.92fr)] lg:items-center">
+          <div className="relative space-y-4">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="section-badge">Selo institucional</span>
               <span className="ui-chip">PWA público-universitário</span>
               <span className="ui-chip ui-chip-active">UFF</span>
             </div>
 
-            <div className="seed-radial-divider max-w-md" aria-hidden="true" />
+            <div className="seed-radial-divider max-w-sm" aria-hidden="true" />
 
-            <div className="space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-text-secondary">{INSTITUTIONAL_COORDINATION}</p>
-              <h1 className="max-w-3xl text-5xl font-black leading-[0.92] tracking-[-0.04em] text-text-primary md:text-6xl lg:text-[4.75rem]">
+            <div className="space-y-1.5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">{INSTITUTIONAL_COORDINATION}</p>
+              <h1 className="max-w-3xl text-4xl font-black leading-[0.94] tracking-[-0.04em] text-text-primary md:text-5xl lg:text-[4.25rem]">
                 SEMEAR
               </h1>
-              <div className="h-1.5 w-28 rounded-full bg-gradient-to-r from-accent-seed via-brand-primary to-accent-lab" aria-hidden="true" />
+              <div className="h-1 w-24 rounded-full bg-gradient-to-r from-accent-seed via-brand-primary to-accent-lab" aria-hidden="true" />
             </div>
 
-            <div className="max-w-3xl space-y-3">
-              <p className="text-2xl font-black leading-tight text-brand-primary-dark md:text-[2.15rem]">
-                Monitoramento da qualidade do ar e memória socioambiental em uma interface pública de referência.
+            <div className="max-w-3xl space-y-2.5">
+              <p className="text-xl font-black leading-tight text-brand-primary-dark md:text-2xl">
+                Monitoramento ambiental, memória pública e participação social em uma interface de referência.
               </p>
-              <p className="max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg">
-                {INSTITUTIONAL_TAGLINE}. Plataforma pública-universitária que reúne dados científicos em tempo real, acervo histórico curado, rodas de conversa inclusivas e atividades participativas de vigilância popular em saúde.
+              <p className="max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">
+                {INSTITUTIONAL_TAGLINE}. Dados em tempo real, acervo curado e relatórios oficiais em uma única experiência pública-universitária.
               </p>
             </div>
 
-            <div className="signature-surface motion-list-item max-w-3xl p-4 md:p-5">
+            <div className="signature-surface motion-list-item max-w-3xl p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <label htmlFor="home-search" className="text-sm font-semibold text-text-primary">
                   Buscar no portal
                 </label>
-                <span className="seed-badge">Busca integrada</span>
+                <span className="section-badge">Busca integrada</span>
               </div>
               <div className="group relative mt-3">
                 <input
@@ -164,7 +164,7 @@ export function HomePage() {
                       if (q.trim()) window.location.href = `/buscar?q=${encodeURIComponent(q)}`;
                     }
                   }}
-                  className="w-full rounded-full border-2 border-border-subtle bg-surface-1 px-6 py-4 pr-14 text-base text-text-primary shadow-[0_1px_0_rgba(17,38,59,0.02)] transition-all duration-200 placeholder:text-text-secondary/60 focus:border-brand-primary focus:ring-4 focus:ring-focus-ring/30"
+                  className="w-full rounded-full border-2 border-border-subtle bg-surface-1 px-5 py-3.5 pr-14 text-base text-text-primary shadow-[0_1px_0_rgba(17,38,59,0.02)] transition-all duration-200 placeholder:text-text-secondary/60 focus:border-brand-primary focus:ring-4 focus:ring-focus-ring/30"
                 />
                 <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-brand-primary-soft p-2 text-brand-primary transition-transform group-focus-within:scale-110">
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,10 +173,18 @@ export function HomePage() {
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Link to="/dados" className="ui-chip ui-chip-active">Dados</Link>
-                <Link to="/relatorios" className="ui-chip">Relatórios</Link>
-                <Link to="/acervo" className="ui-chip">Acervo</Link>
-                <Link to="/mapa" className="ui-chip">Mapa</Link>
+                <Link to="/dados" className="ui-chip ui-chip-active">
+                  Dados
+                </Link>
+                <Link to="/relatorios" className="ui-chip">
+                  Relatórios
+                </Link>
+                <Link to="/acervo" className="ui-chip">
+                  Acervo
+                </Link>
+                <Link to="/mapa" className="ui-chip">
+                  Mapa
+                </Link>
               </div>
             </div>
 
@@ -196,10 +204,10 @@ export function HomePage() {
               <Link to="/dados" className="ui-btn-primary bg-accent-lab px-6 hover:bg-accent-lab/90">
                 Ir para dados
               </Link>
-              <Link to="/agenda" className="ui-btn-secondary px-6">
+              <Link to="/agenda" className="ui-cta-secondary px-6">
                 Ver agenda
               </Link>
-              <Link to="/acervo" className="ui-btn-ghost px-6">
+              <Link to="/acervo" className="ui-cta-secondary px-6">
                 Ir para acervo
               </Link>
             </div>
@@ -207,44 +215,44 @@ export function HomePage() {
             <div className="flex flex-wrap gap-2">
               {heroMetrics.map((metric) => (
                 <Chip key={metric.label} tone={metric.tone}>
-                  <span className="font-black text-sm text-text-primary">{metric.value}</span>
+                  <span className="font-black text-[13px] text-text-primary">{metric.value}</span>
                   <span>{metric.label}</span>
                 </Chip>
               ))}
             </div>
           </div>
 
-            <div className="grid gap-4">
-            <div className="signature-surface motion-list-item p-5 motion-surface motion-surface-hover">
+          <div className="grid gap-4 lg:pt-2">
+            <div className="signature-surface motion-list-item p-4 motion-surface motion-surface-hover">
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-2">
                   <span className="section-badge">Painel instantâneo</span>
-                  <h2 className="text-xl font-black text-text-primary">Dados agora</h2>
+                  <h2 className="text-lg font-black text-text-primary md:text-xl">Dados agora</h2>
                 </div>
-                <IconShell tone="lab" className="h-12 w-12 rounded-full">
-                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <IconShell tone="lab" className="h-11 w-11 rounded-full">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </IconShell>
               </div>
 
               {loading ? (
-                <div className="mt-6 space-y-3">
+                <div className="mt-5 space-y-3">
                   <div className="seed-skeleton h-16 rounded-2xl" />
                   <div className="seed-skeleton h-16 rounded-2xl" />
                 </div>
               ) : error ? (
-                <p className="mt-6 text-sm text-danger">{error}</p>
+                <p className="mt-5 text-sm text-danger">{error}</p>
               ) : (
-                <div className="mt-6 space-y-5">
+                <div className="mt-5 space-y-4">
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-2xl border border-border-subtle bg-brand-primary-soft/60 p-4">
+                    <div className="rounded-2xl border border-border-subtle bg-brand-primary-soft/60 p-3.5">
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary-dark">Online</p>
-                      <p className="mt-2 text-4xl font-black text-text-primary">{onlineCount}</p>
+                      <p className="mt-2 text-3xl font-black text-text-primary">{onlineCount}</p>
                     </div>
-                    <div className="rounded-2xl border border-border-subtle bg-surface-2 p-4">
+                    <div className="rounded-2xl border border-border-subtle bg-surface-2 p-3.5">
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Offline</p>
-                      <p className="mt-2 text-4xl font-black text-text-primary">{offlineCount}</p>
+                      <p className="mt-2 text-3xl font-black text-text-primary">{offlineCount}</p>
                     </div>
                   </div>
 
@@ -265,88 +273,19 @@ export function HomePage() {
                 </div>
               )}
             </div>
-
-            <div className="grid gap-5 sm:grid-cols-2">
-            <div className="signature-surface motion-list-item p-5">
-                <p className="section-badge">Acervo</p>
-                <p className="mt-3 text-3xl font-black text-text-primary">{acervo.length}</p>
-                <p className="mt-1 text-sm text-text-secondary">Itens destacados para navegação rápida.</p>
-              </div>
-            <div className="signature-surface motion-list-item p-5">
-                <p className="section-badge">Transparência</p>
-                <p className="mt-3 text-3xl font-black text-text-primary">{transparency ? formatCurrency(transparency.total_cents) : "—"}</p>
-                <p className="mt-1 text-sm text-text-secondary">Recursos investidos no projeto.</p>
-              </div>
-            </div>
           </div>
         </div>
       </SurfaceCard>
 
-      <SurfaceCard className="p-6 md:p-8">
-        <SectionHeader
-          eyebrow="Dados agora"
-          title="Monitoramento em tempo real"
-          description="Leituras recentes, disponibilidade das estações e contexto imediato para navegação pública."
-          action={<Link className="ui-btn-ghost" to="/dados">Ir para dados</Link>}
-        />
-
-        <div className="mt-6 rounded-[1.5rem] border border-border-subtle bg-surface-1 p-5">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Resumo operacional</p>
-              <h3 className="mt-1 text-xl font-black text-text-primary">Estações e leituras</h3>
-            </div>
-            <IconShell tone="brand" className="h-12 w-12 rounded-full">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </IconShell>
-          </div>
-
-          <div className="mt-5 grid gap-5 sm:grid-cols-3">
-            <div className="rounded-2xl bg-brand-primary-soft/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary-dark">Online</p>
-              <p className="mt-2 text-3xl font-black text-text-primary">{onlineCount}</p>
-            </div>
-            <div className="rounded-2xl bg-surface-2 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Offline</p>
-              <p className="mt-2 text-3xl font-black text-text-primary">{offlineCount}</p>
-            </div>
-            <div className="rounded-2xl bg-surface-2 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Fontes</p>
-              <p className="mt-2 text-3xl font-black text-text-primary">{stations.length}</p>
-            </div>
-          </div>
-          <div className="mt-5 space-y-3">
-            {stations.filter((s) => s.pm25 !== null).slice(0, 2).map((station) => (
-              <div key={station.station_id} className="flex items-center justify-between rounded-2xl border border-divider-subtle bg-surface-2 px-4 py-3">
-                <div>
-                  <p className="text-sm font-semibold text-text-primary">{station.name}</p>
-                  <p className="text-xs text-text-secondary">Última leitura registrada</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-black text-text-primary">{Math.round(station.pm25!)} µg/m³</p>
-                  <p className="text-xs text-text-secondary">{station.last_ts ? formatDateTime(station.last_ts) : "-"}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <Link className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary-dark hover:underline" to="/dados">
-            Ir para dados
-            <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-      </SurfaceCard>
-
-      <SurfaceCard className="p-6 md:p-8">
+      <SurfaceCard className="p-5 md:p-6">
         <SectionHeader
           eyebrow="Agenda"
-          title="Ver agenda"
-          description="Um ritmo mais editorial para a agenda pública, com destaque para o próximo encontro e menos repetição de cards iguais."
+          title="Próximos eventos"
+          description="Atividades públicas, encontros e eventos do projeto SEMEAR abertos à participação da comunidade."
           action={<Link className="ui-btn-ghost" to="/agenda">Ver agenda completa</Link>}
         />
         {loading ? (
-          <div className="mt-6 space-y-4">
+          <div className="mt-5 space-y-4">
             <div className="seed-skeleton h-56 rounded-[1.5rem]" />
             <div className="grid gap-5 md:grid-cols-2">
               <div className="seed-skeleton h-28 rounded-[1.5rem]" />
@@ -354,13 +293,13 @@ export function HomePage() {
             </div>
           </div>
         ) : error ? (
-          <p className="mt-6 text-sm text-danger">{error}</p>
+          <p className="mt-4 text-sm text-danger">{error}</p>
         ) : !featuredEvent ? (
-          <div className="mt-6 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+          <div className="mt-5 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
             <p className="text-sm text-text-secondary">Nenhum evento publicado para os próximos dias.</p>
           </div>
         ) : (
-          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
             <Link to="/agenda" className="group block h-full">
               <EditorialCard variant="featured">
                 <div className="relative min-h-[18rem] bg-gradient-to-br from-accent-yellow/15 via-surface-1 to-surface-2">
@@ -426,15 +365,15 @@ export function HomePage() {
         )}
       </SurfaceCard>
 
-      <SurfaceCard className="p-6 md:p-8">
+      <SurfaceCard className="p-5 md:p-6">
         <SectionHeader
           eyebrow="Dossiês"
           title="Dossiês em destaque"
-          description="Mais editorial, com um cartão principal maior e apoios menores para criar hierarquia e evitar repetição visual."
+          description="Dossiês de pesquisa e documentação curados pelo SEMEAR sobre temas prioritários do monitoramento ambiental."
           action={<Link className="ui-btn-ghost" to="/dossies">Ver todos</Link>}
         />
         {loading ? (
-          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
             <div className="seed-skeleton h-80 rounded-[1.75rem]" />
             <div className="grid gap-4">
               <div className="seed-skeleton h-36 rounded-[1.5rem]" />
@@ -442,11 +381,11 @@ export function HomePage() {
             </div>
           </div>
         ) : !featuredCollection ? (
-          <div className="mt-6 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+          <div className="mt-5 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
             <p className="text-sm text-text-secondary">Nenhum dossiê em destaque no momento.</p>
           </div>
         ) : (
-          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
             <Link to={`/dossies/${featuredCollection.slug}`} className="group block h-full">
               <EditorialCard variant="featured">
                 <div className="relative min-h-[20rem] bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2">
@@ -456,7 +395,7 @@ export function HomePage() {
                     <div className="document-placeholder absolute inset-0" />
                   )}
                   <div className="absolute left-5 top-5">
-                    <span className="seed-badge">Dossiê principal</span>
+                  <span className="section-badge">Dossiê principal</span>
                   </div>
                 </div>
                 <EditorialCardBody className="justify-between">
@@ -510,15 +449,15 @@ export function HomePage() {
         )}
       </SurfaceCard>
 
-      <SurfaceCard className="p-6 md:p-8">
+      <SurfaceCard className="p-5 md:p-6">
         <SectionHeader
           eyebrow="Corredores"
           title="Corredores climáticos"
-          description="Rotas e recortes territoriais monitorados em linguagem mais sintética e visualmente mais territorial."
+          description="Navegue pelas rotas e recortes territoriais monitorados em Volta Redonda e no Sul Fluminense."
           action={<Link className="ui-btn-ghost" to="/corredores">Ver mapa</Link>}
         />
         {loading ? (
-          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
             <div className="seed-skeleton h-72 rounded-[1.75rem]" />
             <div className="space-y-4">
               <div className="seed-skeleton h-28 rounded-[1.5rem]" />
@@ -526,11 +465,11 @@ export function HomePage() {
             </div>
           </div>
         ) : !featuredCorridor ? (
-          <div className="mt-6 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+          <div className="mt-5 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
             <p className="text-sm text-text-secondary">Nenhum corredor em destaque no momento.</p>
           </div>
         ) : (
-          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
             <Link to={`/corredores/${featuredCorridor.slug}`} className="group block h-full">
               <EditorialCard variant="featured">
                 <div className="relative min-h-[20rem] bg-gradient-to-br from-success/10 via-surface-1 to-surface-2">
@@ -593,14 +532,14 @@ export function HomePage() {
         )}
       </SurfaceCard>
 
-      <SurfaceCard className="p-6 md:p-8">
+      <SurfaceCard className="p-5 md:p-6">
         <SectionHeader
           eyebrow="Novidades"
           title="O que há de novo"
-          description="Blog e transparência ganham uma leitura mais serena, com mais destaque para o conteúdo editorial e menos blocos equivalentes."
+          description="Últimas publicações, transparência financeira e atualizações institucionais do projeto."
           action={<Link className="ui-btn-ghost" to="/status">Ver status</Link>}
         />
-        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
+        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
           <div className="grid gap-4">
             <Link to={latestBlog ? `/blog/${latestBlog.slug}` : "/blog"} className="group block h-full">
               <EditorialCard variant="featured">
@@ -683,15 +622,15 @@ export function HomePage() {
         </div>
       </SurfaceCard>
 
-      <SurfaceCard className="p-6 md:p-8">
+      <SurfaceCard className="p-5 md:p-6">
         <SectionHeader
           eyebrow="Relatórios"
           title="Relatórios e notas técnicas"
-          description="A última camada da home traz os documentos oficiais com destaque editorial, thumbnail reforçada e cards menos genéricos."
+          description="Documentos oficiais, notas técnicas, boletins e anexos produzidos pelo projeto SEMEAR."
           action={<Link className="ui-btn-ghost" to="/relatorios">Ver todos</Link>}
         />
         {loading ? (
-          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
             <div className="seed-skeleton h-72 rounded-[1.75rem]" />
             <div className="space-y-4">
               <div className="seed-skeleton h-28 rounded-[1.5rem]" />
@@ -699,11 +638,11 @@ export function HomePage() {
             </div>
           </div>
         ) : !featuredReport ? (
-          <div className="mt-6 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+          <div className="mt-5 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
             <p className="text-sm text-text-secondary">Nenhum relatório em destaque no momento.</p>
           </div>
         ) : (
-          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
             <Link to={`/relatorios/${featuredReport.slug}`} className="group block h-full">
               <EditorialCard variant="featured">
                 <div className="relative min-h-[18rem] bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2">
@@ -711,7 +650,7 @@ export function HomePage() {
                     <img src={getOptimizedCover(featuredReport, "thumb") || ""} alt={`Capa de ${featuredReport.title}`} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
                   ) : (
                     <div className="report-placeholder absolute inset-0 flex flex-col justify-between bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2 p-6">
-                      <span className="seed-badge w-fit">SEMEAR</span>
+                      <span className="section-badge w-fit">SEMEAR</span>
                       <span className="max-w-md text-2xl font-black uppercase leading-tight text-text-primary">Relatórios e notas técnicas</span>
                     </div>
                   )}
@@ -773,6 +712,7 @@ export function HomePage() {
     </section>
   );
 }
+
 
 
 

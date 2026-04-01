@@ -51,58 +51,53 @@ export function Navbar() {
 
   const navItemClass = ({ isActive }: { isActive: boolean }) =>
     [
-      "motion-action motion-focus inline-flex min-h-[44px] items-center rounded-full border px-4 text-sm font-semibold",
-      isActive
-        ? "border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_24px_rgba(0,93,170,0.12)]"
-        : "border-transparent bg-transparent text-text-secondary hover:border-border-subtle hover:bg-surface-2 hover:text-text-primary"
+      "ui-nav-pill motion-focus",
+      isActive ? "ui-nav-pill-active" : ""
     ].join(" ");
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-border-subtle bg-surface-1/90 backdrop-blur-xl">
-      <div className="mx-auto w-full max-w-7xl px-4 pt-3 md:px-6 md:pt-4">
+      <div className="mx-auto w-full max-w-7xl px-4 pt-2 md:px-6 md:pt-3">
         <div className="signature-shell logo-watermark-soft overflow-hidden">
-          <div className="grid gap-4 border-b border-divider-subtle px-4 py-4 md:grid-cols-[minmax(0,1.05fr)_auto_auto] md:items-center md:px-6">
-            <div className="space-y-2">
+          <div className="grid gap-3 border-b border-divider-subtle px-4 py-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center md:px-6 md:py-3">
+            <div className="min-w-0 space-y-1.5">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="section-badge">{INSTITUTIONAL_FUNDING}</span>
-                <span className="hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary md:inline">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
                   {INSTITUTIONAL_COORDINATION}
                 </span>
               </div>
-              <p className="max-w-xl text-xs leading-relaxed text-text-secondary md:text-sm">
-                {INSTITUTIONAL_COORDINATION} · {INSTITUTIONAL_UNIVERSITY_FULL_NAME}
+              <p className="max-w-xl text-[11px] leading-snug text-text-secondary md:text-xs">
+                Coordenação: {INSTITUTIONAL_UNIVERSITY_FULL_NAME}
               </p>
             </div>
 
-            <Link to="/" className="group flex min-w-0 items-center gap-3">
+            <Link to="/" className="group flex min-w-0 items-center gap-2.5">
               <img
                 src="/brand/semear-logo.svg"
                 alt=""
                 aria-hidden="true"
-                className="h-12 w-12 shrink-0 rounded-2xl border border-border-subtle bg-surface-1 object-contain p-1 shadow-[0_8px_20px_rgba(17,38,59,0.06)]"
+                className="h-10 w-10 shrink-0 rounded-2xl border border-border-subtle bg-surface-1 object-contain p-1 shadow-[0_8px_20px_rgba(17,38,59,0.06)] md:h-11 md:w-11"
               />
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="section-badge">SEMEAR</span>
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
+              <div className="min-w-0 space-y-1">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className="text-lg font-black uppercase tracking-[0.18em] text-brand-primary-dark md:text-xl">
+                    {import.meta.env.VITE_PROJECT_NAME || "SEMEAR"}
+                  </span>
+                <span className="ui-chip ui-chip-active border-0 bg-brand-primary-soft/80 px-2.5 py-1 text-[10px] tracking-[0.14em] text-brand-primary-dark">
                     UFF
                   </span>
                 </div>
-                <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span className="text-xl font-black uppercase tracking-[0.18em] text-brand-primary-dark md:text-2xl">
-                    {import.meta.env.VITE_PROJECT_NAME || "SEMEAR"}
-                  </span>
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-text-secondary md:text-xs">
-                    {INSTITUTIONAL_UNIVERSITY_FULL_NAME}
-                  </span>
-                </div>
+                <p className="max-w-md text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary md:text-xs">
+                  Plataforma pública-universitária de referência
+                </p>
               </div>
             </Link>
 
-            <div className="hidden items-center gap-3 md:flex">
+            <div className="hidden items-center gap-2 md:flex">
               <span className="ui-chip">PWA pública</span>
               <button
-                className="ui-btn-primary motion-focus px-4 shadow-[0_10px_26px_rgba(0,93,170,0.18)]"
+                className="ui-btn-primary motion-focus px-3.5 py-2 text-[13px] shadow-[0_10px_26px_rgba(0,93,170,0.18)]"
                 onClick={handleInstallClick}
                 type="button"
                 aria-label="Instalar aplicativo - Funciona offline e recebe notificações"
@@ -110,11 +105,24 @@ export function Navbar() {
                 Instalar app
               </button>
             </div>
+
+            <div className="flex items-center gap-2 md:hidden">
+              <span className="ui-chip hidden sm:inline-flex">PWA pública</span>
+              <button
+                className="ui-cta-secondary min-h-[40px] px-3.5 py-2 text-[13px]"
+                onClick={() => setIsMenuOpen((open) => !open)}
+                type="button"
+                aria-expanded={isMenuOpen}
+                aria-controls="mobile-navigation"
+              >
+                Menu
+              </button>
+            </div>
           </div>
 
-          <nav className="bg-surface-1/96 px-4 py-3 md:px-6" aria-label="Navegação principal">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <ul className="flex flex-wrap items-center gap-2">
+          <nav className="hidden bg-surface-1/96 px-4 py-2.5 md:block md:px-6" aria-label="Navegação principal">
+            <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
+              <ul className="flex flex-wrap items-center gap-1.5">
                 {primaryLinks.map((link) => (
                   <li key={link.href}>
                     <NavLink className={navItemClass} to={link.href} aria-current={undefined}>
@@ -126,9 +134,9 @@ export function Navbar() {
 
               <Link
                 to="/sobre"
-                className="motion-action motion-focus inline-flex min-h-[44px] items-center gap-2 rounded-full border border-brand-primary/15 bg-brand-primary-soft/80 px-4 py-2 text-sm font-semibold text-brand-primary-dark shadow-[0_8px_22px_rgba(0,93,170,0.1)] hover:bg-brand-primary-soft"
+                className="ui-cta-secondary motion-focus inline-flex min-h-[40px] items-center gap-2 px-3.5 py-2 text-[13px]"
               >
-                <span className="seed-badge border-0 bg-white/70 px-2 py-0.5 text-[10px] tracking-[0.16em]">Guia</span>
+                <span className="ui-chip ui-chip-active border-0 bg-white/70 px-2.5 py-1 text-[10px] tracking-[0.14em]">Guia</span>
                 Sobre o projeto
               </Link>
             </div>
@@ -142,8 +150,8 @@ export function Navbar() {
           className="motion-dialog border-b border-border-subtle bg-surface-1 md:hidden"
           aria-label="Navegação móvel"
         >
-          <div className="mx-auto w-full max-w-7xl space-y-4 px-4 py-4 md:px-6">
-            <div className="signature-shell logo-watermark-soft p-4">
+          <div className="mx-auto w-full max-w-7xl space-y-3 px-4 py-3 md:px-6">
+            <div className="signature-shell logo-watermark-soft p-3.5">
               <p className="section-badge">Menu principal</p>
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-text-secondary">
                 Navegação institucional do portal SEMEAR, com acesso rápido aos fluxos mais usados.
@@ -156,10 +164,8 @@ export function Navbar() {
                   key={link.href}
                   className={({ isActive }) =>
                     [
-                      "motion-action motion-focus flex min-h-[44px] items-center rounded-2xl px-4 text-sm font-semibold",
-                      isActive
-                        ? "border border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_24px_rgba(0,93,170,0.12)]"
-                        : "border border-transparent text-text-secondary hover:border-border-subtle hover:bg-surface-2 hover:text-text-primary"
+                      "ui-nav-pill motion-focus w-full justify-start rounded-2xl px-4",
+                      isActive ? "ui-nav-pill-active" : ""
                     ].join(" ")
                   }
                   to={link.href}
@@ -169,7 +175,7 @@ export function Navbar() {
               ))}
             </div>
 
-            <div className="grid gap-3 border-t border-divider-subtle pt-4">
+            <div className="grid gap-3 border-t border-divider-subtle pt-3.5">
               <button
                 className="ui-btn-primary w-full px-4"
                 onClick={handleInstallClick}

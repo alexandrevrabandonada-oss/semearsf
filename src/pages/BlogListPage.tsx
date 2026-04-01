@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Chip, EditorialCard, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, SectionHeader, SurfaceCard } from "../components/BrandSystem";
+import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, SectionHeader, SurfaceCard } from "../components/BrandSystem";
 import { listBlogPosts, type BlogPost } from "../lib/api";
 import { getOptimizedCover } from "../lib/imageOptimization";
 
@@ -38,11 +38,10 @@ export function BlogListPage() {
         return () => { cancelled = true; };
     }, [demoOrAdminMode]);
 
-    const allTags = Array.from(new Set(posts.flatMap((p) => p.tags))).sort();
     const isScheduled = (post: BlogPost) => Boolean(post.publish_at) && new Date(post.publish_at as string).getTime() > Date.now();
 
     return (
-        <section className="space-y-12">
+        <section className="space-y-10 md:space-y-12">
             <SurfaceCard className="signature-shell logo-watermark-soft p-6 md:p-8">
                 <SectionHeader
                     eyebrow="Comunicação"
@@ -52,7 +51,11 @@ export function BlogListPage() {
             </SurfaceCard>
 
             {loading ? (
-                <p aria-live="polite" className="text-base text-text-secondary" role="status">Carregando posts...</p>
+                <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="seed-skeleton h-72 rounded-[1.75rem]" />
+                    ))}
+                </div>
             ) : error ? (
                 <p aria-live="assertive" className="rounded-md border border-error bg-error/10 p-3 text-base text-error" role="alert">
                     {error}
@@ -80,22 +83,17 @@ export function BlogListPage() {
                                     <div className="h-44 w-full overflow-hidden bg-bg-surface relative">
                                         <img
                                             alt={post.title}
-                                            className="h-full w-full object-cover transition-all duration-700 ease-in-out"
+                                            className="h-full w-full object-cover transition-all duration-700 ease-in-out group-hover:scale-105"
                                             src={getOptimizedCover(post, "thumb") || ""}
                                         loading="lazy"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                        style={
-                                            (!post.cover_small_url && !post.cover_thumb_url) ? {} : {
-                                                filter: "blur(0)"
-                                            }
-                                        }
                                         />
                                     </div>
                                 ) : (
                                     <div className="floral-placeholder flex h-44 w-full flex-col justify-between p-5">
                                         <span className="section-badge w-fit">SEMEAR</span>
                                         <span className="max-w-[12rem] text-lg font-black leading-tight text-text-primary">
-                                            Conteúdo editorial sem capa
+                                            Conteúdo editorial
                                         </span>
                                     </div>
                                 )}
@@ -106,16 +104,24 @@ export function BlogListPage() {
                                     </EditorialCardMeta>
                                     <EditorialCardTitle className="line-clamp-2 md:text-xl">{post.title}</EditorialCardTitle>
                                     {post.excerpt ? <EditorialCardExcerpt className="line-clamp-3">{post.excerpt}</EditorialCardExcerpt> : null}
-                                    <div className="mt-auto flex flex-wrap gap-1">
-                                        {post.tags.slice(0, 3).map((tag) => (
-                                            <span
-                                                className="rounded-full bg-brand-primary-soft px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-brand-primary-dark"
-                                                key={tag}
-                                            >
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
+                                    {post.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-1">
+                                            {post.tags.slice(0, 3).map((tag) => (
+                                                <span
+                                                    className="rounded-full bg-brand-primary-soft px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-brand-primary-dark"
+                                                    key={tag}
+                                                >
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <EditorialCardActions>
+                                        <span className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary transition-transform group-hover:translate-x-0.5">
+                                            Ler post
+                                            <span aria-hidden="true">→</span>
+                                        </span>
+                                    </EditorialCardActions>
                                 </EditorialCardBody>
                             </EditorialCard>
                         </Link>
@@ -125,6 +131,4 @@ export function BlogListPage() {
         </section>
     );
 }
-
-
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { IconShell, SectionHeader, SurfaceCard, EditorialCard, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, Chip } from "../../components/BrandSystem";
+import { IconShell, SectionHeader, SurfaceCard, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, Chip } from "../../components/BrandSystem";
 import { ClimateCorridor, listCorridors } from "../../lib/api";
 import { getOptimizedCover } from "../../lib/imageOptimization";
 
@@ -72,8 +72,8 @@ export function CorredoresListPage() {
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {corridors.map((c) => (
-            <EditorialCard key={c.id} variant={c.featured ? "featured" : "media"}>
-              <Link to={`/corredores/${c.slug}`} className="block">
+            <Link key={c.id} to={`/corredores/${c.slug}`} className="group motion-list-item block h-full">
+              <EditorialCard variant="standard">
                 <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-brand-primary-soft/40 to-surface-2">
                   {c.featured && (
                     <div className="absolute right-0 top-0 z-10 rounded-bl-xl bg-brand-primary px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
@@ -96,21 +96,23 @@ export function CorredoresListPage() {
                     </div>
                   )}
                 </div>
-              </Link>
 
-              <EditorialCardBody>
-                <EditorialCardMeta>
-                  <Chip tone="seed">Corredor</Chip>
-                  {c.featured ? <Chip tone="active">Destaque</Chip> : null}
-                </EditorialCardMeta>
-                <EditorialCardTitle className="line-clamp-2">{c.title}</EditorialCardTitle>
-                {c.excerpt ? <EditorialCardExcerpt className="line-clamp-3">{c.excerpt}</EditorialCardExcerpt> : null}
-                <div className="mt-auto flex items-center justify-between text-xs font-bold uppercase tracking-widest text-success">
-                  <span>Explorar rota</span>
-                  <span className="transition-transform group-hover:translate-x-1">→</span>
-                </div>
-              </EditorialCardBody>
-            </EditorialCard>
+                <EditorialCardBody>
+                  <EditorialCardMeta>
+                    <Chip tone="seed">Corredor</Chip>
+                    {c.featured ? <Chip tone="active">Destaque</Chip> : null}
+                  </EditorialCardMeta>
+                  <EditorialCardTitle className="line-clamp-2">{c.title}</EditorialCardTitle>
+                  {c.excerpt ? <EditorialCardExcerpt className="line-clamp-3">{c.excerpt}</EditorialCardExcerpt> : null}
+                  <EditorialCardActions>
+                    <span className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary transition-transform group-hover:translate-x-0.5">
+                      Explorar rota
+                      <span aria-hidden="true">→</span>
+                    </span>
+                  </EditorialCardActions>
+                </EditorialCardBody>
+              </EditorialCard>
+            </Link>
           ))}
         </div>
       )}
