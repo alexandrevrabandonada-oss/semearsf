@@ -1,20 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { SurfaceCard } from "../components/BrandSystem";
 import {
-  Chip,
-  EditorialCard,
-  EditorialCardActions,
-  EditorialCardBody,
-  EditorialCardEyebrow,
-  EditorialCardExcerpt,
-  EditorialCardMeta,
-  EditorialCardTitle,
-  IconShell,
-  SectionHeader,
-  SurfaceCard
-} from "../components/BrandSystem";
-import { BrandRadialDivider } from "../components/BrandMicro";
+  DocumentalCard,
+  EditorialFamilyCard,
+  FeaturedCard,
+  TerritorialCard
+} from "../components/CardFamilies";
 import type {
   AcervoCollection,
   AcervoItem,
@@ -101,103 +94,97 @@ export function HomePage() {
 
   const featuredCollection = collections[0] ?? null;
   const secondaryCollections = collections.slice(1, 3);
-  const featuredCorridor = corridors[0] ?? null;
-  const supportingCorridors = corridors.slice(1, 3);
-  const featuredReport = reports[0] ?? null;
-  const supportingReports = reports.slice(1, 3);
-  const featuredEvent = events[0] ?? null;
-  const upcomingEvents = events.slice(1, 3);
-
-  const heroMetrics = useMemo(
-    () => [
-      { label: "estações online", value: String(onlineCount), tone: "seed" as const },
-      { label: "dossiês", value: String(collections.length), tone: "active" as const },
-      { label: "relatórios", value: String(reports.length), tone: "lab" as const }
-    ],
-    [collections.length, onlineCount, reports.length]
-  );
 
   return (
-    <section className="space-y-10 md:space-y-12">
-      <SurfaceCard className="hero-semear-shell signature-shell logo-watermark-soft semear-seed-wave overflow-hidden border-brand-primary/12 bg-gradient-to-br from-surface-1 via-surface-1 to-surface-2 p-5 shadow-[0_20px_60px_rgba(17,38,59,0.08)] md:p-6">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.08fr)_minmax(300px,0.92fr)] lg:items-center">
-          <div className="relative space-y-4">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="ui-pill-institutional">Selo institucional</span>
-              <span className="ui-chip-editorial">PWA público-universitário</span>
+    <section className="space-y-8 md:space-y-10">
+
+      {/* ── 1. HERO ─────────────────────── manifesto assimétrico ── */}
+      <SurfaceCard className="hero-semear-shell signature-shell overflow-hidden border-brand-primary/12 bg-gradient-to-br from-surface-1 via-surface-1 to-surface-2 px-5 py-7 shadow-[0_20px_60px_rgba(17,38,59,0.08)] md:px-7 md:py-9">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.18fr)_minmax(260px,0.82fr)] lg:items-start">
+
+          {/* Left — manifesto */}
+          <div className="space-y-6">
+            {/* Coord badge */}
+            <div className="flex items-center gap-3">
               <span className="ui-pill-institutional">UFF</span>
+              <span className="h-px w-8 bg-border-subtle opacity-50" aria-hidden="true" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-text-secondary">{INSTITUTIONAL_COORDINATION}</span>
             </div>
 
-            <BrandRadialDivider className="max-w-sm" />
-
-            <div className="flex items-center gap-3" aria-hidden="true">
-              <span className="semear-core-disc h-11 w-11" />
-              <span className="semear-core-disc h-7 w-7 opacity-80" />
-              <div className="semear-seed-wave h-7 w-28" />
-            </div>
-
-            <div className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">{INSTITUTIONAL_COORDINATION}</p>
+            {/* Big SEMEAR + two-line statement */}
+            <div className="space-y-3">
               <div className="hero-title-shell">
-                <img src="/brand/semear-logo.svg" alt="" aria-hidden="true" className="h-12 w-12 rounded-2xl border border-border-subtle bg-surface-1 p-1.5 shadow-[0_10px_24px_rgba(17,38,59,0.08)] md:h-14 md:w-14" />
-                <h1 className="max-w-3xl text-5xl font-black leading-[0.9] tracking-[-0.045em] text-text-primary md:text-6xl lg:text-[5rem]">
+                <img src="/brand/semear-logo.svg" alt="" aria-hidden="true" className="h-10 w-10 rounded-xl border border-border-subtle bg-surface-1 p-1 shadow-sm md:h-12 md:w-12" />
+                <h1 className="text-[4.5rem] font-black leading-[0.86] tracking-[-0.055em] text-text-primary md:text-[6.5rem] lg:text-[8.5rem]">
                   SEMEAR
                 </h1>
               </div>
-            </div>
-
-            <div className="max-w-3xl space-y-2.5">
-              <p className="text-xl font-black leading-tight text-brand-primary-dark md:text-2xl">
-                Monitoramento ambiental, memória pública e participação social em uma interface de referência.
-              </p>
-              <p className="max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">
-                {INSTITUTIONAL_TAGLINE}. Dados em tempo real, acervo curado e relatórios oficiais em uma única experiência pública-universitária.
-              </p>
-            </div>
-
-            <div className="hero-search-shell motion-list-item max-w-3xl">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <label htmlFor="home-search" className="text-sm font-semibold text-text-primary">
-                  Busca inteligente do portal
-                </label>
-                <span className="ui-pill-institutional">Busca integrada</span>
+              <div className="space-y-0 pl-1">
+                <p className="text-[1.3rem] font-black leading-snug text-brand-primary-dark md:text-[1.6rem]">
+                  Ciência aberta.
+                </p>
+                <p className="text-[1.3rem] font-black leading-snug text-brand-primary md:text-[1.6rem]">
+                  Vigilância popular.
+                </p>
               </div>
-              <div className="group relative mt-3">
+            </div>
+
+            {/* Tagline */}
+            <p className="max-w-[40ch] text-sm leading-relaxed text-text-secondary md:text-[0.9375rem]">
+              {INSTITUTIONAL_TAGLINE}. Dados em tempo real, acervo curado e memória ambiental em uma plataforma pública-universitária de referência.
+            </p>
+
+            {/* Inline metric belt */}
+            {!loading && (
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-border-subtle bg-surface-2/60 px-4 py-3">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-[1.6rem] font-black tabular-nums text-text-primary">{onlineCount}</span>
+                  <span className="text-[11px] text-text-secondary">estações online</span>
+                </div>
+                <div className="h-4 w-px bg-border-subtle" aria-hidden="true" />
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-[1.6rem] font-black tabular-nums text-text-primary">{collections.length}</span>
+                  <span className="text-[11px] text-text-secondary">dossiês</span>
+                </div>
+                <div className="h-4 w-px bg-border-subtle" aria-hidden="true" />
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-[1.6rem] font-black tabular-nums text-text-primary">{reports.length}</span>
+                  <span className="text-[11px] text-text-secondary">relatórios</span>
+                </div>
+              </div>
+            )}
+
+            {/* Search */}
+            <div className="hero-search-shell max-w-xl">
+              <div className="group relative">
                 <input
                   id="home-search"
                   type="search"
-                  placeholder="Busque por relatório, local, tema, corredor ou publicação..."
+                  placeholder="Busque relatório, corredor, tema ou publicação…"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       const q = (e.target as HTMLInputElement).value;
                       if (q.trim()) window.location.href = `/buscar?q=${encodeURIComponent(q)}`;
                     }
                   }}
-                  className="w-full rounded-full border-2 border-border-subtle bg-surface-1 px-5 py-3.5 pr-14 text-base text-text-primary shadow-[0_1px_0_rgba(17,38,59,0.02)] transition-all duration-200 placeholder:text-text-secondary/60 focus:border-brand-primary focus:ring-4 focus:ring-focus-ring/30"
+                  className="w-full rounded-full border-2 border-border-subtle bg-surface-1 px-5 py-3 pr-12 text-base text-text-primary transition-all duration-200 placeholder:text-text-secondary/60 focus:border-brand-primary focus:ring-4 focus:ring-focus-ring/30"
                 />
-                <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-brand-primary-soft p-2 text-brand-primary transition-transform group-focus-within:scale-110">
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-brand-primary-soft p-1.5 text-brand-primary">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Link to="/dados" className="hero-shortcut-chip">
-                  PM2.5 em tempo real
-                </Link>
-                <Link to="/relatorios" className="hero-shortcut-chip">
-                  Últimos relatórios
-                </Link>
-                <Link to="/acervo" className="hero-shortcut-chip">
-                  Acervo curado
-                </Link>
-                <Link to="/corredores" className="hero-shortcut-chip">
-                  Corredores climáticos
-                </Link>
+              <div className="mt-2.5 flex flex-wrap gap-1.5">
+                <Link to="/dados" className="hero-shortcut-chip">PM2.5 ao vivo</Link>
+                <Link to="/relatorios" className="hero-shortcut-chip">Relatórios oficiais</Link>
+                <Link to="/corredores" className="hero-shortcut-chip">Corredores</Link>
+                <Link to="/acervo" className="hero-shortcut-chip">Acervo</Link>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2.5">
+            {/* Primary CTAs */}
+            <div className="flex flex-wrap items-center gap-3">
               {prompt && (
                 <button
                   onClick={async () => {
@@ -205,525 +192,308 @@ export function HomePage() {
                     const { outcome } = await prompt.userChoice;
                     if (outcome === "accepted") clearPrompt();
                   }}
-                  className="ui-cta-primary px-6 shadow-[0_12px_30px_rgba(0,93,170,0.18)] hover:shadow-[0_18px_40px_rgba(0,93,170,0.24)]"
+                  className="ui-cta-primary px-6"
                 >
-                  Instalar aplicativo
+                  Instalar app
                 </button>
               )}
               <Link to="/dados" className="ui-cta-primary px-6">
-                Ir para dados
+                Dados em tempo real →
               </Link>
-              <Link to="/agenda" className="ui-cta-secondary px-6">
-                Ver agenda
+              <Link to="/corredores" className="ui-cta-secondary px-6">
+                Corredores climáticos
               </Link>
-              <Link to="/acervo" className="ui-cta-secondary px-6">
-                Ir para acervo
-              </Link>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {heroMetrics.map((metric) => (
-                <Chip key={metric.label} tone={metric.tone}>
-                  <span className="font-black text-[13px] text-text-primary">{metric.value}</span>
-                  <span>{metric.label}</span>
-                </Chip>
-              ))}
             </div>
           </div>
 
-          <div className="grid gap-4 lg:pt-2">
-            <div className="data-now-panel signature-surface motion-list-item p-4 motion-surface motion-surface-hover">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2">
-                  <span className="ui-pill-institutional">Painel instantâneo</span>
-                  <h2 className="text-lg font-black text-text-primary md:text-xl">Dados agora</h2>
-                </div>
-                <IconShell tone="lab" className="h-11 w-11 rounded-full">
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </IconShell>
+          {/* Right — live data panel */}
+          <div className="data-now-panel motion-surface motion-surface-hover p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <span className="ui-pill-institutional">Ao vivo</span>
+                <h2 className="text-lg font-black text-text-primary">Dados agora</h2>
               </div>
-
-              {loading ? (
-                <div className="mt-5 space-y-3">
-                  <div className="seed-skeleton h-16 rounded-2xl" />
-                  <div className="seed-skeleton h-16 rounded-2xl" />
-                </div>
-              ) : error ? (
-                <p className="mt-5 text-sm text-danger">{error}</p>
-              ) : (
-                <div className="mt-5 space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-2xl border border-border-subtle bg-brand-primary-soft/60 p-3.5">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary-dark">Online</p>
-                      <p className="mt-2 text-3xl font-black text-text-primary">{onlineCount}</p>
-                    </div>
-                    <div className="rounded-2xl border border-border-subtle bg-surface-2 p-3.5">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Offline</p>
-                      <p className="mt-2 text-3xl font-black text-text-primary">{offlineCount}</p>
-                    </div>
-                  </div>
-
-                  <div className="motion-list-item space-y-3 rounded-2xl border border-border-subtle bg-surface-2/80 p-4">
-                    {stations.filter((s) => s.pm25 !== null).slice(0, 3).map((station) => (
-                      <div key={station.station_id} className="flex items-center justify-between gap-4 border-b border-divider-subtle pb-3 last:border-0 last:pb-0">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-text-primary">{station.name}</p>
-                          <p className="text-xs text-text-secondary">Última leitura</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-lg font-black text-text-primary">{Math.round(station.pm25!)} µg/m³</p>
-                          <p className="text-xs text-text-secondary">{station.last_ts ? formatDateTime(station.last_ts) : "-"}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <Link to="/dados" className="rounded-full bg-brand-primary/10 p-2 text-brand-primary hover:bg-brand-primary/20" aria-label="Ver painel de dados">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </Link>
             </div>
+            {loading ? (
+              <div className="mt-4 space-y-3">
+                <div className="seed-skeleton h-16 rounded-2xl" />
+                <div className="seed-skeleton h-16 rounded-2xl" />
+              </div>
+            ) : error ? (
+              <p className="mt-4 text-sm text-danger">{error}</p>
+            ) : (
+              <div className="mt-4 space-y-3">
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="rounded-2xl border border-border-subtle bg-brand-primary-soft/60 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-primary-dark">Online</p>
+                    <p className="mt-1.5 text-3xl font-black text-text-primary">{onlineCount}</p>
+                  </div>
+                  <div className="rounded-2xl border border-border-subtle bg-surface-2 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">Offline</p>
+                    <p className="mt-1.5 text-3xl font-black text-text-primary">{offlineCount}</p>
+                  </div>
+                </div>
+                <div className="space-y-2.5 rounded-2xl border border-border-subtle bg-surface-2/80 p-3.5">
+                  {stations.filter((s) => s.pm25 !== null).slice(0, 3).map((station) => (
+                    <div key={station.station_id} className="flex items-center justify-between gap-3 border-b border-divider-subtle pb-2.5 last:border-0 last:pb-0">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-text-primary">{station.name}</p>
+                        <p className="text-[11px] text-text-secondary">{station.last_ts ? formatDateTime(station.last_ts) : "—"}</p>
+                      </div>
+                      <p className="shrink-0 text-base font-black text-text-primary">{Math.round(station.pm25!)} µg/m³</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </SurfaceCard>
 
-      <SurfaceCard className="home-section-data p-5 md:p-6">
-        <SectionHeader
-          eyebrow="Agenda"
-          title="Próximos eventos"
-          description="Atividades públicas, encontros e eventos do projeto SEMEAR abertos à participação da comunidade."
-          action={<Link className="ui-btn-ghost" to="/agenda">Ver agenda completa</Link>}
-        />
+      {/* ── 2. DOSSIÊS ──────── full-bleed + 2-col secondary ────── */}
+      <div className="home-section-dossies rounded-[2rem] p-5 md:p-7">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div className="space-y-1.5">
+            <span className="axis-eyebrow-dossie">Biblioteca temática</span>
+            <h2 className="text-2xl font-black text-text-primary md:text-3xl">Dossiês em destaque</h2>
+            <p className="max-w-sm text-sm text-text-secondary">Coleções curadas por tema, território e urgência documental.</p>
+          </div>
+          <Link className="ui-btn-ghost shrink-0" to="/dossies">Ver todos →</Link>
+        </div>
         {loading ? (
-          <div className="mt-5 space-y-4">
-            <div className="seed-skeleton h-56 rounded-[1.5rem]" />
-            <div className="grid gap-5 md:grid-cols-2">
-              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
-              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
-            </div>
-          </div>
-        ) : error ? (
-          <p className="mt-4 text-sm text-danger">{error}</p>
-        ) : !featuredEvent ? (
-          <div className="mt-5 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
-            <p className="text-sm text-text-secondary">Nenhum evento publicado para os próximos dias.</p>
-          </div>
-        ) : (
-          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-            <Link to="/agenda" className="group block h-full">
-              <EditorialCard variant="featured" tone="featured">
-                <div className="relative min-h-[18rem] bg-gradient-to-br from-accent-yellow/15 via-surface-1 to-surface-2">
-                  <div className="absolute inset-0 seed-placeholder-miolo opacity-45" aria-hidden="true" />
-                  <div className="absolute left-5 top-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border border-border-subtle bg-surface-1/90 shadow-[0_14px_30px_rgba(17,38,59,0.08)]">
-                    <div className="text-center">
-                      <span className="block text-4xl font-black text-text-primary">{new Date(featuredEvent.start_at).getDate()}</span>
-                      <span className="block text-[11px] font-semibold uppercase tracking-[0.2em] text-text-secondary">
-                        {new Date(featuredEvent.start_at).toLocaleDateString("pt-BR", { month: "short" })}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <EditorialCardBody className="justify-between">
-                  <div className="space-y-3">
-                    <EditorialCardEyebrow>Próximo encontro</EditorialCardEyebrow>
-                    <EditorialCardTitle className="text-2xl md:text-[1.9rem]">{featuredEvent.title}</EditorialCardTitle>
-                    <EditorialCardExcerpt className="line-clamp-3">
-                      {typeof featuredEvent.description === "string" && featuredEvent.description.trim()
-                        ? featuredEvent.description
-                        : "Atividade pública aberta para participação e circulação de conhecimento."}
-                    </EditorialCardExcerpt>
-                  </div>
-                  <EditorialCardActions>
-                    <EditorialCardMeta>
-                      <span>{formatDateTime(featuredEvent.start_at)}</span>
-                    </EditorialCardMeta>
-                    <span className="semear-card-cta">Abrir agenda</span>
-                  </EditorialCardActions>
-                </EditorialCardBody>
-              </EditorialCard>
-            </Link>
-            <div className="space-y-4">
-              {upcomingEvents.length === 0 ? (
-                <div className="rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
-                  <p className="text-sm text-text-secondary">Nenhum outro evento publicado.</p>
-                </div>
-              ) : upcomingEvents.map((event) => (
-                <Link key={event.id} to="/agenda" className="group block h-full">
-                  <EditorialCard variant="compact" tone="editorial" className="grid grid-cols-[84px_minmax(0,1fr)]">
-                    <div className="flex items-center justify-center bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2 p-4 text-center">
-                      <div>
-                        <span className="block text-2xl font-black text-text-primary">{new Date(event.start_at).getDate()}</span>
-                        <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                          {new Date(event.start_at).toLocaleDateString("pt-BR", { month: "short" })}
-                        </span>
-                      </div>
-                    </div>
-                    <EditorialCardBody className="justify-between p-4 md:p-5">
-                      <div className="space-y-2">
-                        <EditorialCardEyebrow>Agenda</EditorialCardEyebrow>
-                        <EditorialCardTitle className="text-lg">{event.title}</EditorialCardTitle>
-                      </div>
-                      <EditorialCardMeta>
-                        <span>{formatDateTime(event.start_at)}</span>
-                      </EditorialCardMeta>
-                    </EditorialCardBody>
-                  </EditorialCard>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </SurfaceCard>
-
-      <SurfaceCard className="home-section-dossies p-5 md:p-6">
-        <SectionHeader
-          eyebrow="Dossiês"
-          title="Dossiês em destaque"
-          description="Dossiês de pesquisa e documentação curados pelo SEMEAR sobre temas prioritários do monitoramento ambiental."
-          action={<Link className="ui-btn-ghost" to="/dossies">Ver todos</Link>}
-        />
-        {loading ? (
-          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+          <div className="space-y-4">
             <div className="seed-skeleton h-80 rounded-[1.75rem]" />
-            <div className="grid gap-4">
-              <div className="seed-skeleton h-36 rounded-[1.5rem]" />
-              <div className="seed-skeleton h-36 rounded-[1.5rem]" />
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="seed-skeleton h-52 rounded-[1.75rem]" />
+              <div className="seed-skeleton h-52 rounded-[1.75rem]" />
             </div>
           </div>
         ) : !featuredCollection ? (
-          <div className="mt-5 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
+          <div className="rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
             <p className="text-sm text-text-secondary">Nenhum dossiê em destaque no momento.</p>
           </div>
         ) : (
-          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-            <Link to={`/dossies/${featuredCollection.slug}`} className="group block h-full">
-              <EditorialCard variant="featured" tone="featured">
-                <div className="relative min-h-[20rem] bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2">
-                  {featuredCollection.cover_url ? (
-                    <img src={getOptimizedCover(featuredCollection, "thumb") || ""} alt={featuredCollection.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-                  ) : (
-                    <div className="seed-placeholder-miolo absolute inset-0" />
-                  )}
-                  <div className="absolute left-5 top-5">
-                  <span className="ui-seal">Dossiê principal</span>
-                  </div>
-                </div>
-                <EditorialCardBody className="justify-between">
-                  <div className="space-y-3">
-                    <EditorialCardTitle className="text-2xl md:text-[1.95rem]">{featuredCollection.title}</EditorialCardTitle>
-                    {featuredCollection.excerpt ? <EditorialCardExcerpt className="line-clamp-4">{featuredCollection.excerpt}</EditorialCardExcerpt> : null}
-                  </div>
-                  <EditorialCardActions>
-                    {featuredCollection.tags.slice(0, 3).map((tag) => <span key={tag} className="ui-tag-signature-editorial">{tag}</span>)}
-                    <span className="semear-card-cta">Abrir dossiê</span>
-                  </EditorialCardActions>
-                </EditorialCardBody>
-              </EditorialCard>
+          <div className="space-y-4">
+            <Link to={`/dossies/${featuredCollection.slug}`} className="group block">
+              <FeaturedCard
+                coverUrl={getOptimizedCover(featuredCollection, "small")}
+                coverAlt={featuredCollection.title}
+                eyebrow="Dossiê principal"
+                title={featuredCollection.title}
+                excerpt={featuredCollection.excerpt}
+                tags={featuredCollection.tags}
+                cta="Abrir dossiê"
+              />
             </Link>
-            <div className="grid gap-4">
-              {secondaryCollections.length === 0 ? (
-                <div className="rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
-                  <p className="text-sm text-text-secondary">Outros dossiês aparecerão aqui.</p>
-                </div>
-              ) : (
-                secondaryCollections.map((col) => (
+            {secondaryCollections.length > 0 && (
+              <div className="grid gap-4 md:grid-cols-2">
+                {secondaryCollections.map((col) => (
                   <Link key={col.id} to={`/dossies/${col.slug}`} className="group block h-full">
-                    <EditorialCard variant="compact" tone="featured" className="grid gap-4 md:grid-cols-[112px_minmax(0,1fr)]">
-                      <div className="overflow-hidden rounded-[1.35rem] bg-surface-2">
-                        {col.cover_url ? (
-                          <img src={getOptimizedCover(col, "thumb") || ""} alt={col.title} loading="lazy" className="h-full w-full object-cover" />
-                        ) : (
-                          <div className="seed-placeholder-miolo flex h-full min-h-28 items-center justify-center bg-gradient-to-br from-brand-primary-soft to-surface-2">
-                            <IconShell tone="seed" className="h-11 w-11 rounded-full">
-                              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                              </svg>
-                            </IconShell>
-                          </div>
-                        )}
-                      </div>
-                      <EditorialCardBody className="justify-between p-4 md:p-5">
-                        <div className="space-y-2">
-                          <EditorialCardEyebrow>Dossiê</EditorialCardEyebrow>
-                          <EditorialCardTitle className="text-lg">{col.title}</EditorialCardTitle>
-                          {col.excerpt ? <EditorialCardExcerpt className="line-clamp-2">{col.excerpt}</EditorialCardExcerpt> : null}
-                        </div>
-                        <div className="flex flex-wrap gap-2">{col.tags.slice(0, 2).map((tag) => <span key={tag} className="ui-tag-signature-editorial">{tag}</span>)}</div>
-                      </EditorialCardBody>
-                    </EditorialCard>
+                    <FeaturedCard
+                      coverUrl={getOptimizedCover(col, "thumb")}
+                      coverAlt={col.title}
+                      eyebrow="Dossiê"
+                      title={col.title}
+                      excerpt={col.excerpt}
+                      tags={col.tags}
+                      cta="Abrir dossiê"
+                    />
                   </Link>
-                ))
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
-      </SurfaceCard>
+      </div>
 
-      <SurfaceCard className="home-section-corredores p-5 md:p-6">
-        <SectionHeader
-          eyebrow="Corredores"
-          title="Corredores climáticos"
-          description="Navegue pelas rotas e recortes territoriais monitorados em Volta Redonda e no Sul Fluminense."
-          action={<Link className="ui-btn-ghost" to="/corredores">Ver mapa</Link>}
+      {/* ── 3. CORREDORES ───── dark territorial strip ───────────── */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0b1e13] via-[#0e2a1a] to-[#091a10] p-5 md:p-7">
+        <div
+          className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full opacity-25"
+          style={{ background: "radial-gradient(circle at center, rgba(21,128,61,0.5) 0%, transparent 70%)" }}
+          aria-hidden="true"
         />
-        {loading ? (
-          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-            <div className="seed-skeleton h-72 rounded-[1.75rem]" />
-            <div className="space-y-4">
-              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
-              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
-            </div>
+        <div className="relative mb-6 flex items-end justify-between gap-4">
+          <div className="space-y-1.5">
+            <span className="inline-flex items-center rounded-full border border-accent-green/30 bg-accent-green/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-accent-green">
+              Território
+            </span>
+            <h2 className="text-2xl font-black text-white md:text-3xl">Corredores Climáticos</h2>
+            <p className="max-w-sm text-sm text-white/55">
+              Rotas e recortes territoriais monitorados em Volta Redonda e no Sul Fluminense.
+            </p>
           </div>
-        ) : !featuredCorridor ? (
-          <div className="mt-5 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
-            <p className="text-sm text-text-secondary">Nenhum corredor em destaque no momento.</p>
+          <Link
+            to="/corredores"
+            className="shrink-0 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/20"
+          >
+            Ver mapa →
+          </Link>
+        </div>
+        {loading ? (
+          <div className="grid gap-4 md:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-64 animate-pulse rounded-[1.5rem] bg-white/10" />
+            ))}
+          </div>
+        ) : corridors.length === 0 ? (
+          <div className="rounded-[1.5rem] border border-dashed border-white/15 p-8 text-center">
+            <p className="text-sm text-white/50">Nenhum corredor publicado no momento.</p>
           </div>
         ) : (
-          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-            <Link to={`/corredores/${featuredCorridor.slug}`} className="group block h-full">
-              <EditorialCard variant="featured" tone="tecnico">
-                <div className="relative min-h-[20rem] bg-gradient-to-br from-success/10 via-surface-1 to-surface-2">
-                  {featuredCorridor.cover_url ? (
-                    <img src={getOptimizedCover(featuredCorridor, "thumb") || featuredCorridor.cover_url} alt={featuredCorridor.title} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="seed-placeholder-miolo absolute inset-0" />
-                  )}
-                </div>
-                <EditorialCardBody className="justify-between">
-                  <div className="space-y-3">
-                    <EditorialCardEyebrow>Corredor principal</EditorialCardEyebrow>
-                    <EditorialCardTitle className="text-2xl md:text-[1.95rem]">{featuredCorridor.title}</EditorialCardTitle>
-                    {featuredCorridor.excerpt ? <EditorialCardExcerpt>{featuredCorridor.excerpt}</EditorialCardExcerpt> : null}
-                  </div>
-                  <EditorialCardActions>
-                    <span className="semear-card-cta">Explorar corredor</span>
-                  </EditorialCardActions>
-                </EditorialCardBody>
-              </EditorialCard>
-            </Link>
-            <div className="grid gap-4">
-              {supportingCorridors.length === 0 ? (
-                <div className="rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
-                  <p className="text-sm text-text-secondary">Outros corredores aparecerão aqui.</p>
-                </div>
-              ) : (
-                supportingCorridors.map((corridor) => (
-                  <Link key={corridor.id} to={`/corredores/${corridor.slug}`} className="group block h-full">
-                    <EditorialCard variant="compact" tone="tecnico" className="grid gap-4 md:grid-cols-[112px_minmax(0,1fr)]">
-                      <div className="overflow-hidden rounded-[1.35rem] bg-surface-2">
-                        {corridor.cover_url ? (
-                          <img src={getOptimizedCover(corridor, "thumb") || corridor.cover_url} alt={corridor.title} className="h-full w-full object-cover" />
-                        ) : (
-                          <div className="seed-placeholder-miolo flex h-full min-h-28 items-center justify-center bg-gradient-to-br from-success/10 to-surface-2">
-                            <IconShell tone="seed" className="h-10 w-10 rounded-full">
-                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                              </svg>
-                            </IconShell>
-                          </div>
-                        )}
-                      </div>
-                      <EditorialCardBody className="justify-between p-4 md:p-5">
-                        <div className="space-y-2">
-                          <EditorialCardEyebrow>Corredor</EditorialCardEyebrow>
-                          <EditorialCardTitle className="text-lg">{corridor.title}</EditorialCardTitle>
-                          {corridor.excerpt ? <EditorialCardExcerpt className="line-clamp-2">{corridor.excerpt}</EditorialCardExcerpt> : null}
-                        </div>
-                        <EditorialCardMeta>
-                          <span>Explorar rota</span>
-                        </EditorialCardMeta>
-                      </EditorialCardBody>
-                    </EditorialCard>
-                  </Link>
-                ))
-              )}
-            </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {corridors.slice(0, 3).map((c) => (
+              <Link key={c.id} to={`/corredores/${c.slug}`} className="group block h-full">
+                <TerritorialCard
+                  coverUrl={getOptimizedCover(c, "small") || c.cover_url || null}
+                  coverAlt={c.title}
+                  title={c.title}
+                  excerpt={c.excerpt}
+                  featured={c.featured ?? false}
+                  cta="Explorar →"
+                />
+              </Link>
+            ))}
           </div>
         )}
-      </SurfaceCard>
+      </div>
 
-      <SurfaceCard className="home-section-novidades p-5 md:p-6">
-        <SectionHeader
-          eyebrow="Novidades"
-          title="O que há de novo"
-          description="Últimas publicações, transparência financeira e atualizações institucionais do projeto."
-          action={<Link className="ui-btn-ghost" to="/status">Ver status</Link>}
-        />
-        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
-          <div className="grid gap-4">
-            <Link to={latestBlog ? `/blog/${latestBlog.slug}` : "/blog"} className="group block h-full">
-              <EditorialCard variant="featured" tone="editorial">
-                <div className="relative min-h-[16rem] bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2">
-                  {latestBlog?.cover_url ? (
-                    <img src={getOptimizedCover(latestBlog, "thumb") || ""} alt={latestBlog.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-                  ) : (
-                    <div className="seed-placeholder-miolo absolute inset-0" />
-                  )}
-                </div>
-                <EditorialCardBody className="justify-between">
-                  <div className="space-y-3">
-                    <EditorialCardEyebrow>Blog</EditorialCardEyebrow>
-                    {latestBlog ? (
-                      <>
-                        <EditorialCardTitle className="text-2xl md:text-[1.9rem]">{latestBlog.title}</EditorialCardTitle>
-                        <EditorialCardExcerpt className="line-clamp-4">{latestBlog.excerpt}</EditorialCardExcerpt>
-                      </>
-                    ) : (
-                      <EditorialCardExcerpt>Nenhuma atualização recente.</EditorialCardExcerpt>
-                    )}
-                  </div>
-                  <EditorialCardActions>
-                    <span className="semear-card-cta">Ver todos os posts</span>
-                  </EditorialCardActions>
-                </EditorialCardBody>
-              </EditorialCard>
-            </Link>
-            <Link to="/transparencia" className="group block h-full">
-              <EditorialCard variant="compact" tone="documental">
-                <div className="relative min-h-[11rem] bg-gradient-to-br from-brand-primary-soft/70 via-surface-1 to-surface-2">
-                  <div className="brand-watermark absolute inset-0 opacity-30" aria-hidden="true" />
-                </div>
-                <EditorialCardBody className="justify-between">
-                  <div className="space-y-2">
-                    <EditorialCardEyebrow>Transparência financeira</EditorialCardEyebrow>
-                    <EditorialCardTitle className="text-[1.55rem]">{transparency ? formatCurrency(transparency.total_cents) : "—"}</EditorialCardTitle>
-                    <EditorialCardExcerpt>Recursos investidos no projeto.</EditorialCardExcerpt>
-                  </div>
-                  <EditorialCardActions>
-                    <span className="semear-card-cta">Acessar prestação de contas</span>
-                  </EditorialCardActions>
-                </EditorialCardBody>
-              </EditorialCard>
-            </Link>
+      {/* ── 4. EM CIRCULAÇÃO ── blog + relatórios + transparência ── */}
+      <SurfaceCard className="home-section-novidades p-5 md:p-7">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div className="space-y-1.5">
+            <span className="axis-eyebrow-blog">Blog &amp; Relatórios</span>
+            <h2 className="text-2xl font-black text-text-primary md:text-3xl">Em circulação</h2>
           </div>
-          <div className="grid gap-4">
-            <EditorialCard variant="compact" tone="tecnico">
-              <EditorialCardBody className="justify-between">
-                <div className="space-y-3">
-                  <EditorialCardEyebrow>Resumo do sistema</EditorialCardEyebrow>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl bg-surface-2 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Acervo</p>
-                      <p className="mt-2 text-2xl font-black text-text-primary">{acervo.length}</p>
-                    </div>
-                    <div className="rounded-2xl bg-surface-2 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Dossiês</p>
-                      <p className="mt-2 text-2xl font-black text-text-primary">{collections.length}</p>
-                    </div>
-                    <div className="rounded-2xl bg-surface-2 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Relatórios</p>
-                      <p className="mt-2 text-2xl font-black text-text-primary">{reports.length}</p>
-                    </div>
+          <div className="flex gap-2">
+            <Link className="ui-btn-ghost" to="/blog">Blog</Link>
+            <Link className="ui-btn-ghost" to="/relatorios">Relatórios</Link>
+          </div>
+        </div>
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)]">
+          {/* Blog + transparency */}
+          <div className="space-y-4">
+            {loading ? (
+              <div className="seed-skeleton h-64 rounded-[1.6rem]" />
+            ) : latestBlog ? (
+              <Link to={`/blog/${latestBlog.slug}`} className="group block">
+                <EditorialFamilyCard
+                  coverUrl={getOptimizedCover(latestBlog, "thumb")}
+                  coverAlt={latestBlog.title}
+                  date={latestBlog.published_at ? new Date(latestBlog.published_at).toLocaleDateString("pt-BR") : undefined}
+                  title={latestBlog.title}
+                  excerpt={latestBlog.excerpt}
+                  tags={latestBlog.tags}
+                  cta="Ler artigo completo"
+                />
+              </Link>
+            ) : (
+              <div className="flex min-h-[10rem] items-center justify-center rounded-[1.6rem] border border-dashed border-border-subtle">
+                <p className="text-sm text-text-secondary">Nenhum post publicado.</p>
+              </div>
+            )}
+            {transparency && (
+              <Link
+                to="/transparencia"
+                className="group flex items-center justify-between rounded-[1.25rem] border border-border-subtle bg-surface-2/70 px-4 py-3 transition-colors hover:bg-surface-2"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">Transparência financeira</p>
+                    <p className="text-sm font-black text-text-primary">{formatCurrency(transparency.total_cents)} investidos</p>
                   </div>
                 </div>
-              </EditorialCardBody>
-            </EditorialCard>
-            <EditorialCard variant="text" tone="editorial">
-              <EditorialCardBody className="justify-between">
-                <div className="space-y-3">
-                  <EditorialCardEyebrow>Chamada editorial</EditorialCardEyebrow>
-                  <EditorialCardExcerpt>
-                    O SEMEAR combina dados, memória e participação pública em uma experiência que precisa parecer uma referência institucional, não apenas um portal funcional.
-                  </EditorialCardExcerpt>
-                </div>
-              </EditorialCardBody>
-            </EditorialCard>
+                <span className="text-sm font-semibold text-brand-primary">Prestar contas →</span>
+              </Link>
+            )}
+          </div>
+          {/* Reports belt */}
+          <div className="space-y-2.5">
+            {loading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="seed-skeleton h-24 rounded-[1.25rem]" />
+              ))
+            ) : reports.length === 0 ? (
+              <div className="rounded-[1.5rem] border border-dashed border-border-subtle p-6 text-center">
+                <p className="text-sm text-text-secondary">Nenhum relatório recente.</p>
+              </div>
+            ) : (
+              reports.map((report) => (
+                <Link key={report.id} to={`/relatorios/${report.slug}`} className="group block">
+                  <DocumentalCard
+                    variant="compact"
+                    kindLabel={REPORT_KIND_LABEL[report.kind]}
+                    date={report.published_at ? new Date(report.published_at).toLocaleDateString("pt-BR") : report.year ? String(report.year) : undefined}
+                    title={report.title}
+                    summary={report.summary}
+                    cta="Abrir PDF"
+                  />
+                </Link>
+              ))
+            )}
+            <Link
+              to="/relatorios"
+              className="flex items-center justify-center gap-1.5 rounded-[1.25rem] border border-border-subtle py-2.5 text-[12px] font-semibold text-text-secondary transition-colors hover:border-brand-primary/30 hover:text-brand-primary"
+            >
+              Ver todos os relatórios <span aria-hidden="true">→</span>
+            </Link>
           </div>
         </div>
       </SurfaceCard>
 
-      <SurfaceCard className="home-section-relatorios p-5 md:p-6">
-        <SectionHeader
-          eyebrow="Relatórios"
-          title="Relatórios e notas técnicas"
-          description="Documentos oficiais, notas técnicas, boletins e anexos produzidos pelo projeto SEMEAR."
-          action={<Link className="ui-btn-ghost" to="/relatorios">Ver todos</Link>}
-        />
-        {loading ? (
-          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-            <div className="seed-skeleton h-72 rounded-[1.75rem]" />
-            <div className="space-y-4">
-              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
-              <div className="seed-skeleton h-28 rounded-[1.5rem]" />
-            </div>
+      {/* ── 5. AGENDA ─────────── aparece só se houver eventos ───── */}
+      {(loading || events.length > 0) && (
+      <SurfaceCard className="home-section-data p-5 md:p-6">
+        <div className="mb-5 flex items-end justify-between gap-4">
+          <div className="space-y-1">
+            <span className="axis-eyebrow-dados">Participação</span>
+            <h2 className="text-xl font-black text-text-primary md:text-2xl">Próximos eventos</h2>
           </div>
-        ) : !featuredReport ? (
-          <div className="mt-5 rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
-            <p className="text-sm text-text-secondary">Nenhum relatório em destaque no momento.</p>
+          <Link className="ui-btn-ghost" to="/agenda">Ver agenda →</Link>
+        </div>
+        {loading ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="seed-skeleton h-24 rounded-[1.5rem]" />
+            ))}
           </div>
         ) : (
-          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-            <Link to={`/relatorios/${featuredReport.slug}`} className="group block h-full">
-              <EditorialCard variant="featured" tone="documental">
-                <div className="relative min-h-[18rem] bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2">
-                  {getOptimizedCover(featuredReport, "thumb") ? (
-                    <img src={getOptimizedCover(featuredReport, "thumb") || ""} alt={`Capa de ${featuredReport.title}`} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-                  ) : (
-                    <div className="seed-placeholder-miolo absolute inset-0 flex flex-col justify-between bg-gradient-to-br from-brand-primary-soft via-surface-1 to-surface-2 p-6">
-                      <span className="section-badge w-fit">SEMEAR</span>
-                      <span className="max-w-md text-2xl font-black uppercase leading-tight text-text-primary">Relatórios e notas técnicas</span>
-                    </div>
-                  )}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {events.map((event) => (
+              <Link
+                key={event.id}
+                to="/agenda"
+                className="group flex gap-4 rounded-[1.35rem] border border-border-subtle bg-surface-2/60 p-4 transition-all duration-200 hover:border-brand-primary/20 hover:shadow-md"
+              >
+                <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-2xl border border-border-subtle bg-surface-1 shadow-sm">
+                  <span className="text-xl font-black leading-none text-text-primary">{new Date(event.start_at).getDate()}</span>
+                  <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                    {new Date(event.start_at).toLocaleDateString("pt-BR", { month: "short" })}
+                  </span>
                 </div>
-                <EditorialCardBody className="justify-between">
-                  <div className="space-y-4">
-                    <EditorialCardMeta>
-                      <span className="ui-tag-signature">Destaque</span>
-                      <span className="ui-tag-signature">{REPORT_KIND_LABEL[featuredReport.kind]}</span>
-                    </EditorialCardMeta>
-                    <EditorialCardTitle className="text-2xl md:text-[1.95rem]">{featuredReport.title}</EditorialCardTitle>
-                    <EditorialCardExcerpt>{featuredReport.summary || "Documento oficial com leitura editorial e dados complementares."}</EditorialCardExcerpt>
-                  </div>
-                  <EditorialCardActions>
-                    <span className="semear-card-cta">Abrir PDF</span>
-                  </EditorialCardActions>
-                </EditorialCardBody>
-              </EditorialCard>
-            </Link>
-            <div className="grid gap-4">
-              {supportingReports.length === 0 ? (
-                <div className="rounded-[1.5rem] border border-dashed border-border-subtle bg-surface-2 p-8 text-center">
-                  <p className="text-sm text-text-secondary">Outros relatórios aparecerão aqui.</p>
+                <div className="min-w-0 space-y-0.5">
+                  <p className="truncate text-sm font-black text-text-primary">{event.title}</p>
+                  <p className="text-[11px] text-text-secondary">{formatDateTime(event.start_at)}</p>
                 </div>
-              ) : (
-                supportingReports.map((report) => {
-                  const thumbUrl = getOptimizedCover(report, "thumb");
-                  return (
-                    <Link key={report.id} to={`/relatorios/${report.slug}`} className="group block h-full">
-                      <EditorialCard variant="compact" tone="documental" className="grid gap-4 md:grid-cols-[104px_minmax(0,1fr)]">
-                        <div className="overflow-hidden rounded-[1.35rem] bg-surface-2">
-                          {thumbUrl ? (
-                            <img src={thumbUrl} alt={`Capa de ${report.title}`} className="h-full w-full object-cover" loading="lazy" />
-                          ) : (
-                            <div className="document-placeholder flex h-full items-center justify-center bg-gradient-to-br from-brand-primary-soft to-surface-2 text-xs font-black uppercase tracking-[0.16em] text-brand-primary-dark">
-                              PDF
-                            </div>
-                          )}
-                        </div>
-                        <EditorialCardBody className="justify-between p-4 md:p-5">
-                          <div className="space-y-2">
-                            <EditorialCardMeta>
-                              <span className="ui-tag-signature">{REPORT_KIND_LABEL[report.kind]}</span>
-                              <span>{report.published_at ? new Date(report.published_at).toLocaleDateString("pt-BR") : "Sem data"}</span>
-                            </EditorialCardMeta>
-                            <EditorialCardTitle className="text-lg">{report.title}</EditorialCardTitle>
-                            {report.summary ? <EditorialCardExcerpt className="line-clamp-2">{report.summary}</EditorialCardExcerpt> : null}
-                          </div>
-                        </EditorialCardBody>
-                      </EditorialCard>
-                    </Link>
-                  );
-                })
-              )}
-            </div>
+              </Link>
+            ))}
           </div>
         )}
       </SurfaceCard>
+      )}
     </section>
   );
 }
-
-
-
 
 
 
