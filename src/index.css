@@ -77,7 +77,7 @@ select,
 input,
 textarea,
 select {
-  @apply border border-border-subtle bg-surface-1 text-text-primary placeholder:text-text-secondary shadow-[0_1px_0_rgba(17,38,59,0.02)] transition;
+  @apply motion-input text-text-primary placeholder:text-text-secondary;
 }
 
 @layer components {
@@ -101,6 +101,23 @@ select {
     @apply hover:-translate-y-0.5 hover:border-brand-primary/20 hover:shadow-[0_20px_44px_rgba(17,38,59,0.09)];
   }
 
+  .motion-action {
+    @apply motion-control active:translate-y-0 active:scale-[0.99] hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgba(17,38,59,0.12)];
+  }
+
+  .motion-input {
+    @apply motion-control border-border-subtle bg-surface-1 shadow-[0_1px_0_rgba(17,38,59,0.02)] transition-[border-color,box-shadow,background-color,transform] duration-200 ease-out;
+    @apply focus:border-brand-primary focus:bg-white focus:shadow-[0_0_0_1px_rgba(0,93,170,0.08),0_12px_28px_rgba(17,38,59,0.06)];
+  }
+
+  .motion-chip-action {
+    @apply motion-control hover:-translate-y-0.5 hover:border-brand-primary/25 hover:bg-brand-primary-soft hover:text-brand-primary-dark active:translate-y-0 active:scale-[0.99];
+  }
+
+  .motion-overlay {
+    @apply bg-black/70 backdrop-blur-sm;
+  }
+
   .motion-list-item {
     animation: motion-fade-up 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
@@ -110,7 +127,7 @@ select {
   }
 
   .motion-tab {
-    @apply motion-control inline-flex items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-3 py-1 text-sm font-semibold text-text-secondary hover:border-brand-primary/20 hover:bg-brand-primary-soft hover:text-brand-primary-dark;
+    @apply motion-action inline-flex items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-3 py-1 text-sm font-semibold text-text-secondary hover:border-brand-primary/20 hover:bg-brand-primary-soft hover:text-brand-primary-dark;
   }
 
   .motion-tab-active {
@@ -119,6 +136,16 @@ select {
 
   .motion-dialog {
     animation: motion-soft-pop 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .motion-dialog-panel {
+    @apply relative overflow-hidden rounded-[1.5rem] border border-border-subtle bg-surface-1 shadow-[0_22px_64px_rgba(17,38,59,0.18)];
+  }
+
+  .motion-dialog-panel::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px;
+    background: linear-gradient(90deg, transparent, rgba(0, 93, 170, 0.2), transparent);
   }
 
   .ui-card {
@@ -130,19 +157,19 @@ select {
   }
 
   .ui-btn-primary {
-    @apply motion-control inline-flex min-h-[44px] items-center justify-center rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(0,93,170,0.16)] hover:bg-brand-primary-dark hover:shadow-[0_12px_28px_rgba(0,93,170,0.22)];
+    @apply motion-action inline-flex min-h-[44px] items-center justify-center rounded-full bg-brand-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(0,93,170,0.16)] hover:bg-brand-primary-dark hover:shadow-[0_12px_28px_rgba(0,93,170,0.22)];
   }
 
   .ui-btn-secondary {
-    @apply motion-control inline-flex min-h-[44px] items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-4 py-2 text-sm font-semibold text-text-primary shadow-sm hover:border-brand-primary/40 hover:bg-brand-primary-soft;
+    @apply motion-action inline-flex min-h-[44px] items-center justify-center rounded-full border border-border-subtle bg-surface-1 px-4 py-2 text-sm font-semibold text-text-primary shadow-sm hover:border-brand-primary/40 hover:bg-brand-primary-soft;
   }
 
   .ui-btn-ghost {
-    @apply motion-control inline-flex min-h-[44px] items-center justify-center rounded-full border border-transparent px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary-soft hover:text-brand-primary-dark;
+    @apply motion-action inline-flex min-h-[44px] items-center justify-center rounded-full border border-transparent px-4 py-2 text-sm font-semibold text-brand-primary hover:bg-brand-primary-soft hover:text-brand-primary-dark;
   }
 
   .ui-chip {
-    @apply motion-control inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface-2 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-secondary;
+    @apply motion-chip-action inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface-2 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-secondary;
   }
 
   .ui-chip-active {

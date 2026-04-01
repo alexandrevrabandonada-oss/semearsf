@@ -1,5 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import {
+  EditorialCard,
+  EditorialCardActions,
+  EditorialCardBody,
+  EditorialCardExcerpt,
+  EditorialCardMeta,
+  EditorialCardTitle,
+  SectionHeader,
+  SurfaceCard
+} from "../components/BrandSystem";
 import { getOpsKpisMonth, getSystemStatus, type OpsKPI, type SystemStatus } from "../lib/api";
 import { getContrastAuditResults } from "../lib/contrastAudit";
 import { getObservabilityErrorSummaryLast24h, trackCsvDownload, trackShare } from "../lib/observability";
@@ -299,26 +309,50 @@ export function StatusPage() {
         </div>
 
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-xl border border-ciano/20 bg-base/20 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-texto/70">Medicoes</p>
-            <p className="mt-2 text-3xl font-black text-ciano">{monthlyLoading ? "..." : formatNumber(monthlyOps.total_measurements)}</p>
-            <p className="mt-1 text-xs text-texto/50">Linhas registradas em measurements.</p>
-          </div>
-          <div className="rounded-xl border border-primaria/20 bg-base/20 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-texto/70">Ingest (novo / duplicado)</p>
-            <p className="mt-2 text-2xl font-black text-primaria">{monthlyLoading ? "..." : `${formatNumber(monthlyOps.inserted_count)} / ${formatNumber(monthlyOps.duplicated_count)}`}</p>
-            <p className="mt-1 text-xs text-texto/50">Novas gravacoes vs repeticoes bloqueadas.</p>
-          </div>
-          <div className="rounded-xl border border-acento/20 bg-base/20 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-texto/70">Alertas push</p>
-            <p className="mt-2 text-3xl font-black text-acento">{monthlyLoading ? "..." : formatNumber(monthlyOps.total_push_alerts)}</p>
-            <p className="mt-1 text-xs text-texto/50">Eventos com trigger ativo em push_events.</p>
-          </div>
-          <div className="rounded-xl border border-base/40 bg-base/20 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-texto/70">Conteudo publicado</p>
-            <p className="mt-2 text-3xl font-black text-texto">{monthlyLoading ? "..." : formatNumber(monthlyOps.published_content_items_count)}</p>
-            <p className="mt-1 text-xs text-texto/50">Blog + acervo publicados no mes.</p>
-          </div>
+          <EditorialCard variant="compact">
+            <EditorialCardBody className="justify-between p-4">
+              <div className="space-y-2">
+                <EditorialCardMeta>
+                  <span>Medições</span>
+                </EditorialCardMeta>
+                <EditorialCardTitle className="text-3xl text-ciano">{monthlyLoading ? "..." : formatNumber(monthlyOps.total_measurements)}</EditorialCardTitle>
+                <EditorialCardExcerpt>Linhas registradas em measurements.</EditorialCardExcerpt>
+              </div>
+            </EditorialCardBody>
+          </EditorialCard>
+          <EditorialCard variant="compact">
+            <EditorialCardBody className="justify-between p-4">
+              <div className="space-y-2">
+                <EditorialCardMeta>
+                  <span>Ingest novo / duplicado</span>
+                </EditorialCardMeta>
+                <EditorialCardTitle className="text-2xl text-primaria">{monthlyLoading ? "..." : `${formatNumber(monthlyOps.inserted_count)} / ${formatNumber(monthlyOps.duplicated_count)}`}</EditorialCardTitle>
+                <EditorialCardExcerpt>Novas gravações vs repetições bloqueadas.</EditorialCardExcerpt>
+              </div>
+            </EditorialCardBody>
+          </EditorialCard>
+          <EditorialCard variant="compact">
+            <EditorialCardBody className="justify-between p-4">
+              <div className="space-y-2">
+                <EditorialCardMeta>
+                  <span>Alertas push</span>
+                </EditorialCardMeta>
+                <EditorialCardTitle className="text-3xl text-acento">{monthlyLoading ? "..." : formatNumber(monthlyOps.total_push_alerts)}</EditorialCardTitle>
+                <EditorialCardExcerpt>Eventos com trigger ativo em push_events.</EditorialCardExcerpt>
+              </div>
+            </EditorialCardBody>
+          </EditorialCard>
+          <EditorialCard variant="compact">
+            <EditorialCardBody className="justify-between p-4">
+              <div className="space-y-2">
+                <EditorialCardMeta>
+                  <span>Conteúdo publicado</span>
+                </EditorialCardMeta>
+                <EditorialCardTitle className="text-3xl text-texto">{monthlyLoading ? "..." : formatNumber(monthlyOps.published_content_items_count)}</EditorialCardTitle>
+                <EditorialCardExcerpt>Blog + acervo publicados no mês.</EditorialCardExcerpt>
+              </div>
+            </EditorialCardBody>
+          </EditorialCard>
         </div>
 
         <div className="mt-5 rounded-2xl border border-base/30 bg-base/10 p-4">
@@ -368,185 +402,170 @@ export function StatusPage() {
         </div>
       </section>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 flex flex-col">
-          <h2 className="text-xs font-black uppercase tracking-widest text-cta">Rede de Monitoramento</h2>
-          <div className="mt-6 flex flex-col gap-4">
-            <div className="flex items-end gap-2">
-              <span className="text-4xl font-black text-primaria">{status.monitoring.stations_count}</span>
-              <span className="mb-1 text-[10px] font-bold uppercase tracking-tighter text-texto/40">Estacoes Ativas</span>
-            </div>
-            <div className="flex items-end gap-2">
-              <span className="text-3xl font-black text-texto">{status.monitoring.measurements_24h}</span>
-              <span className="mb-1 text-[10px] font-bold uppercase tracking-tighter text-texto/40">Medicoes (24h)</span>
-            </div>
-            {status.monitoring.latest_measurement && (
-              <div className="mt-2 rounded-lg bg-base/40 p-3">
-                <p className="text-[10px] font-bold uppercase text-ciano">{status.monitoring.latest_measurement.station_name}</p>
-                <p className="text-xs text-texto/80 font-mono">
-                  {new Date(status.monitoring.latest_measurement.ts).toLocaleTimeString("pt-BR")}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-acento/40 bg-fundo/60 p-6 flex flex-col">
-          <h2 className="text-xs font-black uppercase tracking-widest text-cta">Alertas (7 dias)</h2>
-          <div className="mt-6 flex flex-col gap-4">
-            <div className="flex items-end gap-2">
-              <span className="text-4xl font-black text-acento">{status.alerts.total_7d}</span>
-              <span className="mb-1 text-[10px] font-bold uppercase tracking-tighter text-texto/40">Triggers</span>
-            </div>
-            {status.alerts.top_stations.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold uppercase text-ciano/70">Top Estacoes</p>
-                {status.alerts.top_stations.map((station, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-xs">
-                    <span className="text-texto/60 font-mono">{station.station_code}</span>
-                    <span className="font-black text-acento">{station.count}</span>
+      <SurfaceCard className="p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Operação"
+          title="Rede, transparência e conteúdo"
+          description="Uma leitura institucional dos sinais do sistema, com mais hierarquia e menos aparência de console técnico."
+        />
+        <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <EditorialCard variant="compact">
+            <EditorialCardBody className="justify-between p-5">
+              <div className="space-y-3">
+                <EditorialCardMeta><span>Rede de monitoramento</span></EditorialCardMeta>
+                <EditorialCardTitle className="text-3xl text-primaria">{status.monitoring.stations_count}</EditorialCardTitle>
+                <EditorialCardExcerpt>Estações ativas no ar e {status.monitoring.measurements_24h} medições nas últimas 24h.</EditorialCardExcerpt>
+                {status.monitoring.latest_measurement ? (
+                  <div className="rounded-2xl border border-divider-subtle bg-surface-2 p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">{status.monitoring.latest_measurement.station_name}</p>
+                    <p className="mt-1 text-sm font-semibold text-text-primary">{new Date(status.monitoring.latest_measurement.ts).toLocaleTimeString("pt-BR")}</p>
                   </div>
-                ))}
+                ) : null}
               </div>
-            )}
-            {status.alerts.top_pollutants.length > 0 && (
-              <div className="space-y-2 mt-3">
-                <p className="text-[10px] font-bold uppercase text-ciano/70">Top Poluentes</p>
-                {status.alerts.top_pollutants.map((pol, idx) => (
-                  <div key={idx} className="flex justify-between items-center text-xs">
-                    <span className="text-texto/60">{pol.pollutant}</span>
-                    <span className="font-black text-acento">{pol.count}</span>
+            </EditorialCardBody>
+          </EditorialCard>
+
+          <EditorialCard variant="compact">
+            <EditorialCardBody className="justify-between p-5">
+              <div className="space-y-3">
+                <EditorialCardMeta><span>Alertas (7 dias)</span></EditorialCardMeta>
+                <EditorialCardTitle className="text-3xl text-acento">{status.alerts.total_7d}</EditorialCardTitle>
+                <EditorialCardExcerpt>Triggers e sinais por estação ou poluente.</EditorialCardExcerpt>
+                <div className="space-y-2">
+                  {status.alerts.top_stations.length > 0 ? (
+                    status.alerts.top_stations.slice(0, 3).map((station, idx) => (
+                      <div key={`${station.station_code}-${idx}`} className="flex items-center justify-between rounded-2xl bg-surface-2 px-3 py-2 text-xs">
+                        <span className="font-mono text-text-secondary">{station.station_code}</span>
+                        <span className="font-black text-acento">{station.count}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-text-secondary">Sem alertas relevantes no período.</p>
+                  )}
+                </div>
+              </div>
+            </EditorialCardBody>
+          </EditorialCard>
+
+          <EditorialCard variant="compact">
+            <EditorialCardBody className="justify-between p-5">
+              <div className="space-y-3">
+                <EditorialCardMeta><span>Transparência</span></EditorialCardMeta>
+                <EditorialCardTitle className="text-[1.95rem] text-primaria">{formatCurrency(status.transparency.current_month_total_cents)}</EditorialCardTitle>
+                <EditorialCardExcerpt>
+                  {formatNumber(status.transparency.current_month_count)} lançamentos no mês atual e {formatNumber(status.transparency.last_7d_count)} nos últimos 7 dias.
+                </EditorialCardExcerpt>
+                <div className="space-y-2">
+                  {Object.entries(status.transparency.current_month_by_category).sort((a, b) => Number(b[1]) - Number(a[1])).slice(0, 3).map(([cat, amount]) => (
+                    <div className="flex items-center justify-between rounded-2xl bg-surface-2 px-3 py-2 text-xs" key={cat}>
+                      <span className="capitalize text-text-secondary">{cat}</span>
+                      <span className="font-bold text-text-primary">{formatCurrency(amount)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <EditorialCardActions>
+                <Link to="/transparencia" className="ui-btn-ghost">Detalhes financeiros</Link>
+              </EditorialCardActions>
+            </EditorialCardBody>
+          </EditorialCard>
+        </div>
+
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <EditorialCard variant="standard">
+            <EditorialCardBody className="justify-between p-5">
+              <div className="space-y-3">
+                <EditorialCardMeta><span>Alcance social</span></EditorialCardMeta>
+                <EditorialCardTitle className="text-3xl text-ciano">{formatNumber(status.social.total_7d)}</EditorialCardTitle>
+                <EditorialCardExcerpt>Compartilhamentos por tipo de conteúdo nos últimos 7 dias.</EditorialCardExcerpt>
+                <div className="space-y-2">
+                  {socialKindsOrder.map((kind) => (
+                    <div key={kind} className="flex items-center justify-between rounded-2xl bg-surface-2 px-3 py-2 text-xs">
+                      <span className="text-text-secondary">{socialLabels[kind] || kind}</span>
+                      <span className="font-black text-text-primary">{formatNumber(Number(socialByKind[kind] || 0))}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </EditorialCardBody>
+          </EditorialCard>
+
+          <EditorialCard variant="standard">
+            <EditorialCardBody className="justify-between p-5">
+              <div className="space-y-3">
+                <EditorialCardMeta><span>Sinais de conteúdo</span></EditorialCardMeta>
+                <EditorialCardTitle className="text-2xl">Sincronizado</EditorialCardTitle>
+                <EditorialCardExcerpt>Blog, acervo, agenda e relatórios publicados com leitura contínua.</EditorialCardExcerpt>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl bg-surface-2 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Blog</p>
+                    <p className="mt-2 text-2xl font-black text-text-primary">{status.content.latest_blog.length}</p>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-primaria/40 bg-fundo/60 p-6 flex flex-col">
-          <h2 className="text-xs font-black uppercase tracking-widest text-cta">Transparencia (7 dias / mes atual)</h2>
-          <div className="mt-6 flex flex-col gap-4">
-            <div className="flex flex-col">
-              <span className="text-2xl font-black text-primaria">{formatCurrency(status.transparency.current_month_total_cents)}</span>
-              <span className="text-[10px] font-bold uppercase tracking-tighter text-texto/40 italic">Total no mes atual</span>
-              <span className="text-[10px] text-texto/50">{formatNumber(status.transparency.current_month_count)} lancamentos</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-black text-ciano">{formatCurrency(status.transparency.last_7d_total_cents)}</span>
-              <span className="text-[10px] font-bold uppercase tracking-tighter text-texto/40 italic">Total nos ultimos 7 dias</span>
-              <span className="text-[10px] text-texto/50">{formatNumber(status.transparency.last_7d_count)} lancamentos</span>
-            </div>
-            <div className="space-y-2 mt-2">
-              {Object.entries(status.transparency.current_month_by_category).sort((a, b) => Number(b[1]) - Number(a[1])).slice(0, 3).map(([cat, amount]) => (
-                <div className="flex justify-between items-center text-xs" key={cat}>
-                  <span className="text-texto/60 capitalize">{cat}</span>
-                  <span className="font-bold text-texto">{formatCurrency(amount)}</span>
+                  <div className="rounded-2xl bg-surface-2 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Acervo</p>
+                    <p className="mt-2 text-2xl font-black text-text-primary">{status.content.latest_acervo.length}</p>
+                  </div>
+                  <div className="rounded-2xl bg-surface-2 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Agenda</p>
+                    <p className="mt-2 text-2xl font-black text-text-primary">{status.content.upcoming_events.length}</p>
+                  </div>
+                  <div className="rounded-2xl bg-surface-2 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Relatórios</p>
+                    <p className="mt-2 text-2xl font-black text-text-primary">{status.content.reports_published_month}</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className="mt-3 space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-ciano/80">Top categorias (7 dias)</p>
-            {Object.entries(status.transparency.last_7d_by_category).sort((a, b) => Number(b[1]) - Number(a[1])).slice(0, 3).map(([cat, amount]) => (
-              <div className="flex justify-between items-center text-xs" key={`last7-${cat}`}>
-                <span className="text-texto/60 capitalize">{cat}</span>
-                <span className="font-bold text-texto">{formatCurrency(amount)}</span>
               </div>
-            ))}
-            {Object.keys(status.transparency.last_7d_by_category).length === 0 && (
-              <p className="text-[10px] text-texto/50 italic">Sem lancamentos nos ultimos 7 dias.</p>
-            )}
-          </div>
-          <Link to="/transparencia" className="mt-auto pt-3 text-xs font-bold text-ciano hover:underline">Detalhes financeiros →</Link>
+            </EditorialCardBody>
+          </EditorialCard>
         </div>
 
-        <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 flex flex-col">
-          <h2 className="text-xs font-black uppercase tracking-widest text-cta">Alcance social (7 dias)</h2>
-          <div className="mt-6 flex flex-col gap-4">
-            <div className="flex items-end gap-2">
-              <span className="text-4xl font-black text-ciano">{formatNumber(status.social.total_7d)}</span>
-              <span className="mb-1 text-[10px] font-bold uppercase tracking-tighter text-texto/40">Compartilhamentos</span>
-            </div>
-            <div className="space-y-2">
-              {socialKindsOrder.map((kind) => (
-                <div key={kind} className="flex items-center justify-between text-xs">
-                  <span className="text-texto/60">{socialLabels[kind] || kind}</span>
-                  <span className="font-black text-texto">{formatNumber(Number(socialByKind[kind] || 0))}</span>
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <EditorialCard variant="standard">
+            <EditorialCardBody className="justify-between p-5">
+              <div className="space-y-3">
+                <EditorialCardMeta><span>Saúde da rede</span></EditorialCardMeta>
+                <EditorialCardTitle className="text-2xl">Estado operacional</EditorialCardTitle>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between rounded-2xl bg-surface-2 px-3 py-2 text-xs">
+                    <span className="text-text-secondary">Excelente</span>
+                    <span className="font-black text-text-primary">{status.network_health?.ok || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-2xl bg-surface-2 px-3 py-2 text-xs">
+                    <span className="text-text-secondary">Degradado</span>
+                    <span className="font-black text-text-primary">{status.network_health?.degraded || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-2xl bg-surface-2 px-3 py-2 text-xs">
+                    <span className="text-text-secondary">Offline</span>
+                    <span className="font-black text-text-primary">{status.network_health?.offline || 0}</span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-acento/40 bg-fundo/60 p-6 flex flex-col">
-          <h2 className="text-xs font-black uppercase tracking-widest text-cta">Sinais de Conteudo</h2>
-          <div className="mt-6 space-y-4 flex-1">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-texto/70 italic">Blog</span>
-              <span className="text-xs font-black text-texto">{status.content.latest_blog.length} Recentes</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-texto/70 italic">Acervo</span>
-              <span className="text-xs font-black text-texto">{status.content.latest_acervo.length} Itens</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-texto/70 italic">Agenda</span>
-              <span className="text-xs font-black text-texto">{status.content.upcoming_events.length} Eventos</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-texto/70 italic">Relatorios</span>
-              <span className="text-xs font-black text-texto">{status.content.reports_published_month} no mes</span>
-            </div>
-          </div>
-          <p className="mt-auto text-[10px] text-texto/40 uppercase tracking-tighter">Sincronizado</p>
-        </div>
-
-        <div className="rounded-2xl border border-ciano/40 bg-fundo/60 p-6 flex flex-col">
-          <h2 className="text-xs font-black uppercase tracking-widest text-cta">Saude da Rede</h2>
-          <div className="mt-6 flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <div style={{ backgroundColor: "#22c55e", borderRadius: "4px", width: "20px", height: "20px" }}></div>
-              <div className="flex-1">
-                <span className="text-[10px] font-bold uppercase text-texto/70">Excelente</span>
-                <span className="text-sm font-black text-texto ml-auto">{status.network_health?.ok || 0}</span>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div style={{ backgroundColor: "#eab308", borderRadius: "4px", width: "20px", height: "20px" }}></div>
-              <div className="flex-1">
-                <span className="text-[10px] font-bold uppercase text-texto/70">Degradado</span>
-                <span className="text-sm font-black text-texto ml-auto">{status.network_health?.degraded || 0}</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div style={{ backgroundColor: "#ef4444", borderRadius: "4px", width: "20px", height: "20px" }}></div>
-              <div className="flex-1">
-                <span className="text-[10px] font-bold uppercase text-texto/70">Offline</span>
-                <span className="text-sm font-black text-texto ml-auto">{status.network_health?.offline || 0}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+            </EditorialCardBody>
+          </EditorialCard>
 
-        <div className="seed-placeholder logo-watermark-soft p-6 flex flex-col md:col-span-3">
-          <h2 className="text-xs font-black uppercase tracking-widest text-cta">Erros nas ultimas 24h</h2>
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl border border-red-500/20 bg-base/20 p-4">
-              <p className="text-3xl font-black text-red-500">{formatNumber(observabilityErrors.total)}</p>
-              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Total agregado</p>
-            </div>
-            <div className="rounded-xl border border-red-500/15 bg-base/20 p-4">
-              <p className="text-3xl font-black text-texto">{formatNumber(observabilityErrors.apiErrors)}</p>
-              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Falhas de API</p>
-            </div>
-            <div className="rounded-xl border border-red-500/15 bg-base/20 p-4">
-              <p className="text-3xl font-black text-texto">{formatNumber(observabilityErrors.runtimeErrors)}</p>
-              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Erros de runtime</p>
-            </div>
-          </div>
-          <p className="mt-4 text-[11px] text-texto/50">
-            Contagem agregada e sanitizada dos eventos observados no navegador e nas respostas de API do portal.
-          </p>
+          <EditorialCard variant="standard">
+            <EditorialCardBody className="justify-between p-5">
+              <div className="space-y-3">
+                <EditorialCardMeta><span>Erros nas últimas 24h</span></EditorialCardMeta>
+                <EditorialCardTitle className="text-3xl text-acento">{formatNumber(observabilityErrors.total)}</EditorialCardTitle>
+                <EditorialCardExcerpt>Contagem agregada e sanitizada de eventos do navegador e APIs.</EditorialCardExcerpt>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl bg-surface-2 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">API</p>
+                    <p className="mt-2 text-2xl font-black text-text-primary">{formatNumber(observabilityErrors.apiErrors)}</p>
+                  </div>
+                  <div className="rounded-2xl bg-surface-2 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Runtime</p>
+                    <p className="mt-2 text-2xl font-black text-text-primary">{formatNumber(observabilityErrors.runtimeErrors)}</p>
+                  </div>
+                  <div className="rounded-2xl bg-surface-2 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Limiar 24h</p>
+                    <p className="mt-2 text-2xl font-black text-text-primary">{formatNumber(totalAboveThreshold24h)}</p>
+                  </div>
+                </div>
+              </div>
+            </EditorialCardBody>
+          </EditorialCard>
         </div>
 
         {isDevAccessibilityVisible && (
@@ -580,82 +599,7 @@ export function StatusPage() {
           </div>
         )}
 
-        <div className="seed-placeholder logo-watermark-soft p-6 flex flex-col md:col-span-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-xs font-black uppercase tracking-widest text-cta">Operacao (ultimos 7 dias)</h2>
-            <button
-              type="button"
-              onClick={() => setShowOpsHelp(true)}
-              className="text-left text-xs font-bold text-ciano hover:underline sm:text-right"
-            >
-              Como ler estes numeros?
-            </button>
-          </div>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-xl border border-ciano/20 bg-base/20 p-4">
-              <p className="text-2xl font-black text-ciano">{formatNumber(status.operations.kpis.total_measurements)}</p>
-              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Total de medicoes</p>
-              <p className="mt-1 text-xs text-texto/50">Registros validos recebidos no periodo.</p>
-            </div>
-            <div className="rounded-xl border border-primaria/20 bg-base/20 p-4">
-              <p className="text-2xl font-black text-primaria">{formatNumber(status.operations.kpis.inserted_count)}</p>
-              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Ingest inserido</p>
-              <p className="mt-1 text-xs text-texto/50">Entradas novas gravadas pela rotina hardenizada.</p>
-            </div>
-            <div className="rounded-xl border border-acento/20 bg-base/20 p-4">
-              <p className="text-2xl font-black text-acento">{formatNumber(status.operations.kpis.duplicated_count)}</p>
-              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Ingest duplicado</p>
-              <p className="mt-1 text-xs text-texto/50">Repeticoes detectadas e nao reinseridas.</p>
-            </div>
-            <div className="rounded-xl border border-base/40 bg-base/20 p-4">
-              <p className="text-2xl font-black text-base">{formatNumber(status.operations.kpis.total_push_alerts)}</p>
-              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Alertas disparados</p>
-              <p className="mt-1 text-xs text-texto/50">Eventos push_events com trigger ativo.</p>
-            </div>
-            <div className="rounded-xl border border-base/40 bg-base/20 p-4">
-              <p className="text-2xl font-black text-texto">{formatNumber(status.operations.kpis.published_events_count)}</p>
-              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Eventos publicados</p>
-              <p className="mt-1 text-xs text-texto/50">Entradas de agenda com status = published.</p>
-            </div>
-            <div className="rounded-xl border border-base/40 bg-base/20 p-4">
-              <p className="text-2xl font-black text-texto">{formatNumber(status.operations.kpis.published_content_items_count)}</p>
-              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Acervo + blog publicados</p>
-              <p className="mt-1 text-xs text-texto/50">Soma de itens publicados em acervo e blog.</p>
-            </div>
-            <div className="rounded-xl border border-amber-500/30 bg-base/20 p-4">
-              <p className="text-2xl font-black text-amber-500">{formatNumber(status.operations.kpis.scheduled_content_items_count)}</p>
-              <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Agendados</p>
-              <p className="mt-1 text-xs text-texto/50">Itens com publicacao futura (blog + acervo).</p>
-            </div>
-          </div>
-
-          <div className="mt-3 rounded-xl border border-red-500/30 bg-base/20 p-4">
-            <p className="text-2xl font-black text-red-500">{formatNumber(totalAboveThreshold24h)}</p>
-            <p className="mt-1 text-[11px] font-bold uppercase tracking-wide text-texto/70">Leituras acima do limiar (24h)</p>
-            <p className="mt-1 text-xs text-texto/50">Contagem de leituras acima da referencia OMS (PM2.5 &gt; 15 ou PM10 &gt; 45).</p>
-          </div>
-
-          <div className="mt-4 rounded-xl border border-ciano/15 bg-base/10 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-ciano">Medicoes por estacao (7 dias)</p>
-            <div className="mt-2 grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
-              {status.operations.station_metrics.length === 0 ? (
-                <p className="text-xs text-texto/50 italic">Sem dados no periodo.</p>
-              ) : (
-                status.operations.station_metrics.map((station, idx) => (
-                  <div key={`${station.station_code}-${idx}`} className="flex items-center justify-between rounded-md bg-fundo/40 px-3 py-2 text-xs">
-                    <span className="font-mono text-texto/70">{station.station_code || station.station_name}</span>
-                    <div className="text-right">
-                      <span className="block font-black text-ciano">{formatNumber(station.measurements_count)}</span>
-                      <span className="block text-[10px] font-bold uppercase tracking-wide text-red-500">{formatNumber(station.above_threshold_24h || 0)} acima (24h)</span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+        </SurfaceCard>
 
       {showOpsHelp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowOpsHelp(false)}>
@@ -688,55 +632,62 @@ export function StatusPage() {
         </div>
       )}
 
-      <div className="grid gap-10 md:grid-cols-2">
-        <div className="space-y-6">
-          <h3 className="text-xl font-black text-cta uppercase tracking-widest">Proximos Passos</h3>
-          <div className="space-y-4">
-            {status.content.upcoming_events.length === 0 ? (
-              <div className="seed-placeholder p-4 text-center text-texto/60"><div className="mb-3 flex items-center gap-3"><div className="seed-radial-divider flex-1" aria-hidden="true" /><span className="section-badge">Agenda</span><div className="seed-radial-divider flex-1" aria-hidden="true" /></div><p className="text-sm italic">Nenhum evento agendado.</p></div>
-            ) : (
-              status.content.upcoming_events.map((ev) => (
-                <div key={ev.id} className="border-l-2 border-acento pl-4">
-                  <p className="text-[10px] font-bold text-acento uppercase">{new Date(ev.start_at).toLocaleDateString()}</p>
-                  <p className="text-sm font-bold text-texto">{ev.title}</p>
-                </div>
-              ))
-            )}
-          </div>
+      <SurfaceCard className="p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Conteúdo"
+          title="Próximos passos e memória digital"
+          description="Uma leitura final mais editorial para agenda, blog e acervo, fechando o Status com a mesma linguagem do restante do portal."
+        />
+        <div className="mt-6 grid gap-5 md:grid-cols-2">
+          <EditorialCard variant="standard">
+            <EditorialCardBody className="justify-between p-5">
+              <div className="space-y-3">
+                <EditorialCardMeta><span>Próximos passos</span></EditorialCardMeta>
+                <EditorialCardTitle className="text-2xl">Agenda</EditorialCardTitle>
+                {status.content.upcoming_events.length === 0 ? (
+                  <EditorialCardExcerpt>Nenhum evento agendado.</EditorialCardExcerpt>
+                ) : (
+                  <div className="space-y-3">
+                    {status.content.upcoming_events.map((ev) => (
+                      <Link to={`/agenda`} key={ev.id} className="group block rounded-2xl border border-divider-subtle bg-surface-2 px-4 py-3 motion-surface motion-surface-hover">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">{new Date(ev.start_at).toLocaleDateString()}</p>
+                        <p className="mt-1 text-sm font-semibold text-text-primary">{ev.title}</p>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </EditorialCardBody>
+          </EditorialCard>
 
-          <div className="pt-4 border-t border-ciano/20">
-            <h4 className="text-sm font-black text-ciano uppercase tracking-widest mb-4">Blog</h4>
-            <div className="space-y-3">
-              {status.content.latest_blog.length === 0 ? (
-                <div className="seed-placeholder p-4 text-center text-texto/60"><div className="mb-3 flex items-center gap-3"><div className="seed-radial-divider flex-1" aria-hidden="true" /><span className="section-badge">Blog</span><div className="seed-radial-divider flex-1" aria-hidden="true" /></div><p className="text-xs italic">Nenhum post disponivel.</p></div>
-              ) : (
-                status.content.latest_blog.map((post) => (
-                  <Link to={`/blog/${post.slug}`} key={post.id} className="block group">
-                    <p className="text-xs font-bold text-texto group-hover:text-ciano transition-colors">{post.title}</p>
-                    <p className="text-[10px] text-texto/50 uppercase">{new Date(post.published_at!).toLocaleDateString()}</p>
-                  </Link>
-                ))
-              )}
-            </div>
-          </div>
+          <EditorialCard variant="standard">
+            <EditorialCardBody className="justify-between p-5">
+              <div className="space-y-3">
+                <EditorialCardMeta><span>Memória digital</span></EditorialCardMeta>
+                <EditorialCardTitle className="text-2xl">Acervo e blog</EditorialCardTitle>
+                {status.content.latest_acervo.length === 0 && status.content.latest_blog.length === 0 ? (
+                  <EditorialCardExcerpt>Sem publicações recentes.</EditorialCardExcerpt>
+                ) : (
+                  <div className="space-y-3">
+                    {status.content.latest_blog.slice(0, 2).map((post) => (
+                      <Link to={`/blog/${post.slug}`} key={post.id} className="group block rounded-2xl border border-divider-subtle bg-surface-2 px-4 py-3 motion-surface motion-surface-hover">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">Blog</p>
+                        <p className="mt-1 text-sm font-semibold text-text-primary">{post.title}</p>
+                      </Link>
+                    ))}
+                    {status.content.latest_acervo.slice(0, 2).map((item) => (
+                      <Link to={`/acervo/item/${item.slug}`} key={item.id} className="group block rounded-2xl border border-divider-subtle bg-surface-2 px-4 py-3 motion-surface motion-surface-hover">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">{item.kind}</p>
+                        <p className="mt-1 text-sm font-semibold text-text-primary">{item.title}</p>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </EditorialCardBody>
+          </EditorialCard>
         </div>
-
-        <div className="space-y-6">
-          <h3 className="text-xl font-black text-cta uppercase tracking-widest">Memoria Digital</h3>
-          <div className="space-y-4">
-            {status.content.latest_acervo.length === 0 ? (
-              <div className="seed-placeholder p-4 text-center text-texto/60"><div className="mb-3 flex items-center gap-3"><div className="seed-radial-divider flex-1" aria-hidden="true" /><span className="section-badge">Acervo</span><div className="seed-radial-divider flex-1" aria-hidden="true" /></div><p className="text-sm italic">Acervo vazio.</p></div>
-            ) : (
-              status.content.latest_acervo.map((item) => (
-                <Link to={`/acervo/item/${item.slug}`} key={item.id} className="flex flex-col border border-ciano/20 bg-base/20 rounded-xl p-4 hover:border-ciano/40 transition-all">
-                  <span className="text-[10px] font-bold text-ciano uppercase tracking-widest">{item.kind}</span>
-                  <span className="text-sm font-bold text-texto mt-1">{item.title}</span>
-                </Link>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
+      </SurfaceCard>
     </section>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Chip, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
+import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
 import { getOptimizedCover } from "../../lib/imageOptimization";
 import { listReports, type ReportDocument, type ReportKind } from "../../lib/api";
 
@@ -170,29 +170,37 @@ export function ReportsListPage() {
                 <Link
                   key={item.id}
                   to={`/relatorios/${item.slug}`}
-                  className="group motion-list-item signature-surface overflow-hidden motion-surface motion-surface-hover"
+                  className="group motion-list-item block h-full"
                 >
-                  {thumbUrl ? (
-                    <img
-                      src={thumbUrl}
-                      alt={`Capa de ${item.title}`}
-                      loading="lazy"
-                      className="h-44 w-full object-cover"
-                    />
-                  ) : (
-                    <div className="report-placeholder flex h-44 flex-col justify-between p-5">
-                      <span className="section-badge w-fit">SEMEAR</span>
-                      <span className="text-base font-black uppercase leading-tight text-text-primary">Destaque editorial</span>
-                    </div>
-                  )}
-                  <div className="space-y-3 p-5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Chip tone="active">Destaque</Chip>
-                      <Chip tone="default">{KIND_LABEL[item.kind]}</Chip>
-                    </div>
-                    <h3 className="text-lg font-black leading-tight text-text-primary transition-colors group-hover:text-brand-primary">{item.title}</h3>
-                    {item.summary ? <p className="text-sm leading-relaxed text-text-secondary line-clamp-3">{item.summary}</p> : null}
-                  </div>
+                  <EditorialCard variant="featured">
+                    {thumbUrl ? (
+                      <img
+                        src={thumbUrl}
+                        alt={`Capa de ${item.title}`}
+                        loading="lazy"
+                        className="h-48 w-full object-cover"
+                      />
+                    ) : (
+                      <div className="report-placeholder flex h-48 flex-col justify-between p-5">
+                        <span className="section-badge w-fit">SEMEAR</span>
+                        <span className="text-base font-black uppercase leading-tight text-text-primary">Destaque editorial</span>
+                      </div>
+                    )}
+                    <EditorialCardBody>
+                      <EditorialCardMeta>
+                        <Chip tone="active">Destaque</Chip>
+                        <Chip tone="default">{KIND_LABEL[item.kind]}</Chip>
+                      </EditorialCardMeta>
+                      <EditorialCardTitle className="line-clamp-2">{item.title}</EditorialCardTitle>
+                      {item.summary ? <EditorialCardExcerpt className="line-clamp-3">{item.summary}</EditorialCardExcerpt> : null}
+                      <EditorialCardActions className="pt-1">
+                        <span className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary">
+                          Abrir PDF
+                          <span aria-hidden="true">→</span>
+                        </span>
+                      </EditorialCardActions>
+                    </EditorialCardBody>
+                  </EditorialCard>
                 </Link>
               );
             })}
@@ -228,56 +236,54 @@ export function ReportsListPage() {
                 <li key={item.id}>
                   <Link
                     to={`/relatorios/${item.slug}`}
-                    className="signature-surface motion-list-item grid gap-4 p-4 motion-surface motion-surface-hover md:grid-cols-[132px_minmax(0,1fr)] md:items-start"
+                    className="group motion-list-item block h-full"
                   >
-                    {thumbUrl ? (
-                      <div className="overflow-hidden rounded-2xl border border-border-subtle bg-white">
-                        <img
-                          src={thumbUrl}
-                          alt={`Capa de ${item.title}`}
-                          loading="lazy"
-                          className="h-28 w-full object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="document-placeholder flex h-28 w-full flex-col justify-between p-3">
-                        <span className="section-badge w-fit">SEMEAR</span>
-                        <span className="text-xs font-black uppercase leading-tight text-text-primary">Documento oficial</span>
-                      </div>
-                    )}
-                    <div className="flex flex-col gap-3">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
+                    <EditorialCard variant="compact" className="p-0">
+                      {thumbUrl ? (
+                        <div className="overflow-hidden bg-surface-2">
+                          <img
+                            src={thumbUrl}
+                            alt={`Capa de ${item.title}`}
+                            loading="lazy"
+                            className="h-32 w-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="document-placeholder flex h-32 w-full flex-col justify-between p-3">
+                          <span className="section-badge w-fit">SEMEAR</span>
+                          <span className="text-xs font-black uppercase leading-tight text-text-primary">Documento oficial</span>
+                        </div>
+                      )}
+                      <EditorialCardBody className="gap-2">
+                        <EditorialCardMeta className="justify-between">
                           <span className="rounded-full border border-border-subtle bg-surface-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
                             {KIND_LABEL[item.kind]}
                           </span>
-                        </div>
-                        <span className="text-xs font-semibold text-text-secondary">
-                          {item.published_at ? new Date(item.published_at).toLocaleDateString("pt-BR") : "Sem data"}
-                        </span>
-                      </div>
-                      <h2 className="text-base font-black leading-tight text-text-primary">{item.title}</h2>
-                      {item.summary && <p className="text-sm leading-relaxed text-text-secondary line-clamp-2">{item.summary}</p>}
-                      {item.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {item.tags.slice(0, 5).map((itemTag) => (
-                            <button
-                              key={itemTag}
-                              type="button"
-                              onClick={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                setTag(itemTag);
-                              }}
-                              className="motion-control rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary hover:border-brand-primary hover:bg-brand-primary/5"
-                              aria-label={`Filtrar relatórios pela tag ${itemTag}`}
-                            >
-                              {itemTag}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                          <span>{item.published_at ? new Date(item.published_at).toLocaleDateString("pt-BR") : "Sem data"}</span>
+                        </EditorialCardMeta>
+                        <EditorialCardTitle className="text-base md:text-lg">{item.title}</EditorialCardTitle>
+                        {item.summary ? <EditorialCardExcerpt className="line-clamp-2 text-sm">{item.summary}</EditorialCardExcerpt> : null}
+                        {item.tags.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {item.tags.slice(0, 5).map((itemTag) => (
+                              <button
+                                key={itemTag}
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  setTag(itemTag);
+                                }}
+                                className="motion-control rounded-full border border-border-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-primary hover:border-brand-primary hover:bg-brand-primary/5"
+                                aria-label={`Filtrar relatórios pela tag ${itemTag}`}
+                              >
+                                {itemTag}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </EditorialCardBody>
+                    </EditorialCard>
                   </Link>
                 </li>
               );
@@ -288,6 +294,3 @@ export function ReportsListPage() {
     </section>
   );
 }
-
-
-

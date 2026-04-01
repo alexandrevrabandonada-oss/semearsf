@@ -7,6 +7,7 @@ import "leaflet/dist/leaflet.css";
 import { getStationOverview, getStationHealth, listCorridors, type StationOverview, type StationHealth, type ClimateCorridor } from "../lib/api";
 
 import { OfflineBanner } from "../components/OfflineBanner";
+import { Chip, IconShell, SectionHeader, SurfaceCard } from "../components/BrandSystem";
 
 // Fix default marker icons in react-leaflet
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -129,7 +130,6 @@ export function MapaPage() {
   return (
     <section className="space-y-6">
       <a href="#mapa-lista" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-brand-primary focus:shadow-lg">Pular o mapa e ir para a lista acessível</a>
-      {/* Header */}
       {!isOnline && (
         <OfflineBanner
           description="O mapa interativo depende de tiles externos. A lista abaixo continua disponível mesmo sem conexão."
@@ -137,22 +137,30 @@ export function MapaPage() {
         />
       )}
 
-      <div className="rounded-2xl border border-border-subtle bg-white p-6 md:p-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-            </svg>
+      <SurfaceCard className="logo-watermark-soft p-6 md:p-8">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_auto] lg:items-end">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <IconShell tone="brand" className="h-11 w-11 rounded-2xl">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+              </IconShell>
+              <div>
+                <p className="section-badge">Mapa de monitoramento</p>
+                <h1 className="mt-2 text-3xl font-black text-text-primary md:text-5xl">Estações e corredores climáticos</h1>
+              </div>
+            </div>
+            <p className="max-w-3xl text-base leading-relaxed text-text-secondary md:text-lg">
+              Visualize a localização das estações e dos corredores climáticos mapeados em Volta Redonda e região. Se o mapa não carregar, use a lista acessível abaixo.
+            </p>
           </div>
-          <div>
-            <h1 className="text-2xl font-black text-text-primary md:text-4xl">Mapa de monitoramento</h1>
-            <p className="text-xs font-semibold tracking-wider text-text-secondary mt-1 uppercase">Estações de qualidade do ar e corredores climáticos</p>
+          <div className="flex flex-wrap gap-2">
+            <Chip tone="active">Acessível</Chip>
+            <Chip tone="seed">Offline friendly</Chip>
           </div>
         </div>
-        <p className="mt-4 text-base leading-relaxed text-text-secondary">
-          Visualize a localização das estações e dos corredores climáticos mapeados em Volta Redonda e região. Se o mapa não carregar, use a lista acessível abaixo.
-        </p>
-      </div>
+      </SurfaceCard>
 
       {/* Error message */}
       {error && (
@@ -162,15 +170,21 @@ export function MapaPage() {
       )}
 
       {/* Map Section */}
-      <section aria-labelledby="mapa-interativo-titulo" className="rounded-2xl border border-border-subtle bg-white p-6 overflow-hidden">
-        <h2 id="mapa-interativo-titulo" className="text-lg font-bold text-brand-primary mb-4">Mapa interativo</h2>
-        
+      <SurfaceCard className="p-6 md:p-8">
+        <SectionHeader
+          eyebrow="Mapa"
+          title="Mapa interativo"
+          description="Navegação espacial das estações e corredores, com leitura complementar na lista acessível."
+        />
+
         {loading ? (
-          <p aria-live="polite" className="text-sm text-text-secondary" role="status">
-            Carregando mapa...
-          </p>
+          <div className="mt-6 rounded-[1.5rem] border border-border-subtle bg-surface-2 p-6">
+            <p aria-live="polite" className="text-sm text-text-secondary" role="status">
+              Carregando mapa...
+            </p>
+          </div>
         ) : !isOnline ? (
-          <div className="space-y-4">
+          <div className="mt-6 space-y-4">
             <OfflineBanner
               compact
               description="Sem conexão, o mapa pode não carregar. A lista acessível abaixo continua disponível."
@@ -179,13 +193,13 @@ export function MapaPage() {
             <p className="text-sm text-text-secondary">Use a lista de estações e corredores para navegação completa enquanto estiver offline.</p>
           </div>
         ) : (
-          <div className="relative" style={{ height: "500px" }}>
+          <div className="mt-6 relative" style={{ height: "500px" }}>
             <MapContainer
               center={mapCenter}
               zoom={13}
               scrollWheelZoom={false}
-              style={{ height: "100%", width: "100%", borderRadius: "0.5rem" }}
-              className="z-0"
+              style={{ height: "100%", width: "100%", borderRadius: "1rem" }}
+              className="z-0 rounded-[1rem]"
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -219,7 +233,7 @@ export function MapaPage() {
                         <Link
                           to={`/dados?station=${station.code}`}
                           aria-label={`Abrir dados da estação ${station.name}`}
-                          className="ui-btn-primary motion-focus mt-2 px-3 py-1 text-xs"
+                          className="ui-btn-primary motion-focus motion-action mt-2 px-3 py-1 text-xs"
                         >
                           Abrir dados da estação
                         </Link>
@@ -251,7 +265,7 @@ export function MapaPage() {
                             <p class="text-xs text-gray-600 mb-2">${corridor.excerpt || ""}</p>
                             <a 
                               href="/corredores/${corridor.slug}" 
-                              class="ui-btn-primary inline-block mt-2 px-3 py-1 text-xs"
+                              class="ui-btn-primary motion-action inline-block mt-2 px-3 py-1 text-xs"
                             >
                               Abrir corredor climático
                             </a>
@@ -271,7 +285,7 @@ export function MapaPage() {
 
         {/* Legend */}
         {!loading && (
-          <div className="mt-4 rounded-lg border border-border-subtle bg-bg-surface p-4">
+          <div className="mt-4 rounded-[1.35rem] border border-border-subtle bg-surface-1 p-4">
             <p className="text-xs font-bold uppercase tracking-wide text-brand-primary mb-3">Legenda</p>
             <div className="grid gap-3 md:grid-cols-2">
               <div className="flex items-center gap-2">
@@ -297,101 +311,102 @@ export function MapaPage() {
             </div>
           </div>
         )}
-      </section>
+      </SurfaceCard>
 
       {/* Accessible Fallback List */}
-      <section id="mapa-lista" tabIndex={-1} aria-labelledby="mapa-lista-titulo" className="rounded-2xl border border-border-subtle bg-white p-6">
-        <h2 id="mapa-lista-titulo" className="text-lg font-bold text-brand-primary mb-4">Lista acessível de estações e corredores</h2>
-        <p className="text-sm text-text-secondary mb-4">
-          Informações acessíveis para leitores de tela e navegação sem JavaScript.
-        </p>
+      <section id="mapa-lista" tabIndex={-1} aria-labelledby="mapa-lista-titulo">
+        <SurfaceCard className="p-6 md:p-8">
+          <h2 id="mapa-lista-titulo" className="mb-4 text-lg font-bold text-brand-primary">Lista acessível de estações e corredores</h2>
+          <p className="mb-4 text-sm text-text-secondary">
+            Informações acessíveis para leitores de tela e navegação sem JavaScript.
+          </p>
 
-        {/* Stations List */}
-        <div className="mb-6">
-          <h3 className="text-md font-bold text-text-primary mb-3">Estações de Monitoramento</h3>
-          {loading ? (
-            <p aria-live="polite" className="text-sm text-text-secondary" role="status">
-              Carregando estações...
-            </p>
-          ) : stations.length === 0 ? (
-            <p className="text-sm text-text-secondary">Nenhuma estação encontrada no momento.</p>
-          ) : (
-            <ul className="space-y-3">
-              {stations.map((station) => (
-                <li key={station.station_id} className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <div className="flex-1">
-                      <h4 className="font-bold text-text-primary">{station.name}</h4>
-                      {station.bairro && (
-                        <p className="text-sm text-text-secondary mt-1">{station.bairro}</p>
-                      )}
-                      <p className="text-sm mt-2">
-                        <span className="font-semibold">Status:</span>{" "}
-                        <span className={station.is_online ? "text-accent-green" : "text-error"}>
-                          {station.is_online ? "● Online" : "● Offline"}
-                        </span>
-                      </p>
-                      {station.last_seen_at && (
-                        <p className="text-sm text-text-secondary mt-1">
-                          Última atualização: {new Date(station.last_seen_at).toLocaleString("pt-BR")}
+          <div className="mb-6">
+            <h3 className="mb-3 text-md font-bold text-text-primary">Estações de Monitoramento</h3>
+            {loading ? (
+              <p aria-live="polite" className="text-sm text-text-secondary" role="status">
+                Carregando estações...
+              </p>
+            ) : stations.length === 0 ? (
+              <p className="text-sm text-text-secondary">Nenhuma estação encontrada no momento.</p>
+            ) : (
+              <ul className="space-y-3">
+                {stations.map((station) => (
+                  <li key={station.station_id} className="rounded-[1.35rem] border border-border-subtle bg-surface-1 p-4 motion-surface motion-surface-hover">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <h4 className="font-bold text-text-primary">{station.name}</h4>
+                        {station.bairro && (
+                          <p className="mt-1 text-sm text-text-secondary">{station.bairro}</p>
+                        )}
+                        <p className="mt-2 text-sm">
+                          <span className="font-semibold">Status:</span>{" "}
+                          <span className={station.is_online ? "text-accent-green" : "text-error"}>
+                            {station.is_online ? "● Online" : "● Offline"}
+                          </span>
                         </p>
-                      )}
+                        {station.last_seen_at && (
+                          <p className="mt-1 text-sm text-text-secondary">
+                            Última atualização: {new Date(station.last_seen_at).toLocaleString("pt-BR")}
+                          </p>
+                        )}
+                      </div>
+                      <Link
+                        to={`/dados?station=${station.code}`}
+                        aria-label={`Abrir dados da estação ${station.name}`}
+                        className="ui-btn-primary motion-focus motion-action px-4 py-2 text-sm"
+                      >
+                        Abrir dados da estação
+                      </Link>
                     </div>
-                    <Link
-                      to={`/dados?station=${station.code}`}
-                      aria-label={`Abrir dados da estação ${station.name}`}
-                      className="ui-btn-primary motion-focus px-4 py-2 text-sm"
-                    >
-                      Abrir dados da estação
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
 
-        {/* Corridors List */}
-        <div>
-          <h3 className="text-md font-bold text-text-primary mb-3">Corredores Climáticos</h3>
-          {loading ? (
-            <p aria-live="polite" className="text-sm text-text-secondary" role="status">
-              Carregando corredores...
-            </p>
-          ) : corridors.length === 0 ? (
-            <p className="text-sm text-text-secondary">Nenhum corredor climático encontrado no momento.</p>
-          ) : (
-            <ul className="space-y-3">
-              {corridors.map((corridor) => (
-                <li key={corridor.id} className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <div className="flex-1">
-                      <h4 className="font-bold text-text-primary">{corridor.title}</h4>
-                      {corridor.excerpt && (
-                        <p className="text-sm text-text-secondary mt-2">{corridor.excerpt}</p>
-                      )}
-                      {corridor.featured && (
-                        <span className="inline-block mt-2 rounded-full bg-accent-green/10 px-2 py-1 text-xs font-bold text-accent-green">
-                          Em Destaque
-                        </span>
-                      )}
+          <div>
+            <h3 className="mb-3 text-md font-bold text-text-primary">Corredores Climáticos</h3>
+            {loading ? (
+              <p aria-live="polite" className="text-sm text-text-secondary" role="status">
+                Carregando corredores...
+              </p>
+            ) : corridors.length === 0 ? (
+              <p className="text-sm text-text-secondary">Nenhum corredor climático encontrado no momento.</p>
+            ) : (
+              <ul className="space-y-3">
+                {corridors.map((corridor) => (
+                  <li key={corridor.id} className="rounded-[1.35rem] border border-border-subtle bg-surface-1 p-4 motion-surface motion-surface-hover">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <h4 className="font-bold text-text-primary">{corridor.title}</h4>
+                        {corridor.excerpt && (
+                          <p className="mt-2 text-sm text-text-secondary">{corridor.excerpt}</p>
+                        )}
+                        {corridor.featured && (
+                          <span className="mt-2 inline-block rounded-full bg-accent-green/10 px-2 py-1 text-xs font-bold text-accent-green">
+                            Em Destaque
+                          </span>
+                        )}
+                      </div>
+                      <Link
+                        to={`/corredores/${corridor.slug}`}
+                        aria-label={`Abrir corredor ${corridor.title}`}
+                        className="ui-btn-secondary motion-focus motion-action px-4 py-2 text-sm"
+                      >
+                        Abrir corredor
+                      </Link>
                     </div>
-                    <Link
-                      to={`/corredores/${corridor.slug}`}
-                      aria-label={`Abrir corredor ${corridor.title}`}
-                      className="ui-btn-secondary motion-focus px-4 py-2 text-sm"
-                    >
-                      Abrir corredor
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </SurfaceCard>
       </section>
     </section>
   );
 }
+
 
 

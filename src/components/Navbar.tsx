@@ -51,91 +51,90 @@ export function Navbar() {
 
   const navItemClass = ({ isActive }: { isActive: boolean }) =>
     [
-      "motion-control motion-focus inline-flex min-h-[44px] items-center rounded-full px-4 text-sm font-semibold",
+      "motion-action motion-focus inline-flex min-h-[44px] items-center rounded-full border px-4 text-sm font-semibold",
       isActive
-        ? "border border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_24px_rgba(0,93,170,0.12)]"
-        : "text-text-secondary hover:bg-surface-2 hover:text-text-primary"
+        ? "border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_24px_rgba(0,93,170,0.12)]"
+        : "border-transparent bg-transparent text-text-secondary hover:border-border-subtle hover:bg-surface-2 hover:text-text-primary"
     ].join(" ");
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border-subtle bg-surface-1/92 backdrop-blur-xl">
-      <div className="signature-shell border-b border-border-subtle bg-brand-primary-soft/60">
-        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-2 text-[11px] font-semibold text-brand-primary-dark md:px-6">
-          <span className="section-badge">{INSTITUTIONAL_FUNDING}</span>
-          <span className="hidden text-text-secondary md:inline">{INSTITUTIONAL_COORDINATION}</span>
-        </div>
-      </div>
-
-      <div className="border-b border-border-subtle bg-surface-1">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 md:px-6">
-          <Link to="/" className="group flex min-w-0 items-center gap-3">
-            <img
-              src="/brand/semear-logo.svg"
-              alt=""
-              aria-hidden="true"
-              className="h-12 w-12 shrink-0 rounded-2xl border border-border-subtle bg-surface-1 object-contain p-1 shadow-[0_8px_20px_rgba(17,38,59,0.06)]"
-            />
-            <div className="min-w-0">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border-subtle bg-surface-1/90 backdrop-blur-xl">
+      <div className="mx-auto w-full max-w-7xl px-4 pt-3 md:px-6 md:pt-4">
+        <div className="signature-shell logo-watermark-soft overflow-hidden">
+          <div className="grid gap-4 border-b border-divider-subtle px-4 py-4 md:grid-cols-[minmax(0,1.05fr)_auto_auto] md:items-center md:px-6">
+            <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="section-badge">SEMEAR</span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-text-secondary">Chancela UFF</span>
-              </div>
-              <div className="mt-1 flex flex-wrap items-center gap-2">
-                <span className="text-lg font-black uppercase tracking-[0.18em] text-brand-primary-dark md:text-xl">
-                  {import.meta.env.VITE_PROJECT_NAME || "SEMEAR"}
-                </span>
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                  {INSTITUTIONAL_UNIVERSITY_FULL_NAME}
+                <span className="section-badge">{INSTITUTIONAL_FUNDING}</span>
+                <span className="hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary md:inline">
+                  {INSTITUTIONAL_COORDINATION}
                 </span>
               </div>
+              <p className="max-w-xl text-xs leading-relaxed text-text-secondary md:text-sm">
+                {INSTITUTIONAL_COORDINATION} · {INSTITUTIONAL_UNIVERSITY_FULL_NAME}
+              </p>
             </div>
-          </Link>
 
-          <div className="hidden items-center gap-3 md:flex">
-            <span className="ui-chip">PWA pública</span>
-            <button
-            className="ui-btn-secondary motion-focus px-4 shadow-sm"
-              onClick={handleInstallClick}
-              type="button"
-              aria-label="Instalar aplicativo - Funciona offline e recebe notificações"
-            >
-              Instalar app
-            </button>
+            <Link to="/" className="group flex min-w-0 items-center gap-3">
+              <img
+                src="/brand/semear-logo.svg"
+                alt=""
+                aria-hidden="true"
+                className="h-12 w-12 shrink-0 rounded-2xl border border-border-subtle bg-surface-1 object-contain p-1 shadow-[0_8px_20px_rgba(17,38,59,0.06)]"
+              />
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="section-badge">SEMEAR</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
+                    UFF
+                  </span>
+                </div>
+                <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className="text-xl font-black uppercase tracking-[0.18em] text-brand-primary-dark md:text-2xl">
+                    {import.meta.env.VITE_PROJECT_NAME || "SEMEAR"}
+                  </span>
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-text-secondary md:text-xs">
+                    {INSTITUTIONAL_UNIVERSITY_FULL_NAME}
+                  </span>
+                </div>
+              </div>
+            </Link>
+
+            <div className="hidden items-center gap-3 md:flex">
+              <span className="ui-chip">PWA pública</span>
+              <button
+                className="ui-btn-primary motion-focus px-4 shadow-[0_10px_26px_rgba(0,93,170,0.18)]"
+                onClick={handleInstallClick}
+                type="button"
+                aria-label="Instalar aplicativo - Funciona offline e recebe notificações"
+              >
+                Instalar app
+              </button>
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-            className="ui-btn-secondary motion-focus px-4 md:hidden"
-            aria-label={isMenuOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-navigation"
-          >
-            Menu
-          </button>
+          <nav className="bg-surface-1/96 px-4 py-3 md:px-6" aria-label="Navegação principal">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <ul className="flex flex-wrap items-center gap-2">
+                {primaryLinks.map((link) => (
+                  <li key={link.href}>
+                    <NavLink className={navItemClass} to={link.href} aria-current={undefined}>
+                      {link.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+
+              <Link
+                to="/sobre"
+                className="motion-action motion-focus inline-flex min-h-[44px] items-center gap-2 rounded-full border border-brand-primary/15 bg-brand-primary-soft/80 px-4 py-2 text-sm font-semibold text-brand-primary-dark shadow-[0_8px_22px_rgba(0,93,170,0.1)] hover:bg-brand-primary-soft"
+              >
+                <span className="seed-badge border-0 bg-white/70 px-2 py-0.5 text-[10px] tracking-[0.16em]">Guia</span>
+                Sobre o projeto
+              </Link>
+            </div>
+          </nav>
         </div>
       </div>
-
-      <nav className="signature-shell hidden border-b border-border-subtle bg-surface-1 md:block" aria-label="Navegação principal">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-3">
-          <ul className="flex flex-wrap items-center gap-2">
-            {primaryLinks.map((link) => (
-              <li key={link.href}>
-                <NavLink className={navItemClass} to={link.href} aria-current={undefined}>
-                  {link.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-
-          <Link
-            to="/sobre"
-            className="ui-btn-ghost motion-focus px-4 text-brand-primary"
-          >
-            Sobre o projeto
-          </Link>
-        </div>
-      </nav>
 
       {isMenuOpen && (
         <nav
@@ -143,11 +142,11 @@ export function Navbar() {
           className="motion-dialog border-b border-border-subtle bg-surface-1 md:hidden"
           aria-label="Navegação móvel"
         >
-          <div className="mx-auto w-full max-w-7xl space-y-4 px-4 py-4">
-            <div className="rounded-[1.5rem] border border-border-subtle bg-brand-primary-soft/40 p-4">
+          <div className="mx-auto w-full max-w-7xl space-y-4 px-4 py-4 md:px-6">
+            <div className="signature-shell logo-watermark-soft p-4">
               <p className="section-badge">Menu principal</p>
-              <p className="mt-2 text-sm text-text-secondary">
-                Navegação institucional do portal SEMEAR.
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-text-secondary">
+                Navegação institucional do portal SEMEAR, com acesso rápido aos fluxos mais usados.
               </p>
             </div>
 
@@ -157,7 +156,7 @@ export function Navbar() {
                   key={link.href}
                   className={({ isActive }) =>
                     [
-                      "motion-control motion-focus flex min-h-[44px] items-center rounded-2xl px-4 text-sm font-semibold",
+                      "motion-action motion-focus flex min-h-[44px] items-center rounded-2xl px-4 text-sm font-semibold",
                       isActive
                         ? "border border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark shadow-[0_8px_24px_rgba(0,93,170,0.12)]"
                         : "border border-transparent text-text-secondary hover:border-border-subtle hover:bg-surface-2 hover:text-text-primary"

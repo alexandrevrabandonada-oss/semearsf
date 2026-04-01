@@ -256,7 +256,7 @@ export function TransparenciaPage() {
         action={
           <button
             onClick={() => window.location.reload()}
-            className="ui-btn-primary motion-focus px-5"
+            className="ui-btn-primary motion-focus motion-action px-5"
           >
             Tentar novamente
           </button>
@@ -318,28 +318,28 @@ export function TransparenciaPage() {
         <div className="mt-4 grid gap-4 md:grid-cols-4">
           <div>
             <label htmlFor="filtro-mes" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Mês</label>
-            <select id="filtro-mes" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="motion-focus w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
+            <select id="filtro-mes" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="motion-input motion-focus w-full rounded-md px-3 py-2 text-sm">
               <option value="all">Todos</option>
               {monthOptions.map((month) => <option key={month} value={month}>{month}</option>)}
             </select>
           </div>
           <div>
             <label htmlFor="filtro-ano" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Ano</label>
-            <select id="filtro-ano" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="motion-focus w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
+            <select id="filtro-ano" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="motion-input motion-focus w-full rounded-md px-3 py-2 text-sm">
               <option value="all">Todos</option>
               {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
             </select>
           </div>
           <div>
             <label htmlFor="filtro-categoria" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Categoria</label>
-            <select id="filtro-categoria" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="motion-focus w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm">
+            <select id="filtro-categoria" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="motion-input motion-focus w-full rounded-md px-3 py-2 text-sm">
               <option value="all">Todas</option>
               {categoryOptions.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
             </select>
           </div>
           <div>
             <label htmlFor="filtro-fornecedor" className="mb-1 block text-xs font-bold uppercase tracking-wide text-text-secondary">Fornecedor (busca)</label>
-            <input id="filtro-fornecedor" type="search" value={vendorQuery} onChange={(e) => setVendorQuery(e.target.value)} placeholder="Digite o nome" className="motion-focus w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-sm" />
+            <input id="filtro-fornecedor" type="search" value={vendorQuery} onChange={(e) => setVendorQuery(e.target.value)} placeholder="Digite o nome" className="motion-input motion-focus w-full rounded-md px-3 py-2 text-sm" />
           </div>
         </div>
       </section>
@@ -378,7 +378,7 @@ export function TransparenciaPage() {
             <h2 className="text-2xl font-black text-text-primary">Despesas lançadas</h2>
             <p className="mt-1 text-xs text-text-secondary">Documentos são publicados quando disponíveis.</p>
           </div>
-          <button type="button" onClick={handleDownloadExpensesCsv} className="ui-btn-secondary motion-focus px-4">
+          <button type="button" onClick={handleDownloadExpensesCsv} className="ui-btn-secondary motion-focus motion-action px-4">
             Baixar CSV do filtro
           </button>
         </div>
@@ -450,7 +450,7 @@ export function TransparenciaPage() {
 
       {viewerExpense?.document_url && (
         <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/75 p-4 motion-dialog"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center motion-overlay p-4 motion-dialog"
           role="dialog"
           aria-modal="true"
           aria-labelledby="transparencia-viewer-title"
@@ -459,13 +459,13 @@ export function TransparenciaPage() {
           }}
         >
           <h2 id="transparencia-viewer-title" className="sr-only">Visualizador de documento</h2>
-          <div ref={modalRef} className="w-full max-w-5xl">
+          <div ref={modalRef} className="motion-dialog-panel motion-dialog w-full max-w-5xl">
             <div className="mb-3 flex w-full justify-end gap-2">
               <a
                 href={viewerExpense.document_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="motion-control inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
+                className="motion-action inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
               >
                 Abrir documento
               </a>
@@ -473,7 +473,7 @@ export function TransparenciaPage() {
                 ref={closeButtonRef}
                 type="button"
                 onClick={() => setViewerExpense(null)}
-                className="motion-control inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 text-white hover:bg-error/90"
+                className="motion-action inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 text-white hover:bg-error/90"
                 aria-label="Fechar visualizador de documento (ESC)"
               >
                 ✕
@@ -490,5 +490,7 @@ export function TransparenciaPage() {
     </div>
   );
 }
+
+
 
 

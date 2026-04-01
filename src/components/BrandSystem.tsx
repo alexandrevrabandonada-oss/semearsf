@@ -24,6 +24,14 @@ type ChipProps = {
   className?: string;
 };
 
+type EditorialCardVariant = "standard" | "featured" | "compact" | "text" | "media";
+
+type EditorialCardProps = {
+  children: ReactNode;
+  className?: string;
+  variant?: EditorialCardVariant;
+};
+
 const iconToneClasses: Record<NonNullable<IconShellProps["tone"]>, string> = {
   seed: "bg-accent-seed/10 text-accent-seed",
   lab: "bg-accent-lab/10 text-accent-lab",
@@ -45,14 +53,14 @@ export function SurfaceCard({ children, className = "" }: SurfaceCardProps) {
 
 export function SectionHeader({ eyebrow, title, description, action }: SectionHeaderProps) {
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="space-y-2.5">
           <span className="section-badge">{eyebrow}</span>
-          <h2 className="max-w-3xl text-2xl font-black leading-tight tracking-tight text-text-primary md:text-3xl">{title}</h2>
+          <h2 className="max-w-3xl text-2xl font-black leading-[1.1] tracking-tight text-text-primary md:text-3xl">{title}</h2>
           {description ? <p className="max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">{description}</p> : null}
         </div>
-        {action ? <div className="shrink-0 motion-control md:pb-1">{action}</div> : null}
+        {action ? <div className="shrink-0 motion-control md:pt-1.5">{action}</div> : null}
       </div>
       <div className="decorative-divider" aria-hidden="true" />
     </div>
@@ -65,4 +73,46 @@ export function IconShell({ children, tone = "brand", className = "" }: IconShel
 
 export function Chip({ children, tone = "default", className = "" }: ChipProps) {
   return <span className={`ui-chip leading-none ${chipToneClasses[tone]} ${className}`.trim()}>{children}</span>;
+}
+
+const editorialCardVariantClasses: Record<EditorialCardVariant, string> = {
+  standard: "min-h-[24rem]",
+  featured: "min-h-[30rem]",
+  compact: "min-h-[14rem]",
+  text: "min-h-[13rem]",
+  media: "min-h-[20rem]"
+};
+
+export function EditorialCard({ children, className = "", variant = "standard" }: EditorialCardProps) {
+  return (
+    <article
+      className={`signature-surface motion-surface motion-surface-hover flex h-full flex-col overflow-hidden ${editorialCardVariantClasses[variant]} ${className}`.trim()}
+    >
+      {children}
+    </article>
+  );
+}
+
+export function EditorialCardBody({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <div className={`flex flex-1 flex-col gap-4 p-5 md:p-6 ${className}`.trim()}>{children}</div>;
+}
+
+export function EditorialCardEyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <span className={`section-badge w-fit ${className}`.trim()}>{children}</span>;
+}
+
+export function EditorialCardTitle({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <h3 className={`text-xl font-black leading-[1.1] tracking-tight text-text-primary md:text-[1.35rem] ${className}`.trim()}>{children}</h3>;
+}
+
+export function EditorialCardExcerpt({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <p className={`text-sm leading-relaxed text-text-secondary ${className}`.trim()}>{children}</p>;
+}
+
+export function EditorialCardMeta({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <div className={`flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-text-secondary ${className}`.trim()}>{children}</div>;
+}
+
+export function EditorialCardActions({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <div className={`mt-auto flex flex-wrap items-center gap-3 ${className}`.trim()}>{children}</div>;
 }

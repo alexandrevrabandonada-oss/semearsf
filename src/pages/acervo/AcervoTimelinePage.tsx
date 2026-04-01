@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
-import { IconShell, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
 import { getAcervoByYear, getAcervoYearIndex, type AcervoItem, type AcervoYearIndex } from "../../lib/api";
 import { type AcervoArea, AREA_KINDS } from "../../lib/acervo";
 import { getOptimizedCover } from "../../lib/imageOptimization";
+import { Chip, EditorialCard, EditorialCardActions, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, IconShell, SectionHeader, SurfaceCard } from "../../components/BrandSystem";
 
 const AREA_META: Record<AcervoArea, { label: string; emoji: string; description: string; color: string }> = {
   artigos: {
@@ -109,7 +109,7 @@ export function AcervoTimelinePage() {
   const meta = AREA_META[area];
 
   return (
-    <section className="space-y-12">
+    <section className="space-y-10 md:space-y-12">
       <SurfaceCard className="signature-shell logo-watermark-soft p-6 md:p-8">
         <SectionHeader
           eyebrow={`Acervo / ${meta.label}`}
@@ -133,10 +133,10 @@ export function AcervoTimelinePage() {
                   <button
                     key={entry.year}
                     onClick={() => handleSelectYear(entry.year)}
-                  className={`motion-control motion-focus flex items-center justify-between rounded-2xl border px-4 py-3 text-left ${selectedYear === entry.year
+                    className={`motion-control motion-focus flex items-center justify-between rounded-2xl border px-4 py-3 text-left ${selectedYear === entry.year
                       ? "border-brand-primary/15 bg-brand-primary-soft text-brand-primary-dark"
                       : "border-border-subtle bg-surface-1 text-text-secondary hover:border-brand-primary/20 hover:bg-surface-2 hover:text-text-primary"
-                      }`}
+                    }`}
                   >
                     <span className="font-mono text-lg font-black">{entry.year}</span>
                     <span className="ml-4 text-[10px] font-bold uppercase tracking-widest opacity-60">
@@ -176,55 +176,50 @@ export function AcervoTimelinePage() {
             ) : (
               <div className="grid gap-5 lg:grid-cols-2">
                 {items.map((item) => (
-                  <Link
-                    key={item.slug}
-                    to={`/acervo/item/${item.slug}`}
-                    className="group motion-list-item signature-surface flex h-full flex-col gap-4 p-4 motion-surface motion-surface-hover md:flex-row md:items-center"
-                  >
-                    <div className="h-20 w-32 shrink-0 overflow-hidden rounded-2xl bg-surface-2">
+                  <Link key={item.slug} to={`/acervo/item/${item.slug}`} className="group motion-list-item block h-full">
+                    <EditorialCard variant={getOptimizedCover(item, "thumb") ? "media" : "compact"}>
                       {getOptimizedCover(item, "thumb") ? (
-                        <img
-                          src={getOptimizedCover(item, "thumb")!}
-                          alt={item.title}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
+                        <div className="h-32 w-full overflow-hidden bg-surface-2 md:h-36">
+                          <img
+                            src={getOptimizedCover(item, "thumb")!}
+                            alt={item.title}
+                            loading="lazy"
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        </div>
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center opacity-20 transition-opacity group-hover:opacity-40">
-                          <IconShell tone="seed" className="h-10 w-10 rounded-full">
-                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                          </IconShell>
+                        <div className="document-placeholder flex h-32 w-full flex-col justify-between p-4">
+                          <span className="section-badge w-fit">SEMEAR</span>
+                          <span className="text-xs font-black uppercase leading-tight text-text-primary">Item do acervo</span>
                         </div>
                       )}
-                    </div>
 
-                    <div className="flex min-w-0 flex-1 flex-col gap-2">
-                      <div className="flex flex-wrap items-start justify-between gap-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <TypeBadge kind={item.kind} />
-                          {item.year && <span className="ui-chip">{item.year}</span>}
-                          {item.source_name && <span className="ui-chip">{item.source_name}</span>}
-                        </div>
-                        {item.published_at && (
-                          <span className="shrink-0 text-sm text-text-secondary">
-                            {new Date(item.published_at).toLocaleDateString("pt-BR")}
+                      <EditorialCardBody className="gap-2">
+                        <EditorialCardMeta className="justify-between gap-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <TypeBadge kind={item.kind} />
+                            {item.year && <Chip tone="active">{item.year}</Chip>}
+                            {item.source_name && <Chip tone="default">{item.source_name}</Chip>}
+                          </div>
+                          {item.published_at && <span className="shrink-0 text-sm text-text-secondary">{new Date(item.published_at).toLocaleDateString("pt-BR")}</span>}
+                        </EditorialCardMeta>
+                        <EditorialCardTitle className="line-clamp-2 text-lg md:text-xl">{item.title}</EditorialCardTitle>
+                        {item.curator_note ? (
+                          <div className="rounded-2xl border border-accent-brown/15 bg-accent-brown/5 p-3 italic text-text-primary">
+                            <span className="mb-1 block text-[9px] font-black uppercase tracking-widest text-accent-brown">Nota do curador</span>
+                            <p className="text-xs">{item.curator_note}</p>
+                          </div>
+                        ) : item.excerpt ? (
+                          <EditorialCardExcerpt className="line-clamp-2 text-sm">{item.excerpt}</EditorialCardExcerpt>
+                        ) : null}
+                        <EditorialCardActions className="pt-1">
+                          <span className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary">
+                            Abrir item
+                            <span aria-hidden="true">→</span>
                           </span>
-                        )}
-                      </div>
-                      <h3 className="text-lg font-black leading-tight text-text-primary transition-colors group-hover:text-brand-primary">
-                        {item.title}
-                      </h3>
-                      {item.curator_note ? (
-                        <div className="rounded-2xl border border-accent-brown/15 bg-accent-brown/5 p-3 italic text-text-primary">
-                          <span className="mb-1 block text-[9px] font-black uppercase tracking-widest text-accent-brown">
-                            Nota do curador
-                          </span>
-                          <p className="text-xs">{item.curator_note}</p>
-                        </div>
-                      ) : item.excerpt ? (
-                        <p className="line-clamp-2 text-xs text-text-secondary">{item.excerpt}</p>
-                      ) : null}
-                    </div>
+                        </EditorialCardActions>
+                      </EditorialCardBody>
+                    </EditorialCard>
                   </Link>
                 ))}
               </div>

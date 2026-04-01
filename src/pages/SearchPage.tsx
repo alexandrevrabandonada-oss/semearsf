@@ -198,7 +198,7 @@ export function SearchPage() {
             placeholder="Busque por tema, título, estação ou documento"
             value={query}
             onChange={(e) => setSearchParams({ q: e.target.value, tipo })}
-            className="motion-focus w-full rounded-xl border-2 border-border-subtle bg-white p-5 pr-14 text-base font-semibold text-text-primary placeholder:text-text-secondary/60 transition-all shadow-sm"
+            className="motion-input motion-focus w-full rounded-xl border-2 p-5 pr-14 text-base font-semibold text-text-primary placeholder:text-text-secondary/60"
           />
         </div>
 
@@ -209,7 +209,7 @@ export function SearchPage() {
               <button
                 key={t}
                 onClick={() => handleTipoChange(t)}
-                className={`motion-tab inline-flex min-h-[44px] items-center gap-2 px-4 py-2 ${
+                className={`motion-tab motion-chip-action inline-flex min-h-[44px] items-center gap-2 px-4 py-2 ${
                   tipo === t
                     ? "motion-tab-active"
                     : ""
@@ -239,12 +239,12 @@ export function SearchPage() {
           <SkeletonCard />
         </div>
       ) : error ? (
-        <ErrorState
+          <ErrorState
           description={error}
           action={
             <button
               onClick={() => window.location.reload()}
-              className="ui-btn-primary motion-focus px-5"
+              className="ui-btn-primary motion-focus motion-action px-5"
             >
               Tentar novamente
             </button>
@@ -276,7 +276,7 @@ export function SearchPage() {
                   <Link
                     key={item.url}
                     to={item.url}
-                    className="group motion-list-item flex flex-col rounded-xl border border-border-subtle bg-white p-5 motion-surface motion-surface-hover"
+                    className="group motion-list-item flex flex-col rounded-[1.35rem] border border-border-subtle bg-surface-1 p-5 motion-surface motion-surface-hover"
                   >
                     <div className="flex items-center justify-between">
                       <span className="rounded-full px-3 py-1 text-xs font-semibold bg-brand-primary/10 text-brand-primary">
@@ -303,7 +303,7 @@ export function SearchPage() {
                   <Link
                     key={report.id}
                     to={`/relatorios/${report.slug}`}
-                    className="group motion-list-item flex flex-col rounded-xl border border-brand-primary/25 bg-fundo/60 p-5 motion-surface motion-surface-hover"
+                    className="group motion-list-item flex flex-col rounded-[1.35rem] border border-brand-primary/25 bg-fundo/60 p-5 motion-surface motion-surface-hover"
                   >
                     <span className="w-fit rounded-full bg-brand-primary/10 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-primary">{REPORT_KIND_LABEL[report.kind]}</span>
                     <h3 className="mt-2 font-bold text-texto group-hover:text-ciano">{report.title}</h3>
@@ -319,7 +319,7 @@ export function SearchPage() {
               <h2 className="text-xs font-black uppercase tracking-[0.3em] text-cta">Acervo</h2>
               <div className="grid gap-5 md:grid-cols-2">
                 {results.acervo.map((item) => (
-                  <Link key={item.id} to={`/acervo/item/${item.slug}`} className="group motion-list-item flex flex-col rounded-xl border border-ciano/20 bg-fundo/60 p-5 motion-surface motion-surface-hover">
+                  <Link key={item.id} to={`/acervo/item/${item.slug}`} className="group motion-list-item flex flex-col rounded-[1.35rem] border border-ciano/20 bg-fundo/60 p-5 motion-surface motion-surface-hover">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-ciano">{item.kind}</span>
                     <h3 className="mt-1 font-bold text-texto group-hover:text-ciano">{item.title}</h3>
                   </Link>
@@ -333,7 +333,7 @@ export function SearchPage() {
               <h2 className="text-xs font-black uppercase tracking-[0.3em] text-cta">Blog</h2>
               <div className="grid gap-5 md:grid-cols-2">
                 {results.blog.map((post) => (
-                  <Link key={post.id} to={`/blog/${post.slug}`} className="group motion-list-item flex flex-col rounded-xl border border-primaria/20 bg-fundo/60 p-5 motion-surface motion-surface-hover">
+                  <Link key={post.id} to={`/blog/${post.slug}`} className="group motion-list-item flex flex-col rounded-[1.35rem] border border-primaria/20 bg-fundo/60 p-5 motion-surface motion-surface-hover">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-primaria">Boletim</span>
                     <h3 className="mt-1 font-bold text-texto group-hover:text-ciano">{post.title}</h3>
                   </Link>
@@ -347,7 +347,7 @@ export function SearchPage() {
               <h2 className="text-xs font-black uppercase tracking-[0.3em] text-cta">Agenda</h2>
               <div className="grid gap-5 md:grid-cols-2">
                 {results.events.map((event) => (
-                  <Link key={event.id} to="/agenda" className="group motion-list-item flex flex-col rounded-xl border border-acento/20 bg-fundo/60 p-5 motion-surface motion-surface-hover">
+                  <Link key={event.id} to="/agenda" className="group motion-list-item flex flex-col rounded-[1.35rem] border border-acento/20 bg-fundo/60 p-5 motion-surface motion-surface-hover">
                     <h3 className="mt-1 font-bold text-texto group-hover:text-cta">{event.title}</h3>
                   </Link>
                 ))}
@@ -360,7 +360,7 @@ export function SearchPage() {
               <h2 className="text-xs font-black uppercase tracking-[0.3em] text-cta">Transparência</h2>
               <div className="grid gap-5 md:grid-cols-2">
                 {results.transparency.map((expense) => (
-                  <Link key={expense.id} to="/transparencia" className="group motion-list-item flex flex-col rounded-xl border border-base/40 bg-fundo/60 p-5 motion-surface motion-surface-hover">
+                  <Link key={expense.id} to="/transparencia" className="group motion-list-item flex flex-col rounded-[1.35rem] border border-base/40 bg-fundo/60 p-5 motion-surface motion-surface-hover">
                     <div className="flex justify-between items-start">
                       <span className="text-[10px] font-bold uppercase tracking-widest text-texto/40">{expense.category}</span>
                       <span className="text-sm font-black text-primaria">{formatCurrency(expense.amount_cents)}</span>
@@ -376,4 +376,5 @@ export function SearchPage() {
     </section>
   );
 }
+
 

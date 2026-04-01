@@ -31,7 +31,7 @@ export function OfflineBanner({
           <button
             type="button"
             onClick={onRetry}
-            className="motion-control inline-flex min-h-[44px] items-center rounded-lg border border-amber-500/30 bg-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-amber-900 hover:bg-amber-100"
+            className="motion-action inline-flex min-h-[44px] items-center rounded-lg border border-amber-500/30 bg-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-amber-900 hover:bg-amber-100"
           >
             {ctaLabel}
           </button>
@@ -40,5 +40,6 @@ export function OfflineBanner({
     </div>
   );
 }
+
 
 

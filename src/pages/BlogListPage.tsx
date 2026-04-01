@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Chip, SectionHeader, SurfaceCard } from "../components/BrandSystem";
+import { Chip, EditorialCard, EditorialCardBody, EditorialCardExcerpt, EditorialCardMeta, EditorialCardTitle, SectionHeader, SurfaceCard } from "../components/BrandSystem";
 import { listBlogPosts, type BlogPost } from "../lib/api";
 import { getOptimizedCover } from "../lib/imageOptimization";
 
@@ -71,16 +71,17 @@ export function BlogListPage() {
                 <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {posts.map((post) => (
                         <Link
-                            className="group motion-list-item flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-border-subtle bg-surface-1 shadow-[0_1px_2px_rgba(17,38,59,0.04)] motion-surface motion-surface-hover"
+                            className="group motion-list-item block h-full"
                             key={post.id}
                             to={`/blog/${post.slug}`}
                         >
-                            {post.cover_url ? (
-                                <div className="h-40 w-full overflow-hidden bg-bg-surface relative">
-                                    <img
-                                        alt={post.title}
-                                        className="h-full w-full object-cover transition-all duration-700 ease-in-out"
-                                        src={getOptimizedCover(post, "thumb") || ""}
+                            <EditorialCard variant={post.cover_url ? "media" : "text"}>
+                                {post.cover_url ? (
+                                    <div className="h-44 w-full overflow-hidden bg-bg-surface relative">
+                                        <img
+                                            alt={post.title}
+                                            className="h-full w-full object-cover transition-all duration-700 ease-in-out"
+                                            src={getOptimizedCover(post, "thumb") || ""}
                                         loading="lazy"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                         style={
@@ -88,42 +89,35 @@ export function BlogListPage() {
                                                 filter: "blur(0)"
                                             }
                                         }
-                                    />
-                                </div>
-                            ) : (
-                                <div className="floral-placeholder flex h-40 w-full flex-col justify-between p-5">
-                                    <span className="section-badge w-fit">SEMEAR</span>
-                                    <span className="max-w-[12rem] text-lg font-black leading-tight text-text-primary">
-                                        Conteúdo editorial sem capa
-                                    </span>
-                                </div>
-                            )}
-                            <div className="flex flex-1 flex-col p-5 md:p-6">
-                                <div className="mb-2 flex items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                                    <span>{(post.publish_at || post.published_at) ? new Date((post.publish_at || post.published_at) as string).toLocaleDateString("pt-BR") : "Draft"}</span>
-                                    {demoOrAdminMode && isScheduled(post) && (
-                                        <Chip tone="active">Agendado</Chip>
-                                    )}
-                                </div>
-                                <h2 className="mb-2 text-lg font-black leading-tight text-text-primary line-clamp-2 md:text-xl">
-                                    {post.title}
-                                </h2>
-                                {post.excerpt && (
-                                    <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-text-secondary">
-                                        {post.excerpt}
-                                    </p>
-                                )}
-                                <div className="mt-auto flex flex-wrap gap-1">
-                                    {post.tags.slice(0, 3).map((tag) => (
-                                        <span
-                                            className="rounded-full bg-brand-primary-soft px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-brand-primary-dark"
-                                            key={tag}
-                                        >
-                                            {tag}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="floral-placeholder flex h-44 w-full flex-col justify-between p-5">
+                                        <span className="section-badge w-fit">SEMEAR</span>
+                                        <span className="max-w-[12rem] text-lg font-black leading-tight text-text-primary">
+                                            Conteúdo editorial sem capa
                                         </span>
-                                    ))}
-                                </div>
-                            </div>
+                                    </div>
+                                )}
+                                <EditorialCardBody>
+                                    <EditorialCardMeta className="justify-between">
+                                        <span>{(post.publish_at || post.published_at) ? new Date((post.publish_at || post.published_at) as string).toLocaleDateString("pt-BR") : "Draft"}</span>
+                                        {demoOrAdminMode && isScheduled(post) ? <Chip tone="active">Agendado</Chip> : null}
+                                    </EditorialCardMeta>
+                                    <EditorialCardTitle className="line-clamp-2 md:text-xl">{post.title}</EditorialCardTitle>
+                                    {post.excerpt ? <EditorialCardExcerpt className="line-clamp-3">{post.excerpt}</EditorialCardExcerpt> : null}
+                                    <div className="mt-auto flex flex-wrap gap-1">
+                                        {post.tags.slice(0, 3).map((tag) => (
+                                            <span
+                                                className="rounded-full bg-brand-primary-soft px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-brand-primary-dark"
+                                                key={tag}
+                                            >
+                                                {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </EditorialCardBody>
+                            </EditorialCard>
                         </Link>
                     ))}
                 </div>

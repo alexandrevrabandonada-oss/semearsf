@@ -6,7 +6,7 @@ type SkeletonCardProps = {
 
 export function SkeletonCard({ className = "" }: SkeletonCardProps) {
   return (
-    <SurfaceCard className={`motion-list-item p-6 ${className}`.trim()}>
+    <SurfaceCard className={`motion-list-item motion-pop p-6 ${className}`.trim()}>
       <div className="space-y-4">
         <div className="seed-radial-divider" />
         <div className="h-4 w-1/3 rounded-full bg-surface-3" />
@@ -18,3 +18,6 @@ export function SkeletonCard({ className = "" }: SkeletonCardProps) {
     </SurfaceCard>
   );
 }
+
+
+

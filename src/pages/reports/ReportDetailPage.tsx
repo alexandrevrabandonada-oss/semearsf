@@ -224,7 +224,7 @@ export function ReportDetailPage() {
           {!isOnline && !hasOpenedBefore && (
             <a
               href="/relatorios"
-              className="inline-flex min-h-[44px] items-center rounded-lg border border-amber-500/30 bg-amber-50 px-5 py-3 text-sm font-bold uppercase tracking-wide text-amber-900"
+              className="motion-action inline-flex min-h-[44px] items-center rounded-lg border border-amber-500/30 bg-amber-50 px-5 py-3 text-sm font-bold uppercase tracking-wide text-amber-900"
             >
               Voltar aos relatórios
             </a>
@@ -234,7 +234,7 @@ export function ReportDetailPage() {
 
       {isViewerOpen && hasPdf && (
         <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/75 p-4 motion-dialog"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center motion-overlay p-4 motion-dialog"
           role="dialog"
           aria-modal="true"
           aria-labelledby="report-viewer-title"
@@ -244,14 +244,14 @@ export function ReportDetailPage() {
         >
           <h2 id="report-viewer-title" className="sr-only">Visualizador de PDF do relatório</h2>
 
-          <div ref={modalRef} className="motion-dialog w-full max-w-6xl">
+          <div ref={modalRef} className="motion-dialog-panel motion-dialog w-full max-w-6xl">
             <div className="mb-3 flex w-full justify-end gap-2">
               <a
                 href={report.pdf_url as string}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={markAsOpened}
-                className="motion-control inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
+                className="motion-action inline-flex min-h-[44px] items-center rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
               >
                 Abrir em nova aba
               </a>
@@ -259,7 +259,7 @@ export function ReportDetailPage() {
                 ref={closeButtonRef}
                 type="button"
                 onClick={() => setIsViewerOpen(false)}
-                className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 text-white hover:bg-error/90"
+                className="motion-action inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-error px-3 text-white hover:bg-error/90"
                 aria-label="Fechar visualizador de PDF (ESC)"
               >
                 ✕
@@ -278,6 +278,8 @@ export function ReportDetailPage() {
     </section>
   );
 }
+
+
 
 
 

@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
+import { Chip, IconShell, SectionHeader, SurfaceCard } from "../components/BrandSystem";
 import { LoadingCard } from "../components/LoadingCard";
 import { OfflineBanner } from "../components/OfflineBanner";
 import { EmptyState } from "../components/EmptyState";
@@ -35,14 +36,14 @@ function formatCellValue(value: unknown) {
 function getHealthBadgeInfo(health: string | undefined) {
   switch (health) {
     case 'ok':
-      return { label: 'Excelente', color: 'bg-green-100 text-green-900', icon: '✓' };
+      return { label: 'Excelente', color: 'border-emerald-500/20 bg-emerald-50 text-emerald-800', icon: '✓' };
     case 'degraded':
-      return { label: 'Degradado', color: 'bg-yellow-100 text-yellow-900', icon: '⚠' };
+      return { label: 'Degradado', color: 'border-amber-500/20 bg-amber-50 text-amber-900', icon: '⚠' };
     case 'offline':
-      return { label: 'Offline', color: 'bg-red-100 text-red-900', icon: '✕' };
+      return { label: 'Offline', color: 'border-red-500/20 bg-red-50 text-red-900', icon: '✕' };
     case 'unknown':
     default:
-      return { label: 'Desconhecido', color: 'bg-gray-100 text-gray-900', icon: '?' };
+      return { label: 'Desconhecido', color: 'border-slate-300 bg-slate-50 text-slate-700', icon: '?' };
   }
 }
 
@@ -270,8 +271,7 @@ export function DadosPage() {
   };
 
   return (
-    <section className="space-y-6">
-      {/* Header */}
+    <section className="space-y-10 md:space-y-12">
       {!isOnline && (
         <OfflineBanner
           description="Algumas leituras podem ficar desatualizadas até a conexão voltar. A lista da estação e o histórico carregado continuam disponíveis."
@@ -279,142 +279,172 @@ export function DadosPage() {
         />
       )}
 
-      <div className="rounded-2xl border border-border-subtle bg-white p-6 md:p-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-2xl font-black text-text-primary md:text-4xl">Dados ao vivo</h1>
-            <p className="text-xs font-semibold tracking-wider text-text-secondary mt-1 uppercase">Qualidade do ar e leitura meteorológica</p>
-          </div>
-        </div>
-        <p className="mt-4 text-base leading-relaxed text-text-secondary">
-          Acompanhe as leituras das estações públicas de Volta Redonda e do Sul Fluminense. Leia agora, compare períodos e exporte o recorte em CSV.
-        </p>
-      </div>
-
-      <section className="rounded-2xl border border-border-subtle bg-white p-6">
-        <h2 className="text-lg font-bold text-brand-primary">Como ler os dados</h2>
-        <ul className="mt-3 space-y-2 text-sm text-text-secondary">
-          <li><span className="font-semibold text-text-primary">1.</span> PM2.5 e PM10 medem material particulado no ar em µg/m³.</li>
-          <li><span className="font-semibold text-text-primary">2.</span> A classificação OMS resume o nível atual: bom, moderado, alto ou muito alto.</li>
-          <li><span className="font-semibold text-text-primary">3.</span> Use 24h e 7 dias para contexto. Uma leitura isolada pode enganar.</li>
-          <li><span className="font-semibold text-text-primary">4.</span> Quando houver indisponibilidade, recarregue os dados ou troque de estação.</li>
-        </ul>
-      </section>
-
-      {/* Seleção de estação */}
-      <section className="rounded-2xl border border-border-subtle bg-white p-6">
-        <h2 className="text-lg font-bold text-brand-primary">Selecione uma estação</h2>
-        {loadingStations ? (
-          <p aria-live="polite" className="mt-3 text-sm text-text-secondary" role="status">
-            Carregando estações públicas...
-          </p>
-        ) : null}
-        {!loadingStations && !stations.length ? (
-          <div className="mt-3"><EmptyState title="Nenhuma estação disponível" description="Não foi possível carregar estações agora. Tente novamente quando a conexão voltar ou abra a página mais tarde." action={<button className="ui-btn-secondary px-5" onClick={() => window.location.reload()} type="button">Recarregar dados</button>} /></div>
-        ) : null}
-        <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-          <label className="block">
-            <span className="mb-1 block text-sm font-semibold text-text-primary">Selecione uma estação</span>
-            <select
-              className="w-full rounded-md border border-border-subtle bg-white px-3 py-2 text-text-primary outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
-              disabled={!stations.length}
-              onChange={(e) => setSelectedStationId(e.target.value || null)}
-              value={selectedStationId ?? ""}
-            >
-              {!selectedStationId ? <option value="">Selecione uma estação</option> : null}
-              {stations.map((station) => (
-                <option key={station.station_id} value={station.station_id}>
-                  {String(station.name ?? station.station_id)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            className="rounded-md bg-brand-primary px-4 py-2 text-sm font-black uppercase tracking-wide text-white transition-colors hover:bg-brand-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={!selectedStationId || loadingMeasurements}
-            onClick={() => selectedStationId && void loadMeasurements(selectedStationId)}
-            type="button"
-          >
-            Atualizar leitura
-          </button>
-        </div>
-
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-            <p className="text-xs uppercase tracking-wide text-brand-primary">Status da estação</p>
-            <p className={`mt-1 text-sm font-bold ${isOnline ? "text-accent-green" : "text-error"}`}>
-              {selectedStationId ? (isOnline ? "● Online" : "● Offline") : "-"}
+      <SurfaceCard className="signature-shell logo-watermark-soft overflow-hidden p-6 md:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-3xl space-y-4">
+            <div className="flex items-center gap-3">
+              <IconShell tone="brand" className="rounded-full">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </IconShell>
+              <div>
+                <p className="section-badge">Painel ambiental</p>
+                <h1 className="mt-2 text-2xl font-black leading-tight text-text-primary md:text-4xl">Dados ao vivo</h1>
+              </div>
+            </div>
+            <p className="max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg">
+              Acompanhe as leituras das estações públicas de Volta Redonda e do Sul Fluminense. Leia agora, compare períodos e exporte o recorte em CSV.
             </p>
           </div>
-          <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-            <p className="text-xs uppercase tracking-wide text-brand-primary">Última atualização</p>
-            <p className="mt-1 text-sm font-bold text-text-primary">{stats.lastTime ? formatDate(stats.lastTime) : "-"}</p>
-          </div>
-          <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-            <p className="text-xs uppercase tracking-wide text-brand-primary">Qualidade dos dados</p>
-            {selectedStationId && stationHealth.has(selectedStationId) ? (
-              (() => {
-                const health = stationHealth.get(selectedStationId)!;
-                const info = getHealthBadgeInfo(health.health_status);
-                return (
-                  <div className={`mt-1 inline-block rounded-md px-3 py-1 text-sm font-bold ${info.color}`} aria-label={`Qualidade do dado: ${info.label}`} title={`Status: ${info.label} - ${health.health_status === 'ok' ? 'Medições confiáveis' : health.health_status === 'degraded' ? 'Qualidade comprometida' : health.health_status === 'offline' ? 'Sem comunicação' : 'Dados não disponíveis'}`}>
-                    {info.icon} {info.label}
-                  </div>
-                );
-              })()
-            ) : (
-              <p className="mt-1 text-sm text-text-secondary">-</p>
-            )}
+
+          <div className="grid w-full gap-3 sm:grid-cols-3 lg:max-w-[34rem] lg:grid-cols-1">
+            <div className="signature-surface p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Status</p>
+              <p className={`mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-bold ${selectedStationId ? (isOnline ? "border-emerald-500/20 bg-emerald-50 text-emerald-800" : "border-red-500/20 bg-red-50 text-red-900") : "border-slate-300 bg-slate-50 text-slate-700"}`}>
+                {selectedStationId ? (isOnline ? "● Online" : "● Offline") : "Selecione uma estação"}
+              </p>
+            </div>
+            <div className="signature-surface p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Qualidade</p>
+              <p className="mt-2 text-sm font-semibold text-text-primary">
+                {selectedStationId && stationHealth.has(selectedStationId)
+                  ? getHealthBadgeInfo(stationHealth.get(selectedStationId)!.health_status).label
+                  : "Sem leitura ainda"}
+              </p>
+            </div>
+            <div className="signature-surface p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Atualização</p>
+              <p className="mt-2 text-sm font-semibold text-text-primary">{stats.lastTime ? formatDate(stats.lastTime) : "Aguardando dados"}</p>
+            </div>
           </div>
         </div>
-      </section>
+      </SurfaceCard>
 
-      {/* Tabs de período */}
+      <SurfaceCard className="p-6 md:p-8">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] xl:items-start">
+          <div className="space-y-6">
+            <SectionHeader
+              eyebrow="Leitura pública"
+              title="Selecionar estação e acompanhar leituras"
+              description="Escolha a estação, confira a situação atual e atualize a leitura quando precisar."
+            />
+
+            <div className="signature-surface p-5 md:p-6">
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold text-text-primary">Estação monitorada</span>
+                  <select
+                    className="w-full rounded-full border border-border-subtle bg-surface-1 px-4 py-3 text-text-primary outline-none transition focus:border-brand-primary focus:ring-4 focus:ring-focus-ring/30"
+                    disabled={!stations.length}
+                    onChange={(e) => setSelectedStationId(e.target.value || null)}
+                    value={selectedStationId ?? ""}
+                  >
+                    {!selectedStationId ? <option value="">Selecione uma estação</option> : null}
+                    {stations.map((station) => (
+                      <option key={station.station_id} value={station.station_id}>
+                        {String(station.name ?? station.station_id)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  className="ui-btn-primary px-5 shadow-[0_12px_30px_rgba(0,93,170,0.18)]"
+                  disabled={!selectedStationId || loadingMeasurements}
+                  onClick={() => selectedStationId && void loadMeasurements(selectedStationId)}
+                  type="button"
+                >
+                  Atualizar leitura
+                </button>
+              </div>
+
+              <div className="mt-5 grid gap-3 md:grid-cols-3">
+                <div className="rounded-2xl border border-border-subtle bg-surface-2 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Status da estação</p>
+                  <p className={`mt-2 inline-flex items-center rounded-full border px-3 py-1 text-sm font-bold ${selectedStationId ? (isOnline ? "border-emerald-500/20 bg-emerald-50 text-emerald-800" : "border-red-500/20 bg-red-50 text-red-900") : "border-slate-300 bg-slate-50 text-slate-700"}`}>
+                    {selectedStationId ? (isOnline ? "● Online" : "● Offline") : "Selecione uma estação"}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-border-subtle bg-surface-2 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Última atualização</p>
+                  <p className="mt-2 text-sm font-bold text-text-primary">{stats.lastTime ? formatDate(stats.lastTime) : "Aguardando dados"}</p>
+                </div>
+                <div className="rounded-2xl border border-border-subtle bg-surface-2 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Qualidade dos dados</p>
+                  {selectedStationId && stationHealth.has(selectedStationId) ? (
+                    (() => {
+                      const health = stationHealth.get(selectedStationId)!;
+                      const info = getHealthBadgeInfo(health.health_status);
+                      return (
+                        <div className={`mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-bold ${info.color}`} aria-label={`Qualidade do dado: ${info.label}`} title={`Status: ${info.label} - ${health.health_status === 'ok' ? 'Medições confiáveis' : health.health_status === 'degraded' ? 'Qualidade comprometida' : health.health_status === 'offline' ? 'Sem comunicação' : 'Dados não disponíveis'}`}>
+                          <span aria-hidden="true">{info.icon}</span>
+                          <span>{info.label}</span>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <p className="mt-2 text-sm text-text-secondary">Selecione uma estação para ver a qualidade.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <SectionHeader
+              eyebrow="Guia rápido"
+              title="Como ler os dados"
+              description="O painel foi organizado para leitura rápida e segura em uso público."
+            />
+            <div className="signature-surface p-5">
+              <ul className="space-y-3 text-sm leading-relaxed text-text-secondary">
+                <li><span className="font-semibold text-text-primary">1.</span> PM2.5 e PM10 medem material particulado no ar em µg/m³.</li>
+                <li><span className="font-semibold text-text-primary">2.</span> A classificação OMS resume o nível atual: bom, moderado, alto ou muito alto.</li>
+                <li><span className="font-semibold text-text-primary">3.</span> Use 24h e 7 dias para contexto. Uma leitura isolada pode enganar.</li>
+                <li><span className="font-semibold text-text-primary">4.</span> Quando houver indisponibilidade, recarregue os dados ou troque de estação.</li>
+              </ul>
+            </div>
+            <div className="signature-surface p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Exportação</p>
+              <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+                Baixe o recorte em CSV para análise externa. O botão fica visível nos períodos com dados carregados.
+              </p>
+            </div>
+          </div>
+        </div>
+      </SurfaceCard>
+
       {selectedStationId && (
-        <section className="rounded-2xl border border-border-subtle bg-white p-6">
-          <div className="flex flex-wrap gap-2 mb-6" role="tablist" aria-label="Período de visualização">
+        <SurfaceCard className="p-6 md:p-8">
+          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Período de visualização">
             <button
+              id="tab-now"
               role="tab"
               aria-selected={activeTab === "now"}
               aria-controls="panel-now"
-              className={`rounded-md px-4 py-2 text-sm font-bold uppercase tracking-wide transition-colors ${
-                activeTab === "now" 
-                  ? "bg-brand-primary text-white" 
-                  : "border border-border-subtle bg-white text-text-primary hover:bg-bg-surface"
-              }`}
+              className={activeTab === "now" ? "motion-tab motion-tab-active" : "motion-tab"}
               onClick={() => setActiveTab("now")}
               type="button"
             >
               Agora
             </button>
             <button
+              id="tab-24h"
               role="tab"
               aria-selected={activeTab === "24h"}
               aria-controls="panel-24h"
-              className={`rounded-md px-4 py-2 text-sm font-bold uppercase tracking-wide transition-colors ${
-                activeTab === "24h" 
-                  ? "bg-brand-primary text-white" 
-                  : "border border-border-subtle bg-white text-text-primary hover:bg-bg-surface"
-              }`}
+              className={activeTab === "24h" ? "motion-tab motion-tab-active" : "motion-tab"}
               onClick={() => setActiveTab("24h")}
               type="button"
             >
               24h
             </button>
             <button
+              id="tab-7d"
               role="tab"
               aria-selected={activeTab === "7d"}
               aria-controls="panel-7d"
-              className={`rounded-md px-4 py-2 text-sm font-bold uppercase tracking-wide transition-colors ${
-                activeTab === "7d" 
-                  ? "bg-brand-primary text-white" 
-                  : "border border-border-subtle bg-white text-text-primary hover:bg-bg-surface"
-              }`}
+              className={activeTab === "7d" ? "motion-tab motion-tab-active" : "motion-tab"}
               onClick={() => setActiveTab("7d")}
               type="button"
             >
@@ -422,130 +452,125 @@ export function DadosPage() {
             </button>
           </div>
 
-                    {/* Painel Agora */}
           {activeTab === "now" && (
             <div role="tabpanel" id="panel-now" aria-labelledby="tab-now">
-              <h2 className="text-lg font-bold text-brand-primary mb-4">Leitura atual</h2>
+              <h2 className="mt-6 text-lg font-bold text-brand-primary">Leitura atual</h2>
               {stats.lastValue ? (
-                <>
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                      <p className="text-xs uppercase tracking-wide text-brand-primary">PM2.5</p>
-                      <p className="mt-2 text-3xl font-black text-text-primary">{stats.lastValue.pm25?.toFixed(1) ?? "-"}</p>
-                      <p className={`mt-2 inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-bold ${getOmsLevelStyle(pm25NowClassification.level)}`}>
-                        <span aria-hidden="true">{pm25NowClassification.icon}</span>
-                        <span>Classificacao: {pm25NowClassification.level}</span>
-                      </p>
-                      <p className="mt-2 text-xs text-text-secondary">{pm25NowClassification.summary}</p>
-                      <p className="mt-1 text-xs font-medium text-text-secondary">Cuidado: {pm25NowClassification.recommendation}</p>
+                <div className="mt-4 grid gap-5 md:grid-cols-2">
+                  <div className="signature-surface p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM2.5</p>
+                    <p className="mt-2 text-4xl font-black leading-none text-text-primary">{stats.lastValue.pm25?.toFixed(1) ?? "-"}</p>
+                    <div className={`mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${getOmsLevelStyle(pm25NowClassification.level)}`}>
+                      <span aria-hidden="true">{pm25NowClassification.icon}</span>
+                      <span>Classificação: {pm25NowClassification.level}</span>
                     </div>
-                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                      <p className="text-xs uppercase tracking-wide text-brand-primary">PM10</p>
-                      <p className="mt-2 text-3xl font-black text-text-primary">{stats.lastValue.pm10?.toFixed(1) ?? "-"}</p>
-                      <p className={`mt-2 inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-bold ${getOmsLevelStyle(pm10NowClassification.level)}`}>
-                        <span aria-hidden="true">{pm10NowClassification.icon}</span>
-                        <span>Classificacao: {pm10NowClassification.level}</span>
-                      </p>
-                      <p className="mt-2 text-xs text-text-secondary">{pm10NowClassification.summary}</p>
-                      <p className="mt-1 text-xs font-medium text-text-secondary">Cuidado: {pm10NowClassification.recommendation}</p>
-                    </div>
+                    <p className="mt-3 text-xs leading-relaxed text-text-secondary">{pm25NowClassification.summary}</p>
+                    <p className="mt-1 text-xs font-medium text-text-secondary">Cuidado: {pm25NowClassification.recommendation}</p>
                   </div>
-
-                  <div className="mt-4 grid gap-5 md:grid-cols-2">
-                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                      <p className="text-xs uppercase tracking-wide text-brand-primary">Temperatura</p>
-                      <p className="mt-2 text-2xl font-black text-text-primary">{stats.lastValue.temp?.toFixed(1) ?? "-"}</p>
-                      <p className="text-xs text-text-secondary mt-1">°C</p>
+                  <div className="signature-surface p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM10</p>
+                    <p className="mt-2 text-4xl font-black leading-none text-text-primary">{stats.lastValue.pm10?.toFixed(1) ?? "-"}</p>
+                    <div className={`mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold ${getOmsLevelStyle(pm10NowClassification.level)}`}>
+                      <span aria-hidden="true">{pm10NowClassification.icon}</span>
+                      <span>Classificação: {pm10NowClassification.level}</span>
                     </div>
-                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                      <p className="text-xs uppercase tracking-wide text-brand-primary">Umidade</p>
-                      <p className="mt-2 text-2xl font-black text-text-primary">{stats.lastValue.humidity?.toFixed(0) ?? "-"}</p>
-                      <p className="text-xs text-text-secondary mt-1">%</p>
-                    </div>
+                    <p className="mt-3 text-xs leading-relaxed text-text-secondary">{pm10NowClassification.summary}</p>
+                    <p className="mt-1 text-xs font-medium text-text-secondary">Cuidado: {pm10NowClassification.recommendation}</p>
                   </div>
-                </>
+                  <div className="signature-surface p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Temperatura</p>
+                    <p className="mt-2 text-3xl font-black text-text-primary">{stats.lastValue.temp?.toFixed(1) ?? "-"}</p>
+                    <p className="mt-1 text-xs text-text-secondary">°C</p>
+                  </div>
+                  <div className="signature-surface p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Umidade</p>
+                    <p className="mt-2 text-3xl font-black text-text-primary">{stats.lastValue.humidity?.toFixed(0) ?? "-"}</p>
+                    <p className="mt-1 text-xs text-text-secondary">%</p>
+                  </div>
+                </div>
               ) : (
                 <EmptyState title="Sem leitura disponível agora" description="Escolha outra estação ou aguarde o próximo envio de dados." />
               )}
             </div>
           )}
 
-          {/* Painel 24h / 7d */}
           {(activeTab === "24h" || activeTab === "7d") && (
             <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
               {loadingMeasurements ? (
-                <p aria-live="polite" className="text-sm text-text-secondary" role="status">
+                <p aria-live="polite" className="mt-6 text-sm text-text-secondary" role="status">
                   Carregando medições do período...
                 </p>
               ) : currentMeasurements.length === 0 ? (
                 <EmptyState title="Sem medições para este intervalo" description="Troque para outro intervalo ou aguarde o próximo ciclo de coleta." />
               ) : (
                 <>
-                  {/* Resumo textual para acessibilidade */}
                   <div className="sr-only" aria-live="polite" role="status">
                     {textualSummary}
                   </div>
 
-                  {/* Cards de resumo */}
-                  <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4 mb-6">
-                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                      <p className="text-xs uppercase tracking-wide text-brand-primary">PM2.5 Média</p>
-                      <p className="mt-2 text-2xl font-black text-text-primary">
-                        {stats.pm25Avg !== null ? stats.pm25Avg.toFixed(1) : "-"}
-                      </p>
-                      <p className="text-xs text-text-secondary mt-1">µg/m³</p>
+                  <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,0.82fr)]">
+                    <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+                      <div className="signature-surface p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM2.5 média</p>
+                        <p className="mt-2 text-3xl font-black text-text-primary">{stats.pm25Avg !== null ? stats.pm25Avg.toFixed(1) : "-"}</p>
+                        <p className="mt-1 text-xs text-text-secondary">µg/m³</p>
+                      </div>
+                      <div className="signature-surface p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM2.5 máximo</p>
+                        <p className="mt-2 text-3xl font-black text-text-primary">{stats.pm25Max !== null ? stats.pm25Max.toFixed(1) : "-"}</p>
+                        <p className="mt-1 text-xs text-text-secondary">µg/m³</p>
+                      </div>
+                      <div className="signature-surface p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM10 média</p>
+                        <p className="mt-2 text-3xl font-black text-text-primary">{stats.pm10Avg !== null ? stats.pm10Avg.toFixed(1) : "-"}</p>
+                        <p className="mt-1 text-xs text-text-secondary">µg/m³</p>
+                      </div>
+                      <div className="signature-surface p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">PM10 máximo</p>
+                        <p className="mt-2 text-3xl font-black text-text-primary">{stats.pm10Max !== null ? stats.pm10Max.toFixed(1) : "-"}</p>
+                        <p className="mt-1 text-xs text-text-secondary">µg/m³</p>
+                      </div>
                     </div>
-                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                      <p className="text-xs uppercase tracking-wide text-brand-primary">PM2.5 Máximo</p>
-                      <p className="mt-2 text-2xl font-black text-text-primary">
-                        {stats.pm25Max !== null ? stats.pm25Max.toFixed(1) : "-"}
-                      </p>
-                      <p className="text-xs text-text-secondary mt-1">µg/m³</p>
-                    </div>
-                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                      <p className="text-xs uppercase tracking-wide text-brand-primary">PM10 Média</p>
-                      <p className="mt-2 text-2xl font-black text-text-primary">
-                        {stats.pm10Avg !== null ? stats.pm10Avg.toFixed(1) : "-"}
-                      </p>
-                      <p className="text-xs text-text-secondary mt-1">µg/m³</p>
-                    </div>
-                    <div className="rounded-lg border border-border-subtle bg-bg-surface p-4">
-                      <p className="text-xs uppercase tracking-wide text-brand-primary">PM10 Máximo</p>
-                      <p className="mt-2 text-2xl font-black text-text-primary">
-                        {stats.pm10Max !== null ? stats.pm10Max.toFixed(1) : "-"}
-                      </p>
-                      <p className="text-xs text-text-secondary mt-1">µg/m³</p>
+
+                    <div className="signature-surface p-5">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-primary">Resumo operacional</p>
+                      <p className="mt-3 text-sm leading-relaxed text-text-secondary">{textualSummary}</p>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-2xl bg-surface-2 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Leitura</p>
+                          <p className="mt-2 text-base font-bold text-text-primary">{activeTab === "24h" ? "Últimas 24 horas" : "Últimos 7 dias"}</p>
+                        </div>
+                        <div className="rounded-2xl bg-surface-2 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">Exportação</p>
+                          <p className="mt-2 text-base font-bold text-text-primary">CSV disponível</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Controles do gráfico */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                  <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
                     <div className="flex flex-wrap gap-3">
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <label className="flex cursor-pointer items-center gap-2">
                         <input
                           type="checkbox"
                           checked={showPM25}
                           onChange={(e) => setShowPM25(e.target.checked)}
                           className="h-4 w-4 rounded border-border-subtle text-brand-primary focus:ring-2 focus:ring-brand-primary/20"
                         />
-                        <span className="text-sm font-semibold text-text-primary">
-                          <span style={{ color: "#10b981" }}>■</span> PM2.5
-                        </span>
+                        <span className="text-sm font-semibold text-text-primary"><span style={{ color: "#10b981" }}>■</span> PM2.5</span>
                       </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <label className="flex cursor-pointer items-center gap-2">
                         <input
                           type="checkbox"
                           checked={showPM10}
                           onChange={(e) => setShowPM10(e.target.checked)}
                           className="h-4 w-4 rounded border-border-subtle text-brand-primary focus:ring-2 focus:ring-brand-primary/20"
                         />
-                        <span className="text-sm font-semibold text-text-primary">
-                          <span style={{ color: "#f59e0b" }}>■</span> PM10
-                        </span>
+                        <span className="text-sm font-semibold text-text-primary"><span style={{ color: "#f59e0b" }}>■</span> PM10</span>
                       </label>
                     </div>
                     <button
-                      className="rounded-md border border-brand-primary px-4 py-2 text-sm font-black uppercase tracking-wide text-brand-primary transition-colors hover:bg-brand-primary hover:text-white disabled:opacity-60"
+                      className="ui-btn-secondary px-4 text-xs font-black uppercase tracking-wide text-brand-primary disabled:opacity-60"
                       disabled={currentMeasurements.length === 0}
                       onClick={handleExportCSV}
                       type="button"
@@ -555,16 +580,14 @@ export function DadosPage() {
                     </button>
                   </div>
 
-                  {/* Gráfico */}
-                  <div className="rounded-lg border border-border-subtle bg-white p-4 mb-6">
-                    <h3 className="text-sm font-bold text-brand-primary mb-4">Evolução temporal</h3>
+                  <div className="signature-surface mt-5 p-4 md:p-5">
+                    <h3 className="mb-4 text-sm font-bold text-brand-primary">Evolução temporal</h3>
                     <Suspense fallback={<LoadingCard message="Carregando gráfico histórico..." />}>
                       <MeasurementsChart data={chartData} showPM25={showPM25} showPM10={showPM10} />
                     </Suspense>
                   </div>
 
-                  {/* Tabela fallback para acessibilidade */}
-                  <details className="rounded-lg border border-border-subtle bg-bg-surface p-4">
+                  <details className="signature-surface mt-5 p-4">
                     <summary className="cursor-pointer text-sm font-bold text-brand-primary">
                       Abrir tabela em texto
                     </summary>
@@ -599,7 +622,7 @@ export function DadosPage() {
               )}
             </div>
           )}
-        </section>
+        </SurfaceCard>
       )}
 
       {/* Mensagens de erro */}
@@ -611,6 +634,7 @@ export function DadosPage() {
     </section>
   );
 }
+
 
 
 
