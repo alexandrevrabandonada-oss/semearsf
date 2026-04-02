@@ -428,10 +428,11 @@ select {
   }
 
   .signature-shell {
-    @apply relative overflow-hidden rounded-[1.75rem] border border-border-subtle bg-surface-1;
+    @apply relative overflow-hidden rounded-[1.75rem] border border-border-subtle;
+    background-image: linear-gradient(155deg, #F6FAFD 0%, #FAFCFF 36%, #F1F7FC 70%, #EEF4FB 100%);
     box-shadow:
       0 1px 2px rgba(17, 38, 59, 0.04),
-      0 18px 46px rgba(17, 38, 59, 0.08);
+      0 24px 62px rgba(17, 38, 59, 0.11);
   }
 
   .signature-shell::before {
@@ -499,26 +500,52 @@ select {
     @apply ui-chip-editorial text-[10px] tracking-[0.14em];
   }
 
+  /* ══════════════════════════════════════════════
+     SURFACE VARIATIONS — superfícies com personalidade
+     4 texturas de papel que distinguem seções e famílias
+     de card sem sacrificar legibilidade institucional.
+     surface-warm-paper  = arquivo/dossiê    (creme-âmbar)
+     surface-cool-paper  = análise/dados     (azul-frio)
+     surface-lab         = monitoramento     (teal/ciano)
+     surface-editorial   = blog/narrativa    (azul-brand)
+     ══════════════════════════════════════════════ */
+
+  .surface-warm-paper {
+    background: linear-gradient(155deg, #FEFCF6 0%, #FFFEF9 36%, #FEF9EA 70%, #FFFAED 100%);
+  }
+  .surface-cool-paper {
+    background: linear-gradient(155deg, #F6FAFD 0%, #FAFCFF 36%, #F1F7FC 70%, #EEF4FB 100%);
+  }
+  .surface-lab {
+    background: linear-gradient(155deg, #F4FDFC 0%, #FAFFFF 36%, #EBFAF9 70%, #F1FAFB 100%);
+  }
+  .surface-editorial {
+    background: linear-gradient(155deg, #F4F7FD 0%, #F8FBFF 36%, #EBF0FA 70%, #EDF3FD 100%);
+  }
+
   .home-section-data {
-    @apply relative overflow-hidden border-brand-primary/15 bg-gradient-to-br from-surface-1 via-surface-1 to-brand-primary-soft/30;
+    @apply relative overflow-hidden border-brand-primary/15;
+    background-image: linear-gradient(155deg, #F4FDFC 0%, #FAFFFF 36%, #EBFAF9 70%, #F1FAFB 100%);
   }
 
   .home-section-data::before {
     content: "";
-    @apply pointer-events-none absolute -right-8 top-8 h-40 w-40 rounded-full opacity-65;
+    @apply pointer-events-none absolute -right-8 top-8 h-40 w-40 rounded-full opacity-60;
     background:
-      radial-gradient(circle at center, rgba(0, 93, 170, 0.14), transparent 64%),
-      repeating-radial-gradient(circle at center, rgba(17, 38, 59, 0.1) 0 1px, transparent 1px 4px);
+      radial-gradient(circle at center, rgba(0, 183, 177, 0.20), transparent 64%),
+      repeating-radial-gradient(circle at center, rgba(0, 120, 116, 0.08) 0 1px, transparent 1px 4px);
   }
 
   .home-section-dossies {
-    @apply relative overflow-hidden border-accent-seed/20 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-seed/10;
+    @apply relative overflow-hidden border border-accent-seed/25;
+    background: linear-gradient(155deg, #FEFCF6 0%, #FFFEF9 36%, #FEF9EA 70%, #FFFAED 100%);
+    box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 20px 52px rgba(17,38,59,0.09);
   }
 
   .home-section-dossies::before {
     content: "";
-    @apply pointer-events-none absolute inset-x-0 top-0 h-1;
-    background: linear-gradient(90deg, rgba(163, 216, 50, 0.05), rgba(163, 216, 50, 0.45), rgba(0, 93, 170, 0.35), rgba(0, 93, 170, 0.05));
+    @apply pointer-events-none absolute inset-x-0 top-0 h-[3px];
+    background: linear-gradient(90deg, rgba(163,216,50,0.12), rgba(163,216,50,0.72), rgba(21,128,61,0.50), rgba(0,93,170,0.10));
   }
 
   .home-section-corredores {
@@ -533,13 +560,14 @@ select {
   }
 
   .home-section-novidades {
-    @apply relative overflow-hidden border-accent-lab/25 bg-gradient-to-br from-surface-1 via-surface-1 to-accent-lab/10;
+    @apply relative overflow-hidden border-accent-lab/25;
+    background-image: linear-gradient(155deg, #F4F7FD 0%, #F8FBFF 36%, #EBF0FA 70%, #EDF3FD 100%);
   }
 
   .home-section-novidades::before {
     content: "";
-    @apply pointer-events-none absolute inset-x-0 bottom-0 h-16;
-    background: linear-gradient(180deg, transparent, rgba(0, 183, 177, 0.08));
+    @apply pointer-events-none absolute inset-x-0 top-0 h-[3px];
+    background: linear-gradient(90deg, rgba(0,93,170,0.80), rgba(0,183,177,0.65), transparent);
   }
 
   .home-section-relatorios {
@@ -714,9 +742,9 @@ select {
      Capa alta (56), título extragrande, tags verdes,
      CTA sólido largo. */
   .cf-featured {
-    @apply relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-accent-seed/25 bg-surface-1;
-    background-image: linear-gradient(180deg, rgba(163,216,50,0.04) 0%, transparent 40%);
-    box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 18px 44px rgba(17,38,59,0.08);
+    @apply relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-accent-seed/25;
+    background: linear-gradient(155deg, #FEFCF6 0%, #FFFEF9 36%, #FEF9EA 70%, #FFFAED 100%);
+    box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 20px 50px rgba(17,38,59,0.09);
     transition: transform 200ms ease-out, box-shadow 200ms ease-out;
   }
   .cf-featured:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 24px 52px rgba(17,38,59,0.12); }
@@ -755,8 +783,9 @@ select {
      Imagem média (44), date como byline, título
      itálico-bold, tags como texto inline, CTA ghost  */
   .cf-editorial {
-    @apply relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-brand-primary/15 bg-surface-1;
-    box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 14px 36px rgba(17,38,59,0.07);
+    @apply relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-brand-primary/15;
+    background: linear-gradient(155deg, #F4F7FD 0%, #F8FBFF 36%, #EBF0FA 70%, #EDF3FD 100%);
+    box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 16px 42px rgba(17,38,59,0.08);
     transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
   }
   .cf-editorial:hover { transform: translateY(-2px); border-color: rgba(0,93,170,0.22); box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 20px 44px rgba(17,38,59,0.1); }
@@ -802,8 +831,9 @@ select {
      Featured: capa + cabeçalho de documento.
      Compact: strip âmbar esquerdo + corpo denso. */
   .cf-documental-featured {
-    @apply relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-accent-yellow/25 bg-surface-1;
-    box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 16px 40px rgba(17,38,59,0.08);
+    @apply relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-accent-yellow/25;
+    background: linear-gradient(155deg, #FEFCF6 0%, #FFFEF9 36%, #FEF9EA 70%, #FFFAED 100%);
+    box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 18px 46px rgba(17,38,59,0.09);
     transition: transform 200ms ease-out, box-shadow 200ms ease-out;
   }
   .cf-documental-featured:hover { transform: translateY(-2px); box-shadow: 0 1px 2px rgba(17,38,59,0.04), 0 22px 48px rgba(17,38,59,0.11); }
@@ -813,11 +843,12 @@ select {
     background: linear-gradient(180deg, rgba(212,165,20,0.80), rgba(0,93,170,0.35));
   }
   .cf-documental-compact {
-    @apply relative flex h-full flex-row overflow-hidden rounded-[1.35rem] border border-accent-yellow/20 bg-surface-1;
+    @apply relative flex h-full flex-row overflow-hidden rounded-[1.35rem] border border-accent-yellow/20;
+    background: linear-gradient(155deg, #FEFCF6 0%, #FFFEF9 36%, #FEF9EA 70%, #FFFAED 100%);
     box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 10px 26px rgba(17,38,59,0.06);
-    transition: transform 200ms ease-out, box-shadow 200ms ease-out, background-color 200ms ease-out;
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
   }
-  .cf-documental-compact:hover { transform: translateY(-1px); background-color: #fefaf3; box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 14px 32px rgba(17,38,59,0.09); }
+  .cf-documental-compact:hover { transform: translateY(-1px); background: linear-gradient(155deg, #FDF8EE 0%, #FEFDF4 36%, #FDF4DA 70%, #FDF6E0 100%); box-shadow: 0 1px 2px rgba(17,38,59,0.03), 0 14px 32px rgba(17,38,59,0.09); }
   .cf-documental-compact::before {
     content: "";
     @apply pointer-events-none absolute inset-y-0 left-0 w-1;
