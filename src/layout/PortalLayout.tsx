@@ -47,7 +47,7 @@ export function PortalLayout({ children }: PropsWithChildren) {
           />
         </div>
       )}
-      <main id="main-content" className="mx-auto w-full max-w-7xl px-4 pb-12 pt-32 md:px-6 md:pb-14 md:pt-32 lg:pb-16">{children}</main>
+      <main id="main-content" className="mx-auto w-full max-w-7xl px-4 pb-12 pt-16 md:px-6 md:pb-14 md:pt-32 lg:pb-16">{children}</main>
       <Footer />
     </div>
   );

@@ -115,7 +115,7 @@ export function HomePage() {
             <div className="space-y-3">
               <div className="hero-title-shell">
                 <img src="/brand/semear-logo.svg" alt="" aria-hidden="true" className="h-10 w-10 rounded-xl border border-border-subtle bg-surface-1 p-1 shadow-sm md:h-12 md:w-12" />
-                <h1 className="text-[4.5rem] font-black leading-[0.86] tracking-[-0.055em] text-text-primary md:text-[6.5rem] lg:text-[8.5rem]">
+                <h1 className="text-[3.8rem] font-black leading-[0.86] tracking-[-0.055em] text-text-primary md:text-[6.5rem] lg:text-[8.5rem]">
                   SEMEAR
                 </h1>
               </div>
@@ -257,7 +257,7 @@ export function HomePage() {
 
       {/* ── 2. DOSSIÊS ──────── full-bleed + 2-col secondary ────── */}
       <div className="home-section-dossies rounded-[2rem] p-5 md:p-7">
-        <div className="mb-6 flex items-end justify-between gap-4">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1.5">
             <span className="axis-eyebrow-dossie">Biblioteca temática</span>
             <h2 className="text-2xl font-black text-text-primary md:text-3xl">Dossiês em destaque</h2>
@@ -318,7 +318,7 @@ export function HomePage() {
           style={{ background: "radial-gradient(circle at center, rgba(21,128,61,0.5) 0%, transparent 70%)" }}
           aria-hidden="true"
         />
-        <div className="relative mb-6 flex items-end justify-between gap-4">
+        <div className="relative mb-6 flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1.5">
             <span className="inline-flex items-center rounded-full border border-accent-green/30 bg-accent-green/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-accent-green">
               Território
@@ -365,12 +365,12 @@ export function HomePage() {
 
       {/* ── 4. EM CIRCULAÇÃO ── blog + relatórios + transparência ── */}
       <SurfaceCard className="home-section-novidades p-5 md:p-7">
-        <div className="mb-6 flex items-end justify-between gap-4">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1.5">
             <span className="axis-eyebrow-blog">Blog &amp; Relatórios</span>
             <h2 className="text-2xl font-black text-text-primary md:text-3xl">Em circulação</h2>
           </div>
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-2">
             <Link className="ui-btn-ghost" to="/blog">Blog</Link>
             <Link className="ui-btn-ghost" to="/relatorios">Relatórios</Link>
           </div>
@@ -454,12 +454,12 @@ export function HomePage() {
       {/* ── 5. AGENDA ─────────── aparece só se houver eventos ───── */}
       {(loading || events.length > 0) && (
       <SurfaceCard className="home-section-data p-5 md:p-6">
-        <div className="mb-5 flex items-end justify-between gap-4">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1">
             <span className="axis-eyebrow-dados">Participação</span>
             <h2 className="text-xl font-black text-text-primary md:text-2xl">Próximos eventos</h2>
           </div>
-          <Link className="ui-btn-ghost" to="/agenda">Ver agenda →</Link>
+          <Link className="ui-btn-ghost shrink-0" to="/agenda">Ver agenda →</Link>
         </div>
         {loading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -57,9 +57,49 @@ export function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-border-subtle bg-surface-1/90 backdrop-blur-xl">
-      <div className="mx-auto w-full max-w-7xl px-4 pt-2 md:px-6 md:pt-3">
+
+      {/* ── MOBILE compact top bar ─────────────────────────── */}
+      <div className="flex items-center justify-between px-4 py-3 md:hidden">
+        <Link to="/" className="group flex items-center gap-2.5" aria-label="SEMEAR – Início">
+          <img
+            src="/brand/semear-logo.svg"
+            alt=""
+            aria-hidden="true"
+            className="h-8 w-8 shrink-0 rounded-xl border border-border-subtle bg-surface-1 object-contain p-0.5 shadow-sm"
+          />
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-black uppercase tracking-[0.2em] text-brand-primary-dark">
+              {import.meta.env.VITE_PROJECT_NAME || "SEMEAR"}
+            </span>
+            <span className="inline-flex items-center rounded-full border border-brand-primary/20 bg-brand-primary-soft px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-brand-primary-dark">
+              UFF
+            </span>
+          </div>
+        </Link>
+        <button
+          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border-subtle bg-surface-2 text-text-secondary transition-all duration-150 hover:bg-surface-3 active:scale-95"
+          onClick={() => setIsMenuOpen((open) => !open)}
+          type="button"
+          aria-expanded={isMenuOpen}
+          aria-controls="mobile-navigation"
+          aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu de navegação"}
+        >
+          {isMenuOpen ? (
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
+      </div>
+
+      {/* ── DESKTOP institutional header ───────────────────── */}
+      <div className="mx-auto hidden w-full max-w-7xl px-6 pt-3 md:block">
         <div className="signature-shell logo-watermark-soft overflow-hidden">
-          <div className="grid gap-3 border-b border-divider-subtle px-4 py-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center md:px-6 md:py-3">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 border-b border-divider-subtle px-6 py-3">
             <div className="min-w-0 space-y-1.5">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="section-badge">{INSTITUTIONAL_FUNDING}</span>
@@ -67,7 +107,7 @@ export function Navbar() {
                   {INSTITUTIONAL_COORDINATION}
                 </span>
               </div>
-              <p className="max-w-xl text-[11px] leading-snug text-text-secondary md:text-xs">
+              <p className="max-w-xl text-xs leading-snug text-text-secondary">
                 Coordenação: {INSTITUTIONAL_UNIVERSITY_FULL_NAME}
               </p>
             </div>
@@ -77,24 +117,24 @@ export function Navbar() {
                 src="/brand/semear-logo.svg"
                 alt=""
                 aria-hidden="true"
-                className="h-10 w-10 shrink-0 rounded-2xl border border-border-subtle bg-surface-1 object-contain p-1 shadow-[0_8px_20px_rgba(17,38,59,0.06)] md:h-11 md:w-11"
+                className="h-11 w-11 shrink-0 rounded-2xl border border-border-subtle bg-surface-1 object-contain p-1 shadow-[0_8px_20px_rgba(17,38,59,0.06)]"
               />
               <div className="min-w-0 space-y-1">
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span className="text-lg font-black uppercase tracking-[0.18em] text-brand-primary-dark md:text-xl">
+                  <span className="text-xl font-black uppercase tracking-[0.18em] text-brand-primary-dark">
                     {import.meta.env.VITE_PROJECT_NAME || "SEMEAR"}
                   </span>
-                <span className="ui-chip ui-chip-active border-0 bg-brand-primary-soft/80 px-2.5 py-1 text-[10px] tracking-[0.14em] text-brand-primary-dark">
+                  <span className="ui-chip ui-chip-active border-0 bg-brand-primary-soft/80 px-2.5 py-1 text-[10px] tracking-[0.14em] text-brand-primary-dark">
                     UFF
                   </span>
                 </div>
-                <p className="max-w-md text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary md:text-xs">
+                <p className="max-w-md text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary">
                   Plataforma pública-universitária de referência
                 </p>
               </div>
             </Link>
 
-            <div className="hidden items-center gap-2 md:flex">
+            <div className="flex items-center gap-2">
               <span className="ui-chip">PWA pública</span>
               <button
                 className="ui-btn-primary motion-focus px-3.5 py-2 text-[13px] shadow-[0_10px_26px_rgba(0,93,170,0.18)]"
@@ -105,22 +145,9 @@ export function Navbar() {
                 Instalar app
               </button>
             </div>
-
-            <div className="flex items-center gap-2 md:hidden">
-              <span className="ui-chip hidden sm:inline-flex">PWA pública</span>
-              <button
-                className="ui-cta-secondary min-h-[40px] px-3.5 py-2 text-[13px]"
-                onClick={() => setIsMenuOpen((open) => !open)}
-                type="button"
-                aria-expanded={isMenuOpen}
-                aria-controls="mobile-navigation"
-              >
-                Menu
-              </button>
-            </div>
           </div>
 
-          <nav className="hidden bg-surface-1/96 px-4 py-2.5 md:block md:px-6" aria-label="Navegação principal">
+          <nav className="bg-surface-1/96 px-6 py-2.5" aria-label="Navegação principal">
             <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
               <ul className="flex flex-wrap items-center gap-1.5">
                 {primaryLinks.map((link) => (
@@ -131,7 +158,6 @@ export function Navbar() {
                   </li>
                 ))}
               </ul>
-
               <Link
                 to="/sobre"
                 className="ui-cta-secondary motion-focus inline-flex min-h-[40px] items-center gap-2 px-3.5 py-2 text-[13px]"
@@ -144,27 +170,21 @@ export function Navbar() {
         </div>
       </div>
 
+      {/* ── MOBILE menu drawer ──────────────────────────────── */}
       {isMenuOpen && (
         <nav
           id="mobile-navigation"
-          className="motion-dialog border-b border-border-subtle bg-surface-1 md:hidden"
+          className="motion-dialog max-h-[calc(100svh-58px)] overflow-y-auto border-b border-border-subtle bg-surface-1 md:hidden"
           aria-label="Navegação móvel"
         >
-          <div className="mx-auto w-full max-w-7xl space-y-3 px-4 py-3 md:px-6">
-            <div className="signature-shell logo-watermark-soft p-3.5">
-              <p className="section-badge">Menu principal</p>
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-text-secondary">
-                Navegação institucional do portal SEMEAR, com acesso rápido aos fluxos mais usados.
-              </p>
-            </div>
-
-            <div className="grid gap-2">
+          <div className="space-y-3 px-4 py-3">
+            <div className="grid grid-cols-2 gap-2">
               {links.map((link) => (
                 <NavLink
                   key={link.href}
                   className={({ isActive }) =>
                     [
-                      "ui-nav-pill motion-focus w-full justify-start rounded-2xl px-4",
+                      "ui-nav-pill motion-focus justify-start rounded-2xl px-3.5 py-2.5",
                       isActive ? "ui-nav-pill-active" : ""
                     ].join(" ")
                   }
@@ -175,9 +195,9 @@ export function Navbar() {
               ))}
             </div>
 
-            <div className="grid gap-3 border-t border-divider-subtle pt-3.5">
+            <div className="grid grid-cols-2 gap-2 border-t border-divider-subtle pt-3">
               <button
-                className="ui-btn-primary w-full px-4"
+                className="ui-btn-primary px-4"
                 onClick={handleInstallClick}
                 type="button"
                 aria-label="Instalar aplicativo"
@@ -185,11 +205,11 @@ export function Navbar() {
                 Instalar app
               </button>
               <button
-                className="ui-btn-secondary w-full px-4"
+                className="ui-btn-secondary px-4"
                 onClick={() => setIsMenuOpen(false)}
                 type="button"
               >
-                Fechar menu
+                Fechar
               </button>
             </div>
           </div>
